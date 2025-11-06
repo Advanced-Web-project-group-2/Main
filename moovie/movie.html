@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Information</title>
+</head>
+<body>
+    <header>
+        <h1>Movie title</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="groups.html">Groups</a></li>
+                <li><a href="in-cinemas.html">In Cinemas</a></li>
+                <li><a href="advancedsearch.html">Advanced Search</a></li>
+                <li><a href="shop.html">Shop</a></li>
+                <li><a href="signup.html">Sign up</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+
+        <!-- movie infos -->
+        <section id="movie-info">
+            <h2>Movie Title</h2>
+            <p><strong>Release Year:</strong> 2024</p>
+            <p><strong>Description:</strong> Movie description from the API, added here.</p>
+
+            <p><strong>Genres:</strong> Action, Drama</p>
+
+            <!-- Add to favorites and watchlist -->
+            <div>
+                <button>Add to Favorites</button>
+                <button>Add to Watchlist</button>
+            </div>
+        </section>
+
+        <hr>
+
+        <!-- write review -->
+        <section id="write-review">
+            <h3>Write a Review</h3>
+
+            <!-- only shown if user is logged in -->
+            <form action="#" method="post">
+                <label for="stars">Rating:</label>
+                <select name="stars" id="stars">
+                    <option value="1">⭐</option>
+                    <option value="2">⭐⭐</option>
+                    <option value="3">⭐⭐⭐</option>
+                    <option value="4">⭐⭐⭐⭐</option>
+                    <option value="5">⭐⭐⭐⭐⭐</option>
+                </select>
+                <br><br>
+
+                <textarea 
+                    name="reviewText" 
+                    placeholder="Write your review here..." 
+                    rows="5"
+                    cols="40">
+                </textarea>
+                <br><br>
+
+                <button type="submit">Submit Review</button>
+            </form>
+        </section>
+
+        <hr>
+
+        <!-- list of reviews,  -->
+        <section id="reviews">
+            <h3>User Reviews</h3>
+
+            <ul>
+                <li>
+                    <strong>⭐⭐⭐⭐☆</strong><br>
+                    Great movie!<br>
+                    <em>By movieFan99, 2025-02-10</em> <!---user name from backend, timestamp from backend when review is created or from javascript-->
+                </li>
+
+                <li>
+                    <strong>⭐⭐⭐☆☆</strong><br>
+                    Boring story, good actors.<br>
+                    <em>By ActionDude, 2025-02-08</em>
+                </li>
+            </ul>
+        </section>
+
+    </main>
+
+    <footer>
+        <p>2025 Moo-viestar</p>
+    </footer>
+
+</body>
+</html>
