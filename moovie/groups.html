@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Groups</title>
+</head>
+<body>
+    <header>
+        <h1>Groups</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="in-cinemas.html">In Cinemas</a></li>
+                <li><a href="advancedsearch.html">Advanced Search</a></li>
+                <li><a href="groups.html">Groups</a></li>
+                <li><a href="shop.html">Shop</a></li>
+                <li><a href="signup.html">Sign up</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <!-- create a new group -->
+        <section id="create-group">
+            <h2>Create New Group</h2>
+            <form action="#" method="post">
+                <input type="text" name="groupName" placeholder="Group name" required>
+                <button type="submit">Create Group</button>
+            </form>
+        </section>
+
+        <!---group decoration purchased-->
+        <section id="featured-decorations">
+            <h3>Your Group Decorations</h3>
+            <p>You can buy decorations in the <a href="shop.html">Shop</a>.</p>
+        </section>
+
+        <!-- all public groups, visible to all -->
+        <section id="public-groups">
+            <h2>All Groups</h2>
+            <ul>
+                <li>
+                    Horror Fans 
+                    <a href="group-page.html?groupId=1">Visit Group</a>
+                </li>
+                <li>
+                    Action Movie Lovers 
+                    <a href="group-page.html?groupId=2">Visit Group</a>
+                </li>
+                <li>
+                    Series Junkies 
+                    <a href="group-page.html?groupId=3">Visit Group</a>
+                </li>
+            </ul>
+        </section>
+
+        <!-- the user's groups, only visible when logged in -->
+        <section id="your-groups">
+            <h2>Your Groups</h2>
+            <ul>
+                <li>
+                    Horror Fans 
+                    <a href="group-page.html?groupId=1">Open</a>
+                </li>
+                <!-- list can be adjusted -->
+            </ul>
+        </section>
+    </main>
+
+    <footer>
+        <p>2025 Moo-viestar</p>
+    </footer>
+
+</body>
+</html>
