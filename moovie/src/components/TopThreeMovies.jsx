@@ -6,16 +6,16 @@ export default function TopThreeMovies() {
   useEffect(() => {
     fetch('http://localhost:5000/api/now-playing')
       .then(res => res.json())
-      .then(data => setMovies(data.results.slice(0, 3)))
+      .then(data => setMovies(data.results.slice(0, 5)))
       .catch(err => console.error(err));
   }, []);
 
   return (
-    <div>
-      <h2>Top 3 Now in Cinemas</h2>
-      <ul>
-        {movies.map(movie => (
-          <li key={movie.id}>
+    <div className="top-three">
+      <h2>Top 5 Now in Cinemas</h2>
+      <ul className="top-three-list">
+        {movies.map((movie) => (
+          <li key={movie.id} className="top-three-item">
             <h3>{movie.title}</h3>
             {movie.poster_path && (
               <img
