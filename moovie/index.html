@@ -3,63 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Moo-viestar.com</title>
+    <title>Moo-viestar</title>
 </head>
 <body>
-    <header>
-        <h1>Moo-viestar</h1>
-        <nav>
-            <ul><!--no profile.html and own-groups.html. Only appears when logged in. movie.html only through search-->
-                <li><a href="index.html">Home</a></li>
-                <li><a href="groups.html">Groups</a></li>
-                <li><a href="in-cinemas.html">In Cinemas</a></li>
-                <li><a href="signup.html">Sign up</a></li>
-                <li><a href="signin.html">Sign In</a></li>
-                <li><a href="advancedsearch.html">Advanced Search</a></li>
-                <li><a href="shop.html">shop</a></li>
-            </ul>
-        </nav>
-    </header>
-
-    <main>
-        <section id="hero">
-            <h2>Welcome to Moo-viestar</h2>
-            <p>bla bla bla</p>
-        </section>
-
-        <section id="sign-in">
-            <h3>Sign In</h3>
-            <form action="signin.html" method="post">
-                <input type="email" name="email" placeholder="Email">
-                <br>
-                <input type="password" name="password" placeholder="Password">
-                <br>
-                <button type="submit">Sign In</button>
-            </form>
-            <p>No account yet? Sign up! <a href="signup.html">Sign Up</a></p>
-        </section>
-
-        <section id="search">
-            <h3>Search Movies and Series</h3>
-            <form action="search.html" method="get">
-                <input type="text" name="query" placeholder="Search movies or series">
-                <button type="submit">Search</button>
-            </form>
-        </section>
-
-        <section id="in-cinemas">
-            <h3>In Cinemas Now</h3>
-            <ul>
-                <p>Most popular movies in cinemas right now</p>
-                <li>Movie from API</li>
-                <li>Another movie from API</li>
-            </ul>
-            <p><a href="in-cinemas.html">See all movies in cinemas right now</a></p>
-        </section>
-    </main>
-
-    <footer>
-        <p>2025 Moo-viestar</p>
-    </footer>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
 </body>
 </html>
