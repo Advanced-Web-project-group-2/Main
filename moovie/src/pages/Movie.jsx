@@ -55,7 +55,7 @@ export default function Movie() {
 
           <div>
             <button>Add to Favorites</button>
-            <button>Add to Watchlist</button>
+            <button>Add to List</button>
           </div>
         </section>
 

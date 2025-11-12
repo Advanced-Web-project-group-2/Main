@@ -15,7 +15,15 @@ export default function TopThreeMovies() {
       <h2>Top 3 Now in Cinemas</h2>
       <ul>
         {movies.map(movie => (
-          <li key={movie.id}>{movie.title}</li>
+          <li key={movie.id}>
+            <h3>{movie.title}</h3>
+            {movie.poster_path && (
+              <img
+                src={`https://image.tmdb.org/t/p/w200${movie.poster_path}`}
+                alt={movie.title}
+              />
+            )}
+          </li>
         ))}
       </ul>
     </div>

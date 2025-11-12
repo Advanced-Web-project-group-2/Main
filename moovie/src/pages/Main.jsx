@@ -1,8 +1,9 @@
 
 import React from "react";
 import { Link } from "react-router-dom";
+import TopThreeMovies from "../components/TopThreeMovies.jsx"
 
-export default function Home() {
+export default function Main() {
   return (
     <div>
       <header>
@@ -48,11 +49,11 @@ export default function Home() {
         </section>
 
         <section id="in-cinemas">
-          <h3>In Cinemas Now</h3>
-          <p>Most popular movies in cinemas right now</p>
-          <ul id="cinema-list-front">
-            {/* JavaScript will populate the 3 most popular movies here */}
-          </ul>
+          {/* <h3>In Cinemas Now</h3>
+          <p>Most popular movies in cinemas right now</p> */}
+          
+            <TopThreeMovies/>
+         
           <p><Link to="/in-cinemas">See all movies in cinemas right now</Link></p>
         </section>
       </main>
