@@ -4,18 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Advanced Search - Moo-viestar</title>
+    <link rel="stylesheet" href="src/styles.css">
 </head>
 <body>
-    <header>
-        <h1>Advanced Search</h1>
-        <nav>
-            <ul>
+    <header class="site-header" role="banner">
+        <h1>Moo-viestar</h1>
+        <nav class="main-nav" role="navigation" aria-label="Primary">
+            <ul><!--no profile.html and own-groups.html. Only appears when logged in. movie.html only through search-->
+                <!-- class="active" highlights the current location on navbar -->
+                <!-- void(0) is undefined, doesn't navigate or reload page when pressed-->
                 <li><a href="index.html">Home</a></li>
-                <li><a href="groups.html">Groups</a></li>
+                
+                <li class="dropdown">
+                    <a href="groups.html" class="dropbtn">Groups</a>
+                    <div class="dropdown-content" role="menu" aria-label="Available groups">
+                        <a role="menuitem" href="group-page.html?groupId=1">Horror Fans</a>
+                        <a role="menuitem" href="group-page.html?groupId=2">Action Movie Lovers</a>
+                        <a role="menuitem" href="group-page.html?groupId=3">Series Junkies</a>
+                        <a role="menuitem" href="group-page.html?groupId=4">Indie Hippies</a>
+                        <a role="menuitem" href="group-page.html?groupId=5">Family Picks</a>
+                    </div>
+                </li>
+
                 <li><a href="in-cinemas.html">In Cinemas</a></li>
-                <li><a href="advancedsearch.html">Advanced Search</a></li>
+                <li><a class="active" href="advancedsearch.html">Advanced Search</a></li>
                 <li><a href="shop.html">Shop</a></li>
                 <li><a href="signup.html">Sign up</a></li>
+                <li><a href="signin.html">Sign In</a></li>                
             </ul>
         </nav>
     </header>

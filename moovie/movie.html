@@ -1,21 +1,28 @@
+<!-- MISSING NEW NAVBAR AND HOW DO WE GET HERE? -->
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Movie Information</title>
+    <link rel="stylesheet" href="src/styles.css">
 </head>
 <body>
-    <header>
-        <h1>Movie title</h1>
-        <nav>
-            <ul>
-                <li><a href="index.html">Home</a></li>
+<body>
+    <header class="site-header" role="banner">
+        <h1>Moo-viestar</h1>
+        <nav class="main-nav" role="navigation" aria-label="Primary">
+            <ul><!--no profile.html and own-groups.html. Only appears when logged in. movie.html only through search-->
+                <!-- class="active" highlights the current location on navbar -->
+                <li><a class="active" href="index.html">Home</a></li>
                 <li><a href="groups.html">Groups</a></li>
                 <li><a href="in-cinemas.html">In Cinemas</a></li>
+                <li><a href="signup.html">Sign up</a></li>
+                <li><a href="signin.html">Sign In</a></li>
                 <li><a href="advancedsearch.html">Advanced Search</a></li>
                 <li><a href="shop.html">Shop</a></li>
-                <li><a href="signup.html">Sign up</a></li>
             </ul>
         </nav>
     </header>

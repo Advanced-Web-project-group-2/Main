@@ -1,0 +1,125 @@
+/* base / reset */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+/* Header */
+header.site-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 8px 16px;
+  background: #333333;
+  color: #fff;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, .25);
+  height: 48px;
+}
+
+/* Logo Moo-viestar */
+header.site-header h1 {
+  margin: 0;
+  font-size: 25px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+/* Navbar position */
+nav.main-nav {
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  flex: 0 0 auto;
+}
+
+nav.main-nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: 20px; /* spacing */
+  align-items: center;
+  height: 100%;
+}
+
+nav.main-nav li {
+  margin: 0;
+}
+
+/* Links that are displayed in navbar */
+nav.main-nav a {
+  display: inline-block;
+  padding: 10px 12px;
+  color: #ffffff; /* Link text color */
+  text-decoration: none;
+  border-radius: 6px;
+  transition: background .12s, color .12s;
+  font-size: 14px;
+}
+
+nav.main-nav a:hover {
+  background: #bdbdbd;
+  color: #fff;
+}
+
+/* Shows the page you are currently in*/
+nav.main-nav a.active {
+  background: #77c2c2;
+  color: #ffffff;
+}
+
+/* Spacing between navbar and text below */
+main {
+  padding: 20px;
+}
+
+footer {
+  padding: 12px 20px;
+  text-align: center;
+  color: #666;
+}
+
+
+/* navbar burger menu*/
+nav.main-nav .dropdown {
+  position: relative;
+}
+
+nav.main.nav .dropbtn {
+  cursor: default;
+}
+
+nav.main-nav .dropdown-content {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 160px;
+  z-index: 30;
+  background: #00076e;
+  box-shadow: 0 4px 12px rgba(0,0,0,012);
+}
+
+nav.main-nav .dropdown:hover .dropdown-content,
+nav.main-nav .dropdown:focus-within{
+  display: block;
+}
+
+/* Hero image placed under the header (index.html .hero-image > img) */
+.hero-image img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 420px; 
+  object-fit: contain; 
+  border-bottom-left-radius: 6px;
+  border-bottom-right-radius: 6px;
+}
+
+main {
+  padding: 12px 20px;
+}
