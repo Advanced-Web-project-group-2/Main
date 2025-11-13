@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    container_name: moovie-db
+    environment:
+      POSTGRES_USER: moovie
+      POSTGRES_PASSWORD: moovie123
+      POSTGRES_DB: moovie_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ./server/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: moovie-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@moovie.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+    ports:
+      - "5050:80"
+    depends_on:
+      - db
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+
+  server:
+    build: ./server
+    container_name: moovie-server
+    ports:
+      - "3001:3001"
+    depends_on:
+      - db
+    environment:
+      PGUSER: moovie
+      PGPASSWORD: moovie123
+      PGDATABASE: moovie_db
+      PGHOST: db
+      PGPORT: 5432
+
+volumes:
+  db_data:
+  pgadmin_data:
