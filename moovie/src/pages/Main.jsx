@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Link } from "react-router-dom";
 import TopThreeMovies from "../components/TopThreeMovies.jsx"
@@ -83,4 +82,3 @@ export default function Main() {
     </div>
   );
 }
-
