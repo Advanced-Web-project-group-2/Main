@@ -30,6 +30,34 @@ app.get('/api/now-playing', async (req, res) => {
 });
 
 
+// Minimal search proxy to TMDB (used by the frontend basicSearch util)
+app.get('/api/search', async (req, res) => {
+  const q = (req.query.q || '').trim();
+  if (!q) return res.status(400).json({ error: 'Missing query parameter q' });
+
+  try {
+    // Use the TMDB movie search endpoint so we only return movies
+    const response = await axios.get('https://api.themoviedb.org/3/search/movie', {
+      params: {
+        api_key: process.env.TMDB_API_KEY,
+        query: q,
+        language: 'en-US',
+        page: 1,
+        include_adult: false,
+      },
+    });
+
+    // Return the TMDB response as-is. Frontend will read `results`.
+    res.json(response.data);
+  } catch (err) {
+    console.error('Search proxy error', err?.message || err);
+    res.status(500).json({ error: 'Failed to perform search' });
+  }
+});
+
+app.listen(PORT, () => {
+=======
+
 // CRUD-requests for users
 // GET all users
 app.get('/', async (req, res) => {
