@@ -1,0 +1,60 @@
+import React from "react";
+import { Link } from "react-router-dom";
+import '../styles.css';
+
+export default function SignUp() {
+  return (
+    <div>
+<header className="site-header" role="banner">
+  <h1>Moo-viestar</h1>
+  <nav className="main-nav" role="navigation" aria-label="Primary">
+    <ul>
+      <li><Link to="/">Home</Link></li>
+
+      <li className="dropdown">
+        <Link to="/groups" className="dropbtn">Groups</Link>
+        <div className="dropdown-content" role="menu" aria-label="Available groups">
+          <Link role="menuitem" to="/group/1">Horror Fans</Link>
+          <Link role="menuitem" to="/group/2">Action Movie Lovers</Link>
+          <Link role="menuitem" to="/group/3">Series Junkies</Link>
+          <Link role="menuitem" to="/group/4">Indie Hippies</Link>
+          <Link role="menuitem" to="/group/5">Family Picks</Link>
+        </div>
+      </li>
+
+      <li><Link to="/in-cinemas">In Cinemas</Link></li>
+      <li><Link to="/advanced-search">Advanced Search</Link></li>
+  <li><Link to="/shop">Shop</Link></li>
+  <li><Link to="/profile">Profile</Link></li>
+      <li><Link className="active" to="/signup">Sign up</Link></li>
+      <li><Link to="/signin">Sign In</Link></li>
+    </ul>
+  </nav>
+</header>
+
+      <main>
+        <section id="signup">
+          <h2>Sign Up</h2>
+
+          <form action="#" method="post">
+            <input type="text" name="username" placeholder="Username" required />
+            <br />
+            <input type="email" name="email" placeholder="Email" required />
+            <br />
+            <input type="password" name="password" placeholder="Password" required />
+            <br />
+            <button type="submit">Create Account</button>
+          </form>
+
+          <p>
+            Already have an account? <Link to="/signin">Sign In</Link>
+          </p>
+        </section>
+      </main>
+
+      <footer>
+        <p>2025 Moo-viestar</p>
+      </footer>
+    </div>
+  );
+}
