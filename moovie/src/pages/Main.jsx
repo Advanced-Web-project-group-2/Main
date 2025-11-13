@@ -3,6 +3,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import TopThreeMovies from "../components/TopThreeMovies.jsx"
 import banner from "../images/banner.png";
+import BasicSearch from "../components/basicSearch.jsx";
 
 export default function Main() {
   return (
@@ -28,6 +29,7 @@ export default function Main() {
             <li><Link to="/advanced-search">Advanced Search</Link></li>
             <li><Link to="/shop">Shop</Link></li>
             <li><Link to="/profile">Profile</Link></li>
+            <li className="nav-search"><BasicSearch /></li>
             <li><Link to="/signup">Sign up</Link></li>
             <li><Link to="/signin">Sign In</Link></li>
           </ul>
@@ -60,10 +62,9 @@ export default function Main() {
 
         <section id="search">
           <h3>Search Movies and Series</h3>
-          <form>
-            <input type="text" name="query" placeholder="Search movies or series" />
-            <button type="submit">Search</button>
-          </form>
+          <div>
+            <BasicSearch />
+          </div>
         </section>
 
         <section id="in-cinemas">
@@ -82,3 +83,4 @@ export default function Main() {
     </div>
   );
 }
+
