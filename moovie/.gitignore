@@ -1,6 +1,10 @@
 
-#.env file
+#.env files - ignore all env variants
 .env
+.env.*
+.env.local
+.env.production
+.env.development
 
 
 # Logs
