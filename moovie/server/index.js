@@ -1,4 +1,4 @@
-import express from 'express';
+/* import express from 'express';
 import cors from 'cors';
 import pool from './db.js';  // import the Pool from db.js
 
@@ -104,4 +104,4 @@ app.delete('/delete-user/:id', async (req, res) => {
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
-})
+}) */
