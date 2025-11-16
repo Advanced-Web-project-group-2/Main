@@ -1,22 +1,22 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import "../styles/styles.css";
+import AuthCard from "../components/AuthCard";
+
+import cowWrite from "../assets/images/Lehmä_login_writing.png";
+import cowHide from "../assets/images/Lehmä_login_hide.png";
 
 export default function SignUp() {
-
-  const username = localStorage.getItem("username");
-  if (username) return navigate("/");
-
   const navigate = useNavigate();
+
+  const [cowImg, setCowImg] = useState(cowWrite);
 
   const [form, setForm] = useState({
     username: "",
-    password: ""
+    password: "",
   });
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+  const handleFocus = () => setCowImg(cowHide);
+  const handleBlur = () => setCowImg(cowWrite);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -29,62 +29,55 @@ export default function SignUp() {
       });
 
       const data = await res.json();
+      if (!res.ok) return alert(data.error);
 
-      if (!res.ok) {
-        alert(data.error);
-        return;
-      }
-
-      alert("Account created successfully!");
+      localStorage.setItem("token", data.token);
       navigate("/signin");
-
     } catch (err) {
       console.error(err);
-      alert("Something went wrong");
+      alert("Registration failed");
     }
   };
 
   return (
-    <div>
-      {/* HEADER OMITTED FOR BREVITY */}
+    <AuthCard cowImage={cowImg}>
+      <h2>Create Account</h2>
 
-      <main>
-        <section id="signup">
-          <h2>Sign Up</h2>
+      <form onSubmit={handleSubmit}>
+        <input
+          type="text"
+          name="username"
+          placeholder="Username"
+          value={form.username}
+          onChange={(e) =>
+            setForm({ ...form, [e.target.name]: e.target.value })
+          }
+          required
+        />
 
-          <form onSubmit={handleSubmit}>
-            <input
-              type="text"
-              name="username"
-              placeholder="Username"
-              required
-              value={form.username}
-              onChange={handleChange}
-            />
-            <br />
+        <br />
 
-            <input
-              type="password"
-              name="password"
-              placeholder="Password"
-              required
-              value={form.password}
-              onChange={handleChange}
-            />
-            <br />
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          onFocus={handleFocus}
+          onBlur={handleBlur}
+          value={form.password}
+          onChange={(e) =>
+            setForm({ ...form, [e.target.name]: e.target.value })
+          }
+          required
+        />
 
-            <button type="submit">Create Account</button>
-          </form>
+        <br />
 
-          <p>
-            Already have an account? <Link to="/signin">Sign In</Link>
-          </p>
-        </section>
-      </main>
+        <button type="submit" className="btn-primary">Create Account</button>
+      </form>
 
-      <footer>
-        <p>2025 Moo-viestar</p>
-      </footer>
-    </div>
+      <p>
+        Already have an account? <Link to="/signin">Sign in</Link>
+      </p>
+    </AuthCard>
   );
 }

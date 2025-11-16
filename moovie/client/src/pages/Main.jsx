@@ -1,14 +1,13 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import TopThreeMovies from "../components/movies/TopThreeMovies.jsx";
-import banner from "../images/banner.png";
+import banner from "../assets/images/banner.png";
 import BasicSearch from "../components/search/basicSearch.jsx";
 
 export default function Main() {
   return (
     <div className="home-wrapper">
 
-      {/* Banner sits flush on top of the card */}
       <div className="hero-image">
         <img src={banner} alt="Cinema banner" />
       </div>

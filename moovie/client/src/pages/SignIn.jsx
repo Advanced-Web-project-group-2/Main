@@ -1,18 +1,24 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import AuthCard from "../components/AuthCard";
+
+import cowRead from "../assets/images/Lehmä_login_read.png";
+import cowHide from "../assets/images/Lehmä_login_hide.png";
 
 export default function SignIn() {
   const navigate = useNavigate();
   const { login } = useAuth();
+
+  const [cowImg, setCowImg] = useState(cowRead);
 
   const [form, setForm] = useState({
     username: "",
     password: "",
   });
 
-  const handleChange = (e) =>
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const handleFocus = () => setCowImg(cowHide);
+  const handleBlur = () => setCowImg(cowRead);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -26,13 +32,9 @@ export default function SignIn() {
 
       const data = await res.json();
 
-      if (!res.ok) {
-        alert(data.error);
-        return;
-      }
+      if (!res.ok) return alert(data.error);
 
       localStorage.setItem("token", data.token);
-
       login(data.user.username);
 
       navigate("/");
@@ -43,18 +45,22 @@ export default function SignIn() {
   };
 
   return (
-    <section id="signin">
-      <h2>Welcome Back! Please log in</h2>
+    <AuthCard cowImage={cowImg}>
+      <h2>Welcome Back!</h2>
 
       <form onSubmit={handleSubmit}>
+
         <input
           type="text"
           name="username"
           placeholder="Username"
           value={form.username}
-          onChange={handleChange}
+          onChange={(e) =>
+            setForm({ ...form, [e.target.name]: e.target.value })
+          }
           required
         />
+
         <br />
 
         <input
@@ -62,17 +68,22 @@ export default function SignIn() {
           name="password"
           placeholder="Password"
           value={form.password}
-          onChange={handleChange}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
+          onChange={(e) =>
+            setForm({ ...form, [e.target.name]: e.target.value })
+          }
           required
         />
+
         <br />
 
-        <button type="submit">Sign In</button>
+        <button type="submit" className="btn-primary">Sign In</button>
       </form>
 
       <p>
         Don’t have an account yet? <Link to="/signup">Create account</Link>
       </p>
-    </section>
+    </AuthCard>
   );
 }

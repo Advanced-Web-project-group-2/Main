@@ -1,3 +1,4 @@
+// client/src/context/AuthContext.jsx
 import { createContext, useContext, useEffect, useState } from "react";
 
 const AuthContext = createContext();
@@ -5,16 +6,20 @@ const AuthContext = createContext();
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
 
+  // On mount, restore from localStorage
   useEffect(() => {
     const username = localStorage.getItem("username");
-    if (username) setUser({ username });
     const token = localStorage.getItem("token");
-   if (username && token) {
+
+    if (username && token) {
       setUser({ username });
     }
   }, []);
 
-  const login = (username) => {
+  const login = (username, token) => {
+    if (token) {
+      localStorage.setItem("token", token);
+    }
     localStorage.setItem("username", username);
     setUser({ username });
   };

@@ -15,6 +15,7 @@ import AdvancedSearch from "./pages/AdvancedSearch.jsx";
 import Shop from "./pages/Shop.jsx";
 import Movie from "./pages/Movie.jsx";
 import Main from "./pages/Main.jsx";
+import "./styles/styles.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <AuthProvider>

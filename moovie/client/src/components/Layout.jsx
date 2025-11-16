@@ -20,7 +20,7 @@ export default function Layout() {
             {user ? (
               <>
                 <li><Link to="/profile">{user.username}</Link></li>
-                <li><button onClick={logout}>Log Out</button></li>
+                <li><button className="btn-warning" onClick={logout}>Log Out</button></li>
               </>
             ) : (
               <>

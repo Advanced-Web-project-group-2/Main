@@ -1,6 +1,8 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
+import { setupSwagger } from "./swagger.js";
+
 import express from 'express';
 import cors from 'cors';
 import axios from 'axios';
@@ -18,7 +20,11 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
+
+setupSwagger(app);
+
 app.use("/auth", authRoutes);
+
 
 // Fetch now-playing movies from TMDB
 app.get('/api/now-playing', async (req, res) => {
@@ -155,5 +161,7 @@ app.delete('/delete-user/:id', async (req, res) => {
 
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running at http://localhost:${PORT}`);
+  console.log("Swagger should now be available at http://localhost:5000/docs");
+
 });
 
