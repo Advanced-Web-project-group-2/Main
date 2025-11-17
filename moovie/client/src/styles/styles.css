@@ -136,9 +136,13 @@ nav.main-nav a {
   font-size: 14px;
 }
 
-nav.main-nav a:hover {
+/* NavBar Group showing when hovering with mouse */
+nav.main-nav a:hover,
+nav.main-nav .dropbtn:hover,
+nav.main-nav .dropdown.open > dropbtn {
   background: #bdbdbd;
   color: #fff;
+  transition: background .12s, color .12s;
 }
 
 /* Shows the page you are currently in*/
@@ -159,14 +163,24 @@ footer {
 }
 
 
-/* navbar burger menu*/
+/* navbar burger menu on Groups*/
 nav.main-nav .dropdown {
   position: relative;
 }
 
-nav.main.nav .dropbtn {
-  cursor: default;
+nav.main-nav .dropbtn {
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  color: inherit;
+  padding: 10px 12px;
+  font-size: 14px;
+  font-weight: normal;
+  font-family: inherit;
+  border-radius: 6px;
 }
+
 
 nav.main-nav .dropdown-content {
   display: none;

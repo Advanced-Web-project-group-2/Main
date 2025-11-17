@@ -1,8 +1,15 @@
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import {useState, useEffect } from "react";
 
 export default function Layout() {
   const { user, logout } = useAuth();
+  const [open, setOpen] = useState(false);
+  const location = useLocation();
+
+  useEffect(() => {
+    setOpen(false);
+  }, [location.pathname]);
 
   return (
     <>
@@ -12,7 +19,27 @@ export default function Layout() {
         <nav className="main-nav">
           <ul>
             <li><Link to="/">Home</Link></li>
-            <li><Link to="/groups">Groups</Link></li>
+
+            <li className={`dropdown ${open ? "open" :""}`}>
+              <button 
+                type="button"
+                className="dropbtn"
+                aria-haspopup="true"
+                aria-expanded={open}
+                onClick={() => setOpen((s) => !s)}
+              >
+                Groups 
+              </button>
+
+              <div className="dropdown-content" role="menu" aria-label="Available groups">
+                <Link role="menuitem" to="/group/1">Horror Fans</Link>
+                <Link role="menuitem" to="/group/2">Action Movie Lovers</Link>
+                <Link role="menuitem" to="/group/3">Series Junkies</Link>
+                <Link role="menuitem" to="/group/4">Indie Hippies</Link>
+                <Link role="menuitem" to="/group/5">Family Picks</Link>
+              </div>
+            </li>
+
             <li><Link to="/in-cinemas">In Cinemas</Link></li>
             <li><Link to="/advanced-search">Advanced Search</Link></li>
             <li><Link to="/shop">Shop</Link></li>
