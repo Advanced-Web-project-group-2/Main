@@ -10,6 +10,9 @@ export default function Profile() {
     newPassword: "",
     repeatPassword: "",
   });
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deletePassword, setDeletePassword] = useState("");
+
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -49,30 +52,39 @@ export default function Profile() {
     }
   };
 
-  const handleDeleteAccount = async () => {
+  /* const handleDeleteAccount = async () => {
     console.log("Delete button clicked");
 
+    // Step 1: Confirm delete
     const confirmed = window.confirm("Are you sure you want to delete your account?");
     if (!confirmed) return;
 
-    const token = localStorage.getItem("token");   // <-- FIXED
+    // Step 2: Ask for password (safety)
+    const password = window.prompt("Please enter your password to confirm:");
+    if (!password) {
+      alert("Password is required to delete the account.")
+      return;
+    }
+
+    const token = localStorage.getItem("token");
     if (!token) {
       alert("No token found, please log in again.");
       return;
     }
 
     try {
-      const res = await fetch("http://localhost:5000/auth/delete", {   // <-- correct endpoint
+      console.log("Sending delete request with password(length):", password.length);
+
+      const res = await fetch("http://localhost:5000/auth/delete", {   
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
+        body: JSON.stringify({ password }),
       });
 
       let data = null;
-
-      // Try to parse JSON only if server actually returned JSON
       const contentType = res.headers.get("content-type");
       if (contentType && contentType.includes("application/json")) {
         data = await res.json();
@@ -89,6 +101,41 @@ export default function Profile() {
     } catch (err) {
       console.error("Delete error:", err);
       alert("Server error. Please try again later.");
+    }
+  }; */
+
+  const handleDeleteAccount = () => {
+    setShowDeleteModal(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!deletePassword) {
+      alert("Password is required.");
+      return;
+    }
+
+    const token = localStorage.getItem("token");
+
+    try {
+      const res = await fetch("http://localhost:5000/auth/delete", {
+        method: "DELETE",
+        headers: {
+          "Content-type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ password: deletePassword }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) return alert(data.error || "Delete failed.");
+
+      alert("Account deleted successfully.");
+      localStorage.removeItem("token");
+      window.location.href = "/";
+    } catch (err) {
+      console.error(err);
+      alert("Server error.");
     }
   };
 
@@ -156,6 +203,27 @@ export default function Profile() {
       ) : (
         <p>You must be logged in to view your profile.</p>
       )}
+
+      {showDeleteModal && (
+      <div className="modal-overlay">
+        <div className="modal">
+          <h3>Confirm Account Deletion</h3>
+
+          <input
+            type="password"
+            placeholder="Enter your password"
+            value={deletePassword}
+            onChange={(e) => setDeletePassword(e.target.value)}
+          />
+
+          <div className="modal-buttons">
+            <button onClick={confirmDelete}>Delete</button>
+            <button onClick={() => setShowDeleteModal(false)}>Cancel</button>
+          </div>
+        </div>
+      </div>
+      )}
+
     </section>
   );
 }

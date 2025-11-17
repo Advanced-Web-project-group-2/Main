@@ -141,17 +141,38 @@ export async function changePassword(req, res) {
 // DELETE /auth/delete
 export const deleteAccount = async (req, res) => {
   console.log('deleteAccount controller hit');
+
+  const userId = req.user.id;
+  const { password } = req.body;
+
+  if (!password) {
+    return res.status(400).json({ error: "Password is required" });
+  }
+
   try {
-    const userId = req.user.id;
-    console.log("Deleting user with ID:", req.user.id);
-    const result = await pool.query("DELETE FROM users WHERE id = $1 RETURNING *", [userId]);
+    // 1. Fetch user
+    const result = await pool.query("SELECT passhash FROM users WHERE id = $1", [userId]);
 
 
-    if (result.rowCount == 0) {
-      return res.status(404).json({ error: "User not found or already deleted" });
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: "User not found" });
     }
 
-    res.json({ message: "Account deleted successfully", deletedUser: result.rows[0] });
+    const user = result.rows[0];
+
+    // 2. Compare provided password with hashed password
+    const match = await bcrypt.compare(password, user.passhash);
+    if (!match) {
+      return res.status(401).json({ error: "Incorrect password" });
+    }
+
+    // 3. Delete user
+    const deleteResult = await pool.query("DELETE FROM users WHERE id = $1 RETURNING id, username", [userId]);
+
+    res.json({
+      message: "Account deleted successfully",
+      deleted: deleteResult.rows[0],
+    });
   } catch (error) {
     console.error("Error deleting user:", error);
     res.status(500).json({ error: "Internal server error" });

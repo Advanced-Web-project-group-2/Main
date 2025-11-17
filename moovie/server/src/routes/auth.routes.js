@@ -139,6 +139,7 @@ router.get("/protected", authMiddleware, (req, res) => {
  */
 router.put("/change-password", authMiddleware, changePassword);
 
+
 router.delete("/delete", authMiddleware, deleteAccount);
 
 
