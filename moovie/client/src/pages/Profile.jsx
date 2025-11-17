@@ -49,6 +49,50 @@ export default function Profile() {
     }
   };
 
+  const handleDeleteAccount = async () => {
+    console.log("Delete button clicked");
+
+    const confirmed = window.confirm("Are you sure you want to delete your account?");
+    if (!confirmed) return;
+
+    const token = localStorage.getItem("token");   // <-- FIXED
+    if (!token) {
+      alert("No token found, please log in again.");
+      return;
+    }
+
+    try {
+      const res = await fetch("http://localhost:5000/auth/delete", {   // <-- correct endpoint
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      let data = null;
+
+      // Try to parse JSON only if server actually returned JSON
+      const contentType = res.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        data = await res.json();
+      }
+
+      if (!res.ok) {
+        return alert((data && data.error) || "Failed to delete account.");
+      }
+
+      alert("Account deleted successfully.");
+      localStorage.removeItem("token");
+      window.location.href = "/";
+
+    } catch (err) {
+      console.error("Delete error:", err);
+      alert("Server error. Please try again later.");
+    }
+  };
+
+
   return (
     <section>
 
@@ -58,7 +102,7 @@ export default function Profile() {
         <>
           <p>Logged in as: <strong>{user.username}</strong></p>
 
-          <button 
+          <button
             className="change-password-btn"
             onClick={() => setShowChangePw(!showChangePw)}
           >
@@ -100,6 +144,14 @@ export default function Profile() {
               <button type="submit">Update Password</button>
             </form>
           )}
+
+          <button
+            className="delete-account-btn"
+            onClick={handleDeleteAccount}
+          >
+            Delete Account
+          </button>
+
         </>
       ) : (
         <p>You must be logged in to view your profile.</p>

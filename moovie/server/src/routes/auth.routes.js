@@ -5,6 +5,7 @@ import {
   register,
   login,
   changePassword,
+  deleteAccount,
 } from "../controllers/auth.controller.js";
 
 const router = express.Router();
@@ -137,5 +138,8 @@ router.get("/protected", authMiddleware, (req, res) => {
  *         description: User not found
  */
 router.put("/change-password", authMiddleware, changePassword);
+
+router.delete("/delete", authMiddleware, deleteAccount);
+
 
 export default router;

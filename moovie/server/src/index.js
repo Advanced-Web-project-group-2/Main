@@ -10,6 +10,8 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import pool from './db.js'
 
+import authMiddleware from './middleware/auth.js';
+
 import authRoutes from "./routes/auth.routes.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -143,9 +145,10 @@ app.put('/update-user/:id', async (req, res) => {
 });
 
 // DELETE to delete a user
-app.delete('/delete-user/:id', async (req, res) => {
+app.delete('/auth/delete', authMiddleware, async (req, res) => {
   try {
-    const userId = req.params.id;
+    const userId = req.user.id;
+    console.log('Deleting user with ID:', req.user.id);
     const result = await pool.query('DELETE FROM users WHERE id = $1 RETURNING *', [userId]);
 
     if (result.rowCount === 0) {

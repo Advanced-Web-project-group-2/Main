@@ -31,6 +31,7 @@ export default function SignIn() {
       });
 
       const data = await res.json();
+      console.log("Login response:", data);
 
       if (!res.ok) return alert(data.error);
 

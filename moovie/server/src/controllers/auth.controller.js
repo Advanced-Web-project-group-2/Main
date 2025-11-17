@@ -137,3 +137,23 @@ export async function changePassword(req, res) {
     res.status(500).json({ error: "Internal server error" });
   }
 }
+
+// DELETE /auth/delete
+export const deleteAccount = async (req, res) => {
+  console.log('deleteAccount controller hit');
+  try {
+    const userId = req.user.id;
+    console.log("Deleting user with ID:", req.user.id);
+    const result = await pool.query("DELETE FROM users WHERE id = $1 RETURNING *", [userId]);
+
+
+    if (result.rowCount == 0) {
+      return res.status(404).json({ error: "User not found or already deleted" });
+    }
+
+    res.json({ message: "Account deleted successfully", deletedUser: result.rows[0] });
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
