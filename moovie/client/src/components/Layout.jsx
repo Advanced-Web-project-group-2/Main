@@ -1,15 +1,9 @@
-import { Link, Outlet, useLocation } from "react-router-dom";
+import { Link, Outlet } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import {useState, useEffect } from "react";
 
 export default function Layout() {
   const { user, logout } = useAuth();
-  const [open, setOpen] = useState(false);
-  const location = useLocation();
-
-  useEffect(() => {
-    setOpen(false);
-  }, [location.pathname]);
+  
 
   return (
     <>
@@ -20,16 +14,8 @@ export default function Layout() {
           <ul>
             <li><Link to="/">Home</Link></li>
 
-            <li className={`dropdown ${open ? "open" :""}`}>
-              <button 
-                type="button"
-                className="dropbtn"
-                aria-haspopup="true"
-                aria-expanded={open}
-                onClick={() => setOpen((s) => !s)}
-              >
-                Groups 
-              </button>
+            <li className="dropdown">
+              <Link className="dropbtn" to="/groups">Groups</Link>
 
               <div className="dropdown-content" role="menu" aria-label="Available groups">
                 <Link role="menuitem" to="/group/1">Horror Fans</Link>
