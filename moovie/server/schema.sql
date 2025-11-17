@@ -1,14 +1,17 @@
 -- =========================================================
+-- EXTENSIONS
+-- =========================================================
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
+-- =========================================================
 -- ENUM TYPES
 -- =========================================================
-
 CREATE TYPE shop_item_type AS ENUM ('icon', 'banner', 'accessory');
 CREATE TYPE list_genre AS ENUM ('action', 'fantasy', 'sci-fi', 'horror', 'christmas');
 
 -- =========================================================
 -- USERS
 -- =========================================================
-
 CREATE TABLE users (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     username VARCHAR(50) UNIQUE NOT NULL,
@@ -19,9 +22,8 @@ CREATE TABLE users (
 );
 
 -- =========================================================
--- SHOP
+-- SHOP ITEMS
 -- =========================================================
-
 CREATE TABLE shop (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
@@ -31,19 +33,18 @@ CREATE TABLE shop (
 );
 
 -- =========================================================
--- USER ITEMS (many-to-many users ↔ shop)
+-- USER INVENTORY (users ↔ shop)
 -- =========================================================
-
 CREATE TABLE user_items (
     id SERIAL PRIMARY KEY,
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    item_id INT NOT NULL REFERENCES shop(id) ON DELETE CASCADE
+    item_id INT NOT NULL REFERENCES shop(id) ON DELETE CASCADE,
+    is_equipped BOOLEAN DEFAULT FALSE
 );
 
 -- =========================================================
 -- REVIEWS
 -- =========================================================
-
 CREATE TABLE reviews (
     id SERIAL PRIMARY KEY,
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -57,7 +58,6 @@ CREATE TABLE reviews (
 -- =========================================================
 -- GROUPS
 -- =========================================================
-
 CREATE TABLE groups (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
@@ -68,9 +68,8 @@ CREATE TABLE groups (
 );
 
 -- =========================================================
--- GROUP MEMBERSHIP (many-to-many users ↔ groups)
+-- GROUP MEMBERSHIP (users ↔ groups)
 -- =========================================================
-
 CREATE TABLE group_user (
     id SERIAL PRIMARY KEY,
     group_id INT NOT NULL REFERENCES groups(id) ON DELETE CASCADE,
@@ -83,7 +82,6 @@ CREATE TABLE group_user (
 -- =========================================================
 -- LISTS
 -- =========================================================
-
 CREATE TABLE lists (
     id SERIAL PRIMARY KEY,
     owner_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -94,9 +92,8 @@ CREATE TABLE lists (
 );
 
 -- =========================================================
--- MOVIES (optional — for normalization)
+-- MOVIES (optional cached data)
 -- =========================================================
-
 CREATE TABLE movies (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
@@ -106,9 +103,8 @@ CREATE TABLE movies (
 );
 
 -- =========================================================
--- LIST MOVIES (many-to-many lists ↔ movies)
+-- LIST MOVIES (lists ↔ movies)
 -- =========================================================
-
 CREATE TABLE list_movies (
     id SERIAL PRIMARY KEY,
     list_id INT NOT NULL REFERENCES lists(id) ON DELETE CASCADE,
