@@ -1,34 +1,46 @@
-import React from "react";
+import { useEffect, useState } from "react";
 
 export default function Shop() {
-  const userPoints = 120;
+  const [items, setItems] = useState([]);
 
-  const shopItems = [
-    { id: 1, name: "Emoji Pack", price: 20 },
-    { id: 2, name: "Profile Decoration", price: 50 },
-    { id: 3, name: "Group Background Theme", price: 75 },
-  ];
+  useEffect(() => {
+    fetch("http://localhost:5000/shop", {
+      headers: { Authorization: "Bearer " + localStorage.getItem("token") }
+    })
+      .then(res => res.json())
+      .then(data => setItems(data.items))
+      .catch(err => console.error(err));
+  }, []);
+
+  const buy = async (itemId) => {
+    const res = await fetch(`http://localhost:5000/shop/buy/${itemId}`, {
+      method: "POST",
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("token")
+      }
+    });
+
+    const data = await res.json();
+    if (!res.ok) return alert(data.error);
+
+    alert("Item purchased!");
+    setItems(items.filter(i => i.id !== itemId));
+  };
 
   return (
-    <>
-      <section id="user-points">
-        <h2>Your Points</h2>
-        <p><strong>{userPoints}</strong></p>
-      </section>
+    <div>
+      <h2>Shop</h2>
 
-      <section id="shop-items">
-        <h2>Available Items</h2>
-
-        <ul>
-          {shopItems.map((item) => (
-            <li key={item.id}>
-              <h3>{item.name}</h3>
-              <p>Price: {item.price}</p>
-              <button>Buy</button>
-            </li>
-          ))}
-        </ul>
-      </section>
-    </>
+      <div className="shop-grid">
+        {items.map(item => (
+          <div key={item.id} className="shop-card">
+            <img src={item.image_url} alt={item.name} />
+            <h3>{item.name}</h3>
+            <p>{item.price} credits</p>
+            <button onClick={() => buy(item.id)}>Buy</button>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }

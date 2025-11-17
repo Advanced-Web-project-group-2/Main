@@ -28,7 +28,7 @@ export const register = async (req, res) => {
     const result = await pool.query(
       `INSERT INTO users (username, passhash)
        VALUES ($1, $2)
-       RETURNING id, username, credits, icon, created_at`,
+       RETURNING id, username, credits, created_at`,
       [username, passhash]
     );
 
@@ -87,7 +87,6 @@ export const login = async (req, res) => {
         id: user.id,
         username: user.username,
         credits: user.credits,
-        icon: user.icon,
       },
     });
   } catch (err) {
