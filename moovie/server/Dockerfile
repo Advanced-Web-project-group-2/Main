@@ -2,14 +2,14 @@
 FROM node:20
 
 # Set working directory inside the container
-WORKDIR /app
+WORKDIR /server
 
 # Copy package files and install dependencies
 COPY package*.json ./
 RUN npm install
 
 # Copy the rest of your server code
-COPY . .
+COPY ./src ./src
 
 # Expose the port your app runs on
 EXPOSE 5000

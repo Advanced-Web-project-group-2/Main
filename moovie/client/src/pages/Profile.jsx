@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 
 export default function Profile() {
@@ -10,10 +10,16 @@ export default function Profile() {
     newPassword: "",
     repeatPassword: "",
   });
+
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deletePassword, setDeletePassword] = useState("");
 
+  const [favourites, setFavourites] = useState([]);
+  const [shareUrl, setShareUrl] = useState("");
 
+  const token = localStorage.getItem("token");
+
+  // Password Change
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
@@ -52,58 +58,7 @@ export default function Profile() {
     }
   };
 
-  /* const handleDeleteAccount = async () => {
-    console.log("Delete button clicked");
-
-    // Step 1: Confirm delete
-    const confirmed = window.confirm("Are you sure you want to delete your account?");
-    if (!confirmed) return;
-
-    // Step 2: Ask for password (safety)
-    const password = window.prompt("Please enter your password to confirm:");
-    if (!password) {
-      alert("Password is required to delete the account.")
-      return;
-    }
-
-    const token = localStorage.getItem("token");
-    if (!token) {
-      alert("No token found, please log in again.");
-      return;
-    }
-
-    try {
-      console.log("Sending delete request with password(length):", password.length);
-
-      const res = await fetch("http://localhost:5000/auth/delete", {   
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ password }),
-      });
-
-      let data = null;
-      const contentType = res.headers.get("content-type");
-      if (contentType && contentType.includes("application/json")) {
-        data = await res.json();
-      }
-
-      if (!res.ok) {
-        return alert((data && data.error) || "Failed to delete account.");
-      }
-
-      alert("Account deleted successfully.");
-      localStorage.removeItem("token");
-      window.location.href = "/";
-
-    } catch (err) {
-      console.error("Delete error:", err);
-      alert("Server error. Please try again later.");
-    }
-  }; */
-
+  // Delete account
   const handleDeleteAccount = () => {
     setShowDeleteModal(true);
   };
@@ -113,8 +68,6 @@ export default function Profile() {
       alert("Password is required.");
       return;
     }
-
-    const token = localStorage.getItem("token");
 
     try {
       const res = await fetch("http://localhost:5000/auth/delete", {
@@ -127,7 +80,6 @@ export default function Profile() {
       });
 
       const data = await res.json();
-
       if (!res.ok) return alert(data.error || "Delete failed.");
 
       alert("Account deleted successfully.");
@@ -139,16 +91,55 @@ export default function Profile() {
     }
   };
 
+  // Favourites list 
+  const fetchFavourites = async () => {
+    if (!token) return;
+    try {
+      const res = await fetch("http://localhost:5000/lists/favourites", {
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+      });
+      const data = await res.json();
+      console.log("Favourites data:", data);
+      setFavourites(data.favourites || []);
+      setShareUrl(`${window.location.origin}/lists/favourites/public/${user.id}`);
+    } catch (err) {
+      console.error("Failed to fetch favourites:", err);
+    }
+  };
+
+  const removeFavourite = async (movieId) => {
+    try {
+      const res = await fetch("http://localhost:5000/lists/favourites", {
+        method: "DELETE",
+        headers: {
+          "Content-type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ movieId }),
+      });
+      if (!res.ok) return alert("Failed to remove from favourites");
+      setFavourites(favourites.filter((m) => m.id !== movieId));
+    } catch (err) {
+      console.error(err);
+      alert("Server error.");
+    }
+  };
+
+  useEffect(() => {
+    if (user) fetchFavourites();
+  }, [user]);
 
   return (
     <section>
-
       <h2>Profile</h2>
 
       {user ? (
         <>
           <p>Logged in as: <strong>{user.username}</strong></p>
 
+          {/* Password change */}
           <button
             className="change-password-btn"
             onClick={() => setShowChangePw(!showChangePw)}
@@ -192,38 +183,54 @@ export default function Profile() {
             </form>
           )}
 
+          {/* Favourites list */}
+          <h3>Favourites</h3>
+          {favourites.length > 0 ? (
+            <ul>
+              {favourites.map((movie) => (
+                <li key={movie.id}>
+                  {movie.name} ({movie.release_year})
+                  <button onClick={() => removeFavourite(movie.id)}>Remove</button>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p>No favourites yet.</p>
+          )}
+          {shareUrl && (
+            <p>
+              Share your favourites list: <a href={shareUrl} target="_blank" rel="noreferrer">{shareUrl}</a>
+            </p>
+          )}
+
+          {/* Delete account */}
           <button
             className="delete-account-btn"
             onClick={handleDeleteAccount}
           >
             Delete Account
           </button>
-
+          {showDeleteModal && (
+            <div className="modal-overlay">
+              <div className="modal">
+                <h3>Confirm Account Deletion</h3>
+                <input
+                  type="password"
+                  placeholder="Enter your password"
+                  value={deletePassword}
+                  onChange={(e) => setDeletePassword(e.target.value)}
+                />
+                <div className="modal-buttons">
+                  <button onClick={confirmDelete}>Delete</button>
+                  <button onClick={() => setShowDeleteModal(false)}>Cancel</button>
+                </div>
+              </div>
+            </div>
+          )}
         </>
       ) : (
         <p>You must be logged in to view your profile.</p>
       )}
-
-      {showDeleteModal && (
-      <div className="modal-overlay">
-        <div className="modal">
-          <h3>Confirm Account Deletion</h3>
-
-          <input
-            type="password"
-            placeholder="Enter your password"
-            value={deletePassword}
-            onChange={(e) => setDeletePassword(e.target.value)}
-          />
-
-          <div className="modal-buttons">
-            <button onClick={confirmDelete}>Delete</button>
-            <button onClick={() => setShowDeleteModal(false)}>Cancel</button>
-          </div>
-        </div>
-      </div>
-      )}
-
     </section>
   );
 }

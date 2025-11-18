@@ -35,6 +35,12 @@ export const register = async (req, res) => {
     const user = result.rows[0];
     const token = generateToken(user);
 
+    // Create an empty Favourites list automatically
+    await pool.query(
+      "INSERT INTO lists (owner_id, name) VALUES ($1, 'Favourites')",
+      [user.id]
+    );
+
     res.status(201).json({
       message: "User created",
       token,

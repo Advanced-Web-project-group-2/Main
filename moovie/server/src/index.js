@@ -13,6 +13,7 @@ import pool from './db.js'
 import authMiddleware from './middleware/auth.js';
 
 import authRoutes from "./routes/auth.routes.js";
+import listsRoutes from "./routes/lists.routes.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -26,6 +27,7 @@ app.use(express.json());
 setupSwagger(app);
 
 app.use("/auth", authRoutes);
+app.use("/lists", listsRoutes);
 
 
 // Fetch now-playing movies from TMDB
@@ -144,23 +146,6 @@ app.put('/update-user/:id', async (req, res) => {
   }
 });
 
-// DELETE to delete a user
-app.delete('/auth/delete', authMiddleware, async (req, res) => {
-  try {
-    const userId = req.user.id;
-    console.log('Deleting user with ID:', req.user.id);
-    const result = await pool.query('DELETE FROM users WHERE id = $1 RETURNING *', [userId]);
-
-    if (result.rowCount === 0) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-
-    res.json({ message: 'User deleted successfully', deletedUser: result.rows[0] });
-  } catch (error) {
-    console.error('Error deleting user:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
 
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running at http://localhost:${PORT}`);
