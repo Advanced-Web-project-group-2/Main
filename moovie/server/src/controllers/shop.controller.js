@@ -87,3 +87,57 @@ export async function buyItem(req, res) {
     res.status(500).json({ error: "Purchase failed" });
   }
 }
+
+export const getUserItemsByType = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { itemType } = req.params;
+
+    if (!["icons", "accessories"].includes(itemType)) {
+      return res.status(400).json({ error: "Invalid item type" });
+    }
+
+    const dbType = itemType === "icons" ? "icon" : "accessory";
+
+    const result = await pool.query(
+      `SELECT
+        ui.id AS user_item_id,
+        s.id AS item_id,
+        s.name,
+        s.price,
+        s.type,
+        s.image_url,
+        ui.is_equipped
+       FROM user_items ui
+       JOIN shop s ON ui.item_id = s.id
+       WHERE ui.user_id = $1 AND s.type = $2
+       ORDER BY ui.id`,
+      [userId, dbType]
+    );
+
+    res.json({ items: result.rows });
+  } catch (err) {
+    console.error("getUserItemsByType error:", err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+export async function getAvailableShopItems(req, res) {
+  const userId = req.user.id;
+
+  try {
+    const result = await pool.query(
+      `SELECT * FROM shop
+       WHERE id NOT IN (
+         SELECT item_id FROM user_items WHERE user_id = $1
+       )
+       ORDER BY price ASC`,
+      [userId]
+    );
+
+    res.json({ items: result.rows });
+  } catch (err) {
+    console.error("getAvailableShopItems ERROR:", err);
+    res.status(500).json({ error: "Failed to load available items" });
+  }
+}

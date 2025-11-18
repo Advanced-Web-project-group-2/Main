@@ -115,21 +115,17 @@ export default function Profile() {
   return (
     <div className="profile-grid">
 
-      {/* BOX 1 — User Header */}
       <div className="profile-box user-header-box">
 
-        {/* Left: Avatar */}
         <div className="avatar-preview">
-          Avatar Here
+
         </div>
 
-        {/* Middle: username + credits */}
         <div className="profile-main-info">
           <h2>{user.username}</h2>
           <p><strong>Credits:</strong> {user.credits}</p>
         </div>
 
-        {/* Right: settings (pw + delete) */}
         <div className="profile-settings">
           <button
             className="change-password-btn btn-blue"
@@ -197,14 +193,12 @@ export default function Profile() {
 
       </div>
 
-      {/* -------------------------------------- */}
-      {/* BOX 5 — Tall Accessory Box */}
-      {/* -------------------------------------- */}
+
       <div className="profile-box box5">
         <h3>Your Accessories</h3>
         <div className="item-grid">
           {accessories.length === 0 ? (
-            <p>No accessories yet.</p>
+            <p></p>
           ) : (
             accessories.map((a) => (
               <img key={a.id} src={a.image_url} alt={a.name} className="profile-item-icon" />
@@ -213,19 +207,14 @@ export default function Profile() {
         </div>
       </div>
 
-      {/* BOX 2 */}
       <div className="profile-box box2">
         <h3>Your Groups</h3>
-        <p>(Coming later)</p>
       </div>
 
-      {/* BOX 3 */}
       <div className="profile-box box3">
         <h3>Your Movie Lists</h3>
-        <p>(Coming later)</p>
       </div>
 
-      {/* BOX 4 — Wide icons box */}
       <div className="profile-box box4">
         <h3>Your Icons</h3>
         <div className="item-grid">
