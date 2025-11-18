@@ -3,6 +3,31 @@ import pool from "../db.js";
 import bcrypt from "bcrypt";
 import { generateToken } from "../services/jwt.service.js";
 
+function validatePassword(password) {
+  const minLength = 8;
+  const hasUpperCase = /[A-Z]/.test(password);
+  const hasLowerCase = /[a-z]/.test(password)
+  const hasNumber = /[0-9]/.test(password);
+
+  if (password.length < minLength) {
+    return false;
+  }
+
+  if (!hasLowerCase) {
+    return false
+  }
+
+  if (!hasUpperCase) {
+    return false;
+  }
+
+  if (!hasNumber) {
+    return false
+  }
+
+  return true;
+}
+
 // POST /auth/register
 export const register = async (req, res) => {
   try {
@@ -21,6 +46,10 @@ export const register = async (req, res) => {
 
     if (userCheck.rows.length > 0) {
       return res.status(400).json({ error: "Username already taken" });
+    }
+
+    if (!validatePassword(password)) {
+      return res.status(403).json({ error: "Password does not fill requirements" });
     }
 
     const passhash = await bcrypt.hash(password, 10);
@@ -122,6 +151,10 @@ export async function changePassword(req, res) {
     const match = await bcrypt.compare(oldPassword, user.passhash);
     if (!match) {
       return res.status(401).json({ error: "Old password incorrect" });
+    }
+
+    if (!validatePassword(newPassword)) {
+      return res.status(403).json({ error: "Password does not fill requirements" });
     }
 
     const newHash = await bcrypt.hash(newPassword, 10);
