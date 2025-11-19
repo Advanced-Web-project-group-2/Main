@@ -13,6 +13,7 @@ import pool from './db.js'
 import authMiddleware from './middleware/auth.js';
 
 import authRoutes from "./routes/auth.routes.js";
+import groupsRoutes from './routes/groups.routes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -26,6 +27,7 @@ app.use(express.json());
 setupSwagger(app);
 
 app.use("/auth", authRoutes);
+app.use('/api/groups', groupsRoutes);
 
 
 // Fetch now-playing movies from TMDB
@@ -148,7 +150,6 @@ app.put('/update-user/:id', async (req, res) => {
 app.delete('/auth/delete', authMiddleware, async (req, res) => {
   try {
     const userId = req.user.id;
-    console.log('Deleting user with ID:', req.user.id);
     const result = await pool.query('DELETE FROM users WHERE id = $1 RETURNING *', [userId]);
 
     if (result.rowCount === 0) {

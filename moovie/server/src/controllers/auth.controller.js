@@ -78,8 +78,6 @@ export const login = async (req, res) => {
 
     const token = generateToken(user);
 
-    console.log("JWT Token Generated for:", username, "Token:", token);
-
     res.json({
       message: "Logged in",
       token,
@@ -140,10 +138,8 @@ export async function changePassword(req, res) {
 
 // DELETE /auth/delete
 export const deleteAccount = async (req, res) => {
-  console.log('deleteAccount controller hit');
   try {
     const userId = req.user.id;
-    console.log("Deleting user with ID:", req.user.id);
     const result = await pool.query("DELETE FROM users WHERE id = $1 RETURNING *", [userId]);
 
 

@@ -50,7 +50,7 @@ export default function Profile() {
   };
 
   const handleDeleteAccount = async () => {
-    console.log("Delete button clicked");
+    // user initiated account delete
 
     const confirmed = window.confirm("Are you sure you want to delete your account?");
     if (!confirmed) return;
