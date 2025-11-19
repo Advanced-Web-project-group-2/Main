@@ -48,8 +48,10 @@ CREATE TABLE user_items (
 CREATE TABLE reviews (
     id SERIAL PRIMARY KEY,
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    movie_id INT NOT NULL,
     movie_name VARCHAR(255) NOT NULL,
     content TEXT,
+    rating INT CHECK (rating >= 1 AND rating <= 5),
     likes INT DEFAULT 0,
     dislikes INT DEFAULT 0,
     created_at TIMESTAMP DEFAULT NOW()

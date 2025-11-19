@@ -9,6 +9,8 @@ import axios from 'axios';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import pool from './db.js'
+import reviewsRouter from "./routes/reviews.js";
+
 
 import authMiddleware from './middleware/auth.js';
 
@@ -22,6 +24,7 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
+app.use("/api/reviews", reviewsRouter);
 
 setupSwagger(app);
 
