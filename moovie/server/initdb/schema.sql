@@ -80,6 +80,9 @@ CREATE TABLE group_user (
     is_applied BOOLEAN DEFAULT FALSE
 );
 
+-- Ensure a user can be a member of a group only once
+CREATE UNIQUE INDEX IF NOT EXISTS group_user_unique_idx ON group_user (group_id, user_id);
+
 -- =========================================================
 -- LISTS
 -- =========================================================

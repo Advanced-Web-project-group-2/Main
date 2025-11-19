@@ -113,8 +113,6 @@ export const login = async (req, res) => {
 
     const token = generateToken(user);
 
-    console.log("JWT Token Generated for:", username, "Token:", token);
-
     res.json({
       message: "Logged in",
       token,
@@ -190,6 +188,7 @@ export const deleteAccount = async (req, res) => {
   try {
     // 1. Fetch user
     const result = await pool.query("SELECT passhash FROM users WHERE id = $1", [userId]);
+
 
 
     if (result.rowCount === 0) {

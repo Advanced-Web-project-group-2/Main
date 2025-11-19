@@ -18,6 +18,7 @@ import authMiddleware from './middleware/auth.js';
 
 import authRoutes from "./routes/auth.routes.js";
 import listsRoutes from "./routes/lists.routes.js";
+import groupsRoutes from './routes/groups.routes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -37,6 +38,8 @@ app.use("/auth", authRoutes);
 app.use("/lists", listsRoutes);
 app.use("/shop", shopRoutes);
 app.use("/users", usersRoutes);
+app.use('/api/groups', groupsRoutes);
+
 
 
 // Fetch now-playing movies from TMDB

@@ -1,31 +1,128 @@
-import { Link } from "react-router-dom";
+import React, { useEffect, useState, useRef } from 'react';
+import { Link } from 'react-router-dom';
 
 export default function Groups() {
+  const [groups, setGroups] = useState(null); // null = loading, [] = empty
+  const [error, setError] = useState(null);
+  const [query, setQuery] = useState('');
+  const debounceRef = useRef(null);
+
+  // Load groups (either my groups when query is empty, or search results)
+  useEffect(() => {
+    let cancelled = false;
+
+    async function load() {
+      setError(null);
+      try {
+        let res;
+        if (query && query.trim() !== '') {
+          // search all groups
+          const url = `/api/groups?q=${encodeURIComponent(query)}`;
+          res = await fetch(url);
+        } else {
+          // load my groups
+          const token = localStorage.getItem('token');
+          res = await fetch('/api/groups/mine', {
+            headers: {
+              'Content-Type': 'application/json',
+              ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            },
+          });
+        }
+        if (!res.ok) {
+          // parse response and throw a concise error message for the UI
+          let bodyText = '';
+          try { const body = await res.json(); bodyText = JSON.stringify(body); } catch (e) { bodyText = await res.text().catch(()=>'' ); }
+          throw new Error(`Failed to load groups: ${res.status} ${res.statusText} ${bodyText}`);
+        }
+        const data = await res.json();
+        // loaded successfully; UI will update
+        if (!cancelled) setGroups(data.groups || []);
+      } catch (err) {
+        if (!cancelled) {
+          setError(err.message || 'Error loading groups');
+          setGroups([]);
+        }
+      }
+    }
+
+    // debounce searches, but load immediately when clearing the query
+    if (query && query.trim() !== '') {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+      debounceRef.current = setTimeout(() => load(), 300);
+    } else {
+      // no query — load my groups immediately
+      load();
+    }
+
+    return () => {
+      cancelled = true;
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current);
+        debounceRef.current = null;
+      }
+    };
+  }, [query]);
+
+  // listen for newly created groups from CreateGroup page and append
+  useEffect(() => {
+    let cancelled = false;
+    function onGroupCreated(e) {
+      if (cancelled) return;
+      const g = e?.detail;
+      if (!g) return;
+      setGroups(prev => {
+        if (!prev) return [g];
+        if (prev.find(x => x.id === g.id)) return prev;
+        return [g, ...prev];
+      });
+    }
+    window.addEventListener('group:created', onGroupCreated);
+    return () => { cancelled = true; window.removeEventListener('group:created', onGroupCreated); };
+  }, []);
+
   return (
-    <>
-      <section id="create-group">
-        <h2>Create New Group</h2>
-        <form>
-          <input type="text" name="groupName" placeholder="Group name" required />
-          <button type="submit">Create Group</button>
-        </form>
-      </section>
+    <div className="groups-page">
+      <div className="groups-header">
+        <h1>Your Groups</h1>
+        <div className="groups-actions">
+          <input
+            type="search"
+            className="group-search"
+            placeholder="Search groups by name..."
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+            aria-label="Search groups"
+          />
+          <Link to="/groups/create" className="btn btn-primary">Create a group</Link>
+        </div>
+      </div>
 
-      <section id="public-groups">
-        <h2>All Groups</h2>
-        <ul>
-          <li>Horror Fans <Link to="/group/1">Visit</Link></li>
-          <li>Action Movie Lovers <Link to="/group/2">Visit</Link></li>
-          <li>Series Junkies <Link to="/group/3">Visit</Link></li>
-        </ul>
-      </section>
+      {query && query.trim() !== '' && (
+        <div className="groups-search-caption">Search results for "{query}"</div>
+      )}
 
-      <section id="your-groups">
-        <h2>Your Groups</h2>
-        <ul>
-          <li>Horror Fans <Link to="/group/1">Open</Link></li>
-        </ul>
-      </section>
-    </>
+      {groups === null && <p>Loading groups…</p>}
+      {error && <div className="error">{error}</div>}
+
+      {groups && groups.length === 0 && (
+        <div className="groups-empty">
+          <p>You aren't a member of any groups yet.</p>
+          <Link to="/groups/create" className="btn">Create your first group</Link>
+        </div>
+      )}
+
+      <div className="groups-list">
+        {groups && groups.map(g => (
+          <Link key={g.id} to={`/group/${g.id}`} className="group-card">
+            {g.banner_url && <img src={g.banner_url} alt={`${g.name} banner`} className="group-banner" />}
+            <div className="group-info">
+              <h3>{g.name}</h3>
+              <small>Created {new Date(g.created_at).toLocaleString()}</small>
+            </div>
+          </Link>
+        ))}
+      </div>
+    </div>
   );
 }
