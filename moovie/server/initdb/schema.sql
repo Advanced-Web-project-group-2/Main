@@ -17,7 +17,6 @@ CREATE TABLE users (
     username VARCHAR(50) UNIQUE NOT NULL,
     passhash VARCHAR(255) NOT NULL,
     credits INT DEFAULT 0,
-    icon VARCHAR(255),
     created_at TIMESTAMP DEFAULT NOW()
 );
 
@@ -48,8 +47,10 @@ CREATE TABLE user_items (
 CREATE TABLE reviews (
     id SERIAL PRIMARY KEY,
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    movie_id INT NOT NULL,
     movie_name VARCHAR(255) NOT NULL,
     content TEXT,
+    rating INT CHECK (rating >= 1 AND rating <= 5),
     likes INT DEFAULT 0,
     dislikes INT DEFAULT 0,
     created_at TIMESTAMP DEFAULT NOW()

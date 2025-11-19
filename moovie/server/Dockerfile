@@ -2,7 +2,7 @@
 FROM node:20
 
 # Set working directory inside the container
-WORKDIR /app
+WORKDIR /server
 
 # Copy package files and install dependencies
 COPY package*.json ./
