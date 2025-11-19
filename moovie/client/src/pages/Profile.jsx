@@ -1,8 +1,10 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
+import "../styles/Profile.css";
 
 export default function Profile() {
   const { user } = useAuth();
+  const token = localStorage.getItem("token");
 
   const [showChangePw, setShowChangePw] = useState(false);
   const [form, setForm] = useState({
@@ -17,13 +19,15 @@ export default function Profile() {
   const [favourites, setFavourites] = useState([]);
   const [shareUrl, setShareUrl] = useState("");
 
-  const token = localStorage.getItem("token");
+  const [icons, setIcons] = useState([]);
+  const [accessories, setAccessories] = useState([]);
 
-  // Password Change
+  // Handle password input
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  // Handle password submit
   const handlePasswordChange = async (e) => {
     e.preventDefault();
 
@@ -51,7 +55,6 @@ export default function Profile() {
       alert("Password updated successfully!");
       setForm({ oldPassword: "", newPassword: "", repeatPassword: "" });
       setShowChangePw(false);
-
     } catch (err) {
       console.error(err);
       alert("Something went wrong");
@@ -59,9 +62,7 @@ export default function Profile() {
   };
 
   // Delete account
-  const handleDeleteAccount = () => {
-    setShowDeleteModal(true);
-  };
+  const handleDeleteAccount = () => setShowDeleteModal(true);
 
   const confirmDelete = async () => {
     if (!deletePassword) {
@@ -91,17 +92,14 @@ export default function Profile() {
     }
   };
 
-  // Favourites list 
+  // Fetch favourites
   const fetchFavourites = async () => {
     if (!token) return;
     try {
       const res = await fetch("http://localhost:5000/lists/favourites", {
-        headers: {
-          Authorization: `Bearer ${token}`
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
-      console.log("Favourites data:", data);
       setFavourites(data.favourites || []);
       setShareUrl(`${window.location.origin}/lists/favourites/public/${user.id}`);
     } catch (err) {
@@ -127,110 +125,130 @@ export default function Profile() {
     }
   };
 
+  // Fetch user shop items
+  useEffect(() => {
+    if (!user) return;
+
+    async function fetchItems() {
+      try {
+        const res1 = await fetch("http://localhost:5000/shop/user-items/icons", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data1 = await res1.json();
+        setIcons(data1.items || []);
+
+        const res2 = await fetch("http://localhost:5000/shop/user-items/accessories", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data2 = await res2.json();
+        setAccessories(data2.items || []);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    fetchItems();
+  }, [user]);
+
+  // Fetch lists
   useEffect(() => {
     if (user) fetchFavourites();
   }, [user]);
 
+  if (!user) return <p>You must be logged in to view your profile.</p>;
+
   return (
-    <section>
-      <h2>Profile</h2>
+    <div className="profile-grid">
 
-      {user ? (
-        <>
-          <p>Logged in as: <strong>{user.username}</strong></p>
+      <div className="profile-box user-header-box">
+        <div className="profile-main-info">
+          <h2>{user.username}</h2>
+          <p><strong>Credits:</strong> {user.credits}</p>
+        </div>
 
-          {/* Password change */}
-          <button
-            className="change-password-btn"
-            onClick={() => setShowChangePw(!showChangePw)}
-          >
-            {showChangePw ? "Cancel" : "Change Password"}
-          </button>
+        <button className="change-password-btn btn-blue" onClick={() => setShowChangePw(!showChangePw)}>
+          {showChangePw ? "Cancel" : "Change Password"}
+        </button>
 
-          {showChangePw && (
-            <form
-              className="change-password-form"
-              onSubmit={handlePasswordChange}
-            >
-              <input
-                type="password"
-                name="oldPassword"
-                placeholder="Old password"
-                required
-                value={form.oldPassword}
-                onChange={handleChange}
-              />
+        {showChangePw && (
+          <div className="modal-overlay" onClick={() => setShowChangePw(false)}>
+            <div className="modal-box" onClick={(e) => e.stopPropagation()}>
+              <h2>Change Password</h2>
+              <form onSubmit={handlePasswordChange}>
+                <input type="password" name="oldPassword" placeholder="Old password" value={form.oldPassword} onChange={handleChange} required />
+                <input type="password" name="newPassword" placeholder="New password" value={form.newPassword} onChange={handleChange} required />
+                <input type="password" name="repeatPassword" placeholder="Repeat new password" value={form.repeatPassword} onChange={handleChange} required />
 
-              <input
-                type="password"
-                name="newPassword"
-                placeholder="New password"
-                required
-                value={form.newPassword}
-                onChange={handleChange}
-              />
-
-              <input
-                type="password"
-                name="repeatPassword"
-                placeholder="Repeat new password"
-                required
-                value={form.repeatPassword}
-                onChange={handleChange}
-              />
-
-              <button type="submit">Update Password</button>
-            </form>
-          )}
-
-          {/* Favourites list */}
-          <h3>Favourites</h3>
-          {favourites.length > 0 ? (
-            <ul>
-              {favourites.map((movie) => (
-                <li key={movie.id}>
-                  {movie.name} ({movie.release_year})
-                  <button onClick={() => removeFavourite(movie.id)}>Remove</button>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p>No favourites yet.</p>
-          )}
-          {shareUrl && (
-            <p>
-              Share your favourites list: <a href={shareUrl} target="_blank" rel="noreferrer">{shareUrl}</a>
-            </p>
-          )}
-
-          {/* Delete account */}
-          <button
-            className="delete-account-btn"
-            onClick={handleDeleteAccount}
-          >
-            Delete Account
-          </button>
-          {showDeleteModal && (
-            <div className="modal-overlay">
-              <div className="modal">
-                <h3>Confirm Account Deletion</h3>
-                <input
-                  type="password"
-                  placeholder="Enter your password"
-                  value={deletePassword}
-                  onChange={(e) => setDeletePassword(e.target.value)}
-                />
-                <div className="modal-buttons">
-                  <button onClick={confirmDelete}>Delete</button>
-                  <button onClick={() => setShowDeleteModal(false)}>Cancel</button>
-                </div>
-              </div>
+                <button type="submit" className="btn-blue">Update Password</button>
+                <button type="button" className="btn-yellow" onClick={() => setShowChangePw(false)}>Cancel</button>
+              </form>
             </div>
-          )}
-        </>
-      ) : (
-        <p>You must be logged in to view your profile.</p>
+          </div>
+        )}
+
+        <button className="delete-account-btn btn-yellow" onClick={handleDeleteAccount}>
+          Delete Account
+        </button>
+      </div>
+
+      {showDeleteModal && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <h3>Confirm Account Deletion</h3>
+            <input type="password" placeholder="Enter your password" value={deletePassword} onChange={(e) => setDeletePassword(e.target.value)} />
+            <button onClick={confirmDelete}>Delete</button>
+            <button onClick={() => setShowDeleteModal(false)}>Cancel</button>
+          </div>
+        </div>
       )}
-    </section>
+
+      <div className="profile-box box5">
+        <h3>Your Accessories</h3>
+        <div className="item-grid">
+          {accessories.map((a) => (
+            <img key={a.id} src={a.image_url} alt={a.name} className="profile-item-icon" />
+          ))}
+        </div>
+      </div>
+
+      <div className="profile-box box2">
+        <h3>Your Groups</h3>
+      </div>
+
+      <div className="profile-box box3">
+        <h3>Your Movie Lists</h3>
+
+        <h4>Favourites</h4>
+        {favourites.length > 0 ? (
+          <ul>
+            {favourites.map((movie) => (
+              <li key={movie.id}>
+                {movie.name} ({movie.release_year})
+                <button onClick={() => removeFavourite(movie.id)}>Remove</button>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>No favourites yet.</p>
+        )}
+
+        {shareUrl && (
+          <p>
+            Share your favourites list:{" "}
+            <a href={shareUrl} target="_blank" rel="noreferrer">{shareUrl}</a>
+          </p>
+        )}
+      </div>
+
+      <div className="profile-box box4">
+        <h3>Your Icons</h3>
+        <div className="item-grid">
+          {icons.map((i) => (
+            <img key={i.id} src={i.image_url} alt={i.name} className="profile-item-icon" />
+          ))}
+        </div>
+      </div>
+
+    </div>
   );
 }

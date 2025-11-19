@@ -17,7 +17,6 @@ CREATE TABLE users (
     username VARCHAR(50) UNIQUE NOT NULL,
     passhash VARCHAR(255) NOT NULL,
     credits INT DEFAULT 0,
-    icon VARCHAR(255),
     created_at TIMESTAMP DEFAULT NOW()
 );
 

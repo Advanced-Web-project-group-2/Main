@@ -1,6 +1,7 @@
 // server/src/routes/auth.routes.js
 import express from "express";
 import authMiddleware from "../middleware/auth.js";
+import { addCredits } from "../controllers/users.controller.js";
 import {
   register,
   login,
@@ -142,5 +143,38 @@ router.put("/change-password", authMiddleware, changePassword);
 
 router.delete("/delete", authMiddleware, deleteAccount);
 
+/**
+ * @swagger
+ * /auth/add-credits/{userId}:
+ *   put:
+ *     summary: Add or subtract credits from a user
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               amount:
+ *                 type: number
+ *                 example: 50
+ *     responses:
+ *       200:
+ *         description: Credits updated successfully
+ *       400:
+ *         description: Amount missing or invalid
+ *       404:
+ *         description: User not found
+ */
+
+router.put("/add-credits/:userId", addCredits);
 
 export default router;
