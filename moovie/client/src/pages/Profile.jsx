@@ -63,7 +63,6 @@ export default function Profile() {
 
   // Delete account
   const handleDeleteAccount = () => setShowDeleteModal(true);
-
   const confirmDelete = async () => {
     if (!deletePassword) {
       alert("Password is required.");

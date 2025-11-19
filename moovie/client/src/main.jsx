@@ -11,6 +11,7 @@ import Profile from "./pages/Profile.jsx";
 import InCinemas from "./pages/InCinemas.jsx";
 import Groups from "./pages/Groups.jsx";
 import GroupPage from "./pages/GroupPage.jsx";
+import CreateGroup from "./pages/CreateGroup.jsx";
 import AdvancedSearch from "./pages/AdvancedSearch.jsx";
 import Shop from "./pages/Shop.jsx";
 import Movie from "./pages/Movie.jsx";
@@ -31,6 +32,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
           <Route path="/profile" element={<Profile />} />
           <Route path="/in-cinemas" element={<InCinemas />} />
           <Route path="/groups" element={<Groups />} />
+          <Route path="/groups/create" element={<CreateGroup />} />
           <Route path="/group/:groupId" element={<GroupPage />} />
           <Route path="/advanced-search" element={<AdvancedSearch />} />
           <Route path="/shop" element={<Shop />} />

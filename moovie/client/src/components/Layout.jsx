@@ -1,8 +1,52 @@
 import { Link, Outlet } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useEffect, useState } from "react";
 
 export default function Layout() {
   const { user, logout } = useAuth();
+  const [groups, setGroups] = useState(null);
+  const [groupsError, setGroupsError] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function loadGroups() {
+      setGroups(null);
+      setGroupsError(null);
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setGroups([]);
+        return;
+      }
+      try {
+        const res = await fetch("/api/groups/mine", {
+          headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        });
+        if (!res.ok) throw new Error("Failed to load groups");
+        const data = await res.json();
+        if (!cancelled) setGroups(data.groups || []);
+      } catch (err) {
+        if (!cancelled) {
+          setGroupsError(err.message || "Error");
+          setGroups([]);
+        }
+      }
+    }
+    loadGroups();
+    // listen for newly created groups and prepend to dropdown list
+    function onGroupCreated(e) {
+      if (cancelled) return;
+      const g = e?.detail;
+      if (!g) return;
+      setGroups(prev => {
+        if (!prev) return [g];
+        if (prev.find(x => x.id === g.id)) return prev;
+        return [g, ...prev];
+      });
+    }
+    window.addEventListener('group:created', onGroupCreated);
+    return () => { cancelled = true; };
+  }, [user]);
+  
 
   return (
     <>
@@ -12,7 +56,22 @@ export default function Layout() {
         <nav className="main-nav">
           <ul>
             <li><Link to="/">Home</Link></li>
-            <li><Link to="/groups">Groups</Link></li>
+
+            <li className="dropdown">
+              <Link className="dropbtn" to="/groups">Groups</Link>
+
+              <div className="dropdown-content" role="menu" aria-label="Available groups">
+                {groups === null && <div style={{padding: '8px 12px'}}>Loading…</div>}
+                {groupsError && <div style={{padding: '8px 12px', color: 'salmon'}}>Error</div>}
+                {groups && groups.length === 0 && (
+                  <Link role="menuitem" to="/groups/create">Create or join a group</Link>
+                )}
+                {groups && groups.map(g => (
+                  <Link key={g.id} role="menuitem" to={`/group/${g.id}`}>{g.name}</Link>
+                ))}
+              </div>
+            </li>
+
             <li><Link to="/in-cinemas">In Cinemas</Link></li>
             <li><Link to="/advanced-search">Advanced Search</Link></li>
             <li><Link to="/shop">Shop</Link></li>
