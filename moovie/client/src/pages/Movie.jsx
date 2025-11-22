@@ -97,6 +97,37 @@ export default function Movie() {
     }
   };
 
+  // Add to favourites
+  const handleAddToFavourites = async () => {
+    const token = localStorage.getItem("token");
+    const userId = localStorage.getItem("userId");
+
+    if (!token) {
+      return alert("You must be logged in to add favourites");
+    }
+
+    try {
+      await axios.post(
+        "http://localhost:5000/api/lists/favourites",
+        {
+          movieId: Number(movieId),
+          movie_name: movie.title,
+          genre: movie.genres.map((g) => g.name).join(", "),
+          release_year: movie.release_date?.split("-")[0],
+          poster_url: `https://image.tmdb.org/t/p/w500${movie.poster_path}`
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      alert(`${movie.title} added to favourites!`);
+    } catch (err) {
+      console.error("Error adding to favourites:", err.response?.data);
+      alert(err.response?.data?.error || "Failed to add to favourites");
+    }
+  };
+
   return (
     <>
       <section id="movie-info">
@@ -111,7 +142,7 @@ export default function Movie() {
           {movie.genres.map((g) => g.name).join(", ")}
         </p>
 
-        <button>Add to Favorites</button>
+        <button onClick={handleAddToFavourites}>Add to Favourites</button>
         <button>Add to List</button>
       </section>
 

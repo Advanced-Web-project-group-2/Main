@@ -19,6 +19,10 @@ export default function Profile() {
   const [favourites, setFavourites] = useState([]);
   const [shareUrl, setShareUrl] = useState("");
 
+  const [customLists, setCustomLists] = useState([]);
+  const [newListName, setNewListName] = useState("");
+  const [newListDescription, setNewListDescription] = useState("");
+
   const [icons, setIcons] = useState([]);
   const [accessories, setAccessories] = useState([]);
 
@@ -95,12 +99,12 @@ export default function Profile() {
   const fetchFavourites = async () => {
     if (!token) return;
     try {
-      const res = await fetch("http://localhost:5000/lists/favourites", {
+      const res = await fetch("http://localhost:5000/api/lists/favourites", {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
       setFavourites(data.favourites || []);
-      setShareUrl(`${window.location.origin}/lists/favourites/public/${user.id}`);
+      if (user?.id) setShareUrl(`${window.location.origin}/api/lists/favourites/public/${user.id}`);
     } catch (err) {
       console.error("Failed to fetch favourites:", err);
     }
@@ -108,7 +112,7 @@ export default function Profile() {
 
   const removeFavourite = async (movieId) => {
     try {
-      const res = await fetch("http://localhost:5000/lists/favourites", {
+      const res = await fetch("http://localhost:5000/api/lists/favourites", {
         method: "DELETE",
         headers: {
           "Content-type": "application/json",
@@ -116,7 +120,9 @@ export default function Profile() {
         },
         body: JSON.stringify({ movieId }),
       });
+
       if (!res.ok) return alert("Failed to remove from favourites");
+
       setFavourites(favourites.filter((m) => m.id !== movieId));
     } catch (err) {
       console.error(err);
@@ -149,9 +155,57 @@ export default function Profile() {
     fetchItems();
   }, [user]);
 
-  // Fetch lists
+
+
+  // Fetch custom lists
+  const fetchCustomLists = async () => {
+    try {
+      const res = await fetch("http://localhost:5000/api/lists", {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await res.json();
+      setCustomLists(data.lists || []);
+    } catch (err) {
+      console.error("Failed to fetch lists:", err);
+    }
+  };
+
+  // Create a new list
+  const createNewList = async () => {
+    if (!newListName.trim()) return alert("List name cannot be empty");
+
+    try {
+      const res = await fetch("http://localhost:5000/api/lists", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ name: newListName, description: newListDescription }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data.error || "Failed to create list");
+        return;
+      }
+
+      setCustomLists([...customLists, data.list]);
+      setNewListName("");
+      setNewListDescription("");
+    } catch (err) {
+      console.error("Failed to create list:", err);
+      alert("Server error.");
+    }
+  };
+
+  // Load lists when user logs in
   useEffect(() => {
-    if (user) fetchFavourites();
+    if (user) {
+      fetchFavourites();
+      fetchCustomLists();
+    }
   }, [user]);
 
   if (!user) return <p>You must be logged in to view your profile.</p>;
@@ -217,6 +271,34 @@ export default function Profile() {
       <div className="profile-box box3">
         <h3>Your Movie Lists</h3>
 
+        <h4>Create New List</h4>
+        <div className="create-list-box">
+          <input
+            type="text"
+            placeholder="List name..."
+            value={newListName}
+            onChange={(e) => setNewListName(e.target.value)}
+          />
+          <input
+            type="text"
+            placeholder="Description (optional)"
+            value={newListDescription}
+            onChange={(e) => setNewListDescription(e.target.value)}
+          />
+          <button onClick={createNewList}>Create</button>
+        </div>
+
+        <h4>Your Custom Lists</h4>
+        {customLists.length > 0 ? (
+          <ul>
+            {customLists.map((list) => (
+              <li key={list.id}>{list.name}</li>
+            ))}
+          </ul>
+        ) : (
+          <p>You haven't created any lists yet.</p>
+        )}
+
         <h4>Favourites</h4>
         {favourites.length > 0 ? (
           <ul>
@@ -238,6 +320,7 @@ export default function Profile() {
           </p>
         )}
       </div>
+
 
       <div className="profile-box box4">
         <h3>Your Icons</h3>

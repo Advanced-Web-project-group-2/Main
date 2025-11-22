@@ -35,7 +35,7 @@ setupSwagger(app);
 seedShop().catch(err => console.error("SEED ERROR:", err));
 
 app.use("/auth", authRoutes);
-app.use("/lists", listsRoutes);
+app.use("/api/lists", listsRoutes);
 app.use("/shop", shopRoutes);
 app.use("/users", usersRoutes);
 app.use('/api/groups', groupsRoutes);
