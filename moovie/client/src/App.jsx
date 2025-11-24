@@ -14,6 +14,9 @@ import Profile from "./pages/Profile.jsx";
 import Shop from "./pages/Shop.jsx";
 import Movie from "./pages/Movie.jsx";
 
+import './styles/styles.css';
+import './styles/responsive.css';
+
 export default function App() {
   return (
     <Router>
