@@ -6,6 +6,9 @@ import {
   getShopItems,
   buyItem,
   getUserItemsByType,
+  equipIcon,
+  toggleAccessory,
+  getEquippedItems
 } from "../controllers/shop.controller.js";
 
 const router = express.Router();
@@ -113,5 +116,23 @@ router.get("/user-items/icons", authMiddleware, (req, res) =>
 router.get("/user-items/accessories", authMiddleware, (req, res) =>
   getUserItemsByType({ ...req, params: { itemType: "accessories" } }, res)
 );
+
+router.patch("/equip/icon/:itemId", authMiddleware, equipIcon);
+
+
+router.patch("/equip/accessory/:itemId", authMiddleware, toggleAccessory);
+
+
+router.get("/equipped", authMiddleware, getEquippedItems);
+
+router.get("/equipped/:userId", async (req, res) => {
+  try {
+    req.user = { id: req.params.userId };
+    return getEquippedItems(req, res);
+  } catch (err) {
+    console.error("Error fetching equipped items:", err);
+    return res.status(500).json({ error: "Failed to fetch avatar" });
+  }
+});
 
 export default router;

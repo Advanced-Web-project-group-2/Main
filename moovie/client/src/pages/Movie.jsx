@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
+import "../styles/Movie.css";
 
 export default function Movie() {
   const { movieId } = useParams();
@@ -8,11 +9,12 @@ export default function Movie() {
   const [reviews, setReviews] = useState([]);
   const [reviewText, setReviewText] = useState("");
   const [rating, setRating] = useState(5);
-  const [avgRating, setAvgRating] = useState(0)
+  const [avatarCache, setAvatarCache] = useState({}); // 🔥 NEW
 
   const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
+  const token = localStorage.getItem("token");
 
-  // Fetch movie from TMDB
+  // Fetch movie data
   useEffect(() => {
     axios
       .get(`https://api.themoviedb.org/3/movie/${movieId}?api_key=${API_KEY}`)
@@ -20,168 +22,141 @@ export default function Movie() {
       .catch(console.error);
   }, [movieId]);
 
-  // Function to render stars from a numeric rating
-  const renderStars = (rating) => {
-    const full = Math.floor(rating);
-    const half = rating % 1 >= 0.5;
-    const empty = 5 - full - (half ? 1 : 0);
-
-    return "⭐".repeat(full) + (half ? "✬" : "") + "☆".repeat(empty);
-  };
-
-  // Fetch reviews from backend
+  // Fetch reviews
   useEffect(() => {
-    const fetchReviews = async () => {
-      try {
-        const res = await axios.get(
-          `http://localhost:5000/api/reviews/${movieId}`
-        );
-        setReviews(res.data.reviews);
-        setAvgRating(res.data.avgRating);
-      } catch (err) {
-        console.error("Failed to fetch reviews", err);
-      }
-    };
-    fetchReviews();
+    axios
+      .get(`http://localhost:5000/api/reviews/${movieId}`)
+      .then((res) => setReviews(res.data.reviews))
+      .catch(console.error);
   }, [movieId]);
 
-  // Recalculate average rating anytime reviews change
+  // 🔥 Fetch avatar per unique reviewer
   useEffect(() => {
-    if (reviews.length === 0) {
-      setAvgRating(0);
-      return;
-    }
-    const sum = reviews.reduce((acc, review) => acc + review.rating, 0);
-    setAvgRating(sum / reviews.length);
+    const loadAvatars = async () => {
+      const uniqueUserIds = [...new Set(reviews.map((r) => r.user_id))];
+
+      const newAvatars = { ...avatarCache };
+
+      for (const userId of uniqueUserIds) {
+        if (!newAvatars[userId]) {
+          try {
+            const res = await fetch(`http://localhost:5000/shop/equipped/${userId}`);
+            const data = await res.json();
+            newAvatars[userId] = data.equipped || [];
+          } catch {
+            newAvatars[userId] = [];
+          }
+        }
+      }
+
+      setAvatarCache(newAvatars);
+    };
+
+    if (reviews.length > 0) loadAvatars();
   }, [reviews]);
 
   if (!movie) return <p>Loading...</p>;
 
-  // Submit a new review
+  // Submit review
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const token = localStorage.getItem("token");
-    const username = localStorage.getItem("username");
-    if (!token) {
-      return alert("You must be logged in to submit a review");
-    }
-
-    // Check if user already reviewed this movie
-    if (reviews.some(r => r.user_id === localStorage.getItem("userId"))) {
-      return alert("You have already reviewed this movie");
-    }
+    if (!token) return alert("You must be logged in to submit a review");
 
     try {
       const res = await axios.post(
         "http://localhost:5000/api/reviews",
         {
-          movie_id: Number(movieId),    
-          movie_name: movie.title,      
-          content: reviewText,          
-          rating: rating,               
+          movie_id: Number(movieId),
+          movie_name: movie.title,
+          content: reviewText,
+          rating,
         },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      // Add new review
-    const newReview = { ...res.data, username };
-    setReviews([newReview, ...reviews]);
-    setReviewText("");
-    setRating(5);
+      setReviews([res.data, ...reviews]);
+      setReviewText("");
+      setRating(5);
     } catch (err) {
-      console.error("Error submitting review:", err.response?.data);
-      alert(err.response?.data?.error || "Failed to add review");
+      alert("Failed to submit review");
     }
   };
 
   return (
-    <>
-      <section id="movie-info">
-        <h2>{movie.title}</h2>
-        <p>
-          <strong>Release Year:</strong>{" "}
-          {movie.release_date?.split("-")[0]}
-        </p>
-        <p>{movie.overview}</p>
-        <p>
-          <strong>Genres:</strong>{" "}
-          {movie.genres.map((g) => g.name).join(", ")}
-        </p>
+    <div className="movie-page">
 
-        <button>Add to Favorites</button>
-        <button>Add to List</button>
-      </section>
+{/* 🎬 Movie Info */}
+<div className="movie-box">
+  <div className="movie-info-wrapper">
+    <img
+      className="movie-poster"
+      src={`https://image.tmdb.org/t/p/w300${movie.poster_path}`}
+      alt={`${movie.title} poster`}
+    />
 
-      <hr />
+    <div className="movie-details">
+      <h2>{movie.title}</h2>
+      <p><strong>Release Year:</strong> {movie.release_date?.split("-")[0]}</p>
+      <p>{movie.overview}</p>
 
-      <section id="write-review">
+      {/* 🎯 Action Buttons */}
+      <div className="movie-buttons">
+        <button className="btn-warning">❤️ Add to Favorites</button>
+        <button className="btn-primary">📋 Add to List</button>
+        <button className="btn-secondary">🔗 Share</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+      {/* ✍ Write Review */}
+      <div className="movie-box">
         <h3>Write a Review</h3>
         <form onSubmit={handleSubmit}>
-          <label>Rating:</label>
-          <select
-            value={rating}
-            onChange={(e) => setRating(Number(e.target.value))}
-          >
-            <option value={1}>⭐</option>
-            <option value={2}>⭐⭐</option>
-            <option value={3}>⭐⭐⭐</option>
-            <option value={4}>⭐⭐⭐⭐</option>
-            <option value={5}>⭐⭐⭐⭐⭐</option>
+          <select value={rating} onChange={(e) => setRating(Number(e.target.value))}>
+            {[1, 2, 3, 4, 5].map(n => <option value={n} key={n}>{'⭐'.repeat(n)}</option>)}
           </select>
-          <br />
-
-          <textarea
-            rows="4"
-            placeholder="Write your review..."
-            value={reviewText}
-            onChange={(e) => setReviewText(e.target.value)}
-          />
-          <br />
-
-          <button type="submit">Submit Review</button>
+          <textarea value={reviewText} onChange={(e) => setReviewText(e.target.value)} rows="3" />
+          <button type="submit">Submit</button>
         </form>
-      </section>
+      </div>
 
-      <hr />
-
-      <section id="reviews">
+      {/* 📝 Reviews */}
+      <div className="movie-box">
         <h3>User Reviews</h3>
-
-        {reviews.length === 0 ? (
-          <p>No reviews yet</p>
-        ) : (
-          <ul>
+        {reviews.length === 0 ? <p>No reviews yet</p> : (
+          <ul className="reviews-list">
             {reviews.map((r) => (
-              <li key={r.id}>
-                <strong>{r.username}</strong>{" "}
-                {Array(r.rating)
-                  .fill("⭐")
-                  .join("")}
-                <br />
-                {r.content}
-                <br />
-                <em>{new Date(r.created_at).toLocaleDateString()}</em>
+              <li key={r.id} className="review-card">
+
+                {/* 🔥 Avatar */}
+                <div className="review-avatar">
+                  {avatarCache[r.user_id]?.length ? (
+                    avatarCache[r.user_id].map((layer, i) => (
+                      <img
+                        key={i}
+                        className="avatar-layer"
+                        style={{ zIndex: layer.layer_index }}
+                        src={layer.image_url}
+                      />
+                    ))
+                  ) : (
+                    <div className="avatar-placeholder">?</div>
+                  )}
+                </div>
+
+                {/* ✨ Review Content */}
+                <div className="review-content">
+                  <strong>{r.username}</strong> {"⭐".repeat(r.rating)}
+                  <p>{r.content}</p>
+                  <small>{new Date(r.created_at).toLocaleDateString()}</small>
+                </div>
               </li>
             ))}
           </ul>
         )}
-      </section>
-
-      <section id="average-rating">
-        <h3>Average Rating</h3>
-        {reviews.length === 0 ? (
-          <p>No ratings yet</p>
-        ) : (
-          <p>
-            {renderStars(avgRating)} ({avgRating.toFixed(1)})
-          </p>
-        )}
-      </section>
-
-    </>
+      </div>
+    </div>
   );
 }
-

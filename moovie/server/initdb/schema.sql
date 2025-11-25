@@ -28,7 +28,8 @@ CREATE TABLE shop (
     name VARCHAR(100) NOT NULL,
     price INT NOT NULL,
     type shop_item_type NOT NULL,
-    image_url VARCHAR(255)
+    image_url VARCHAR(255),
+    layer_index INT DEFAULT 0
 );
 
 -- =========================================================

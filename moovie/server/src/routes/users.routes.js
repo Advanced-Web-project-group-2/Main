@@ -6,6 +6,7 @@ import {
   deleteUser,
 } from "../controllers/users.controller.js";
 import authMiddleware from "../middleware/auth.js";
+import pool from "../db.js";
 
 const router = Router();
 
@@ -114,4 +115,24 @@ router.put("/update/:id", updateUser);
 
 router.delete("/delete", authMiddleware, deleteUser);
 
+router.get("/me", authMiddleware, async (req, res) => {
+  try {
+    const result = await pool.query(
+      "SELECT id, username, credits FROM users WHERE id = $1",
+      [req.user.id]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error("GET /users/me ERROR:", err);
+    res.status(500).json({ error: "Failed to fetch user" });
+  }
+});
+
+
 export default router;
+
