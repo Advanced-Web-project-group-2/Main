@@ -1,5 +1,16 @@
 import express from 'express';
-import { createGroup, getGroupById, getMyGroups, searchGroups } from '../controllers/groups.controller.js';
+import {
+	createGroup,
+	getGroupById,
+	getMyGroups,
+	searchGroups,
+	sendJoinRequest,
+	cancelJoinRequest,
+	getJoinStatus,
+	getPendingRequests,
+	approveRequest,
+	rejectRequest,
+} from '../controllers/groups.controller.js';
 import authMiddleware from '../middleware/auth.js';
 
 const router = express.Router();
@@ -15,5 +26,15 @@ router.get('/', searchGroups);
 
 // Get group by id
 router.get('/:id', getGroupById);
+
+// Join request endpoints
+router.post('/:id/join', authMiddleware, sendJoinRequest);
+router.delete('/:id/join', authMiddleware, cancelJoinRequest);
+router.get('/:id/join-status', authMiddleware, getJoinStatus);
+
+// Admin: list pending requests
+router.get('/:id/requests', authMiddleware, getPendingRequests);
+router.post('/:id/requests/:userId/approve', authMiddleware, approveRequest);
+router.post('/:id/requests/:userId/reject', authMiddleware, rejectRequest);
 
 export default router;

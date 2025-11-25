@@ -36,7 +36,7 @@ export default function Groups() {
           throw new Error(`Failed to load groups: ${res.status} ${res.statusText} ${bodyText}`);
         }
         const data = await res.json();
-        // loaded successfully; UI will update
+        // loaded successfully; Update UI
         if (!cancelled) setGroups(data.groups || []);
       } catch (err) {
         if (!cancelled) {
@@ -64,7 +64,7 @@ export default function Groups() {
     };
   }, [query]);
 
-  // listen for newly created groups from CreateGroup page and append
+  // listening for new groups
   useEffect(() => {
     let cancelled = false;
     function onGroupCreated(e) {

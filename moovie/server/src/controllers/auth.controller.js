@@ -176,7 +176,7 @@ export async function changePassword(req, res) {
 
 // DELETE /auth/delete
 export const deleteAccount = async (req, res) => {
-  console.log('deleteAccount controller hit');
+  // account deletion requested
 
   const userId = req.user.id;
   const { password } = req.body;
