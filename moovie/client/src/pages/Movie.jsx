@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import axios from "axios";
 import "../styles/Movie.css";
 
@@ -10,6 +11,7 @@ export default function Movie() {
   const [reviewText, setReviewText] = useState("");
   const [rating, setRating] = useState(5);
   const [avatarCache, setAvatarCache] = useState({}); // 🔥 NEW
+  const { user } = useAuth();
 
   const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
   const token = localStorage.getItem("token");
@@ -83,32 +85,67 @@ export default function Movie() {
     }
   };
 
+  const handleAddFavourite = async () => {
+    if (!token) return alert("You must be logged in!");
+
+    try {
+      await fetch("http://localhost:5000/lists/favourites", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          movieId: movie.id,
+          movieName: movie.title,                              
+          genre: movie.genres?.map(g => g.name).join(", "),
+          releaseYear: movie.release_date?.split("-")[0],      
+          posterUrl: movie.poster_path                         
+            ? `https://image.tmdb.org/t/p/w300${movie.poster_path}`
+            : null,
+        }),
+      });
+
+      alert("Added to Favourites!");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to add to favourites");
+    }
+  };
+
+
   return (
     <div className="movie-page">
 
-{/* 🎬 Movie Info */}
-<div className="movie-box">
-  <div className="movie-info-wrapper">
-    <img
-      className="movie-poster"
-      src={`https://image.tmdb.org/t/p/w300${movie.poster_path}`}
-      alt={`${movie.title} poster`}
-    />
+      {/* 🎬 Movie Info */}
+      <div className="movie-box">
+        <div className="movie-info-wrapper">
+          <img
+            className="movie-poster"
+            src={`https://image.tmdb.org/t/p/w300${movie.poster_path}`}
+            alt={`${movie.title} poster`}
+          />
 
-    <div className="movie-details">
-      <h2>{movie.title}</h2>
-      <p><strong>Release Year:</strong> {movie.release_date?.split("-")[0]}</p>
-      <p>{movie.overview}</p>
+          <div className="movie-details">
+            <h2>{movie.title}</h2>
+            <p><strong>Release Year:</strong> {movie.release_date?.split("-")[0]}</p>
+            <p>{movie.overview}</p>
 
-      {/* 🎯 Action Buttons */}
-      <div className="movie-buttons">
-        <button className="btn-warning">❤️ Add to Favorites</button>
-        <button className="btn-primary">📋 Add to List</button>
-        <button className="btn-secondary">🔗 Share</button>
+            {/* 🎯 Action Buttons */}
+            <div className="movie-actions">
+              <button className="btn-white" onClick={handleAddFavourite}>
+                ❤️ Add to Favorites
+              </button>
+              <button className="btn-white">
+                ➕ Add to List
+              </button>
+              <button className="btn-white">
+                🔗 Share
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
-</div>
 
       {/* ✍ Write Review */}
       <div className="movie-box">
@@ -130,7 +167,7 @@ export default function Movie() {
             {reviews.map((r) => (
               <li key={r.id} className="review-card">
 
-                {/* 🔥 Avatar */}
+         // client/src/context/AuthContext.jsx       {/* 🔥 Avatar */}
                 <div className="review-avatar">
                   {avatarCache[r.user_id]?.length ? (
                     avatarCache[r.user_id].map((layer, i) => (

@@ -29,6 +29,8 @@ export default function App() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/shop" element={<Shop />} />
           <Route path="/movie/:movieId" element={<Movie />} />
+          <Route path="/lists/favourites/public/:userId" element={<PublicFavourites />} />
+
         </Route>
 
         {/* Auth pages WITHOUT the layout */}

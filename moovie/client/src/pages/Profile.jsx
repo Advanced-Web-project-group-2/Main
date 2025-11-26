@@ -21,23 +21,21 @@ export default function Profile() {
 
   const [icons, setIcons] = useState([]);
   const [accessories, setAccessories] = useState([]);
-
-  // 🧩 NEW: Store equipped avatar items
   const [equippedItems, setEquippedItems] = useState([]);
 
-  // Handle password fields
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+  const [customLists, setCustomLists] = useState([]);
+  const [newListName, setNewListName] = useState("");
+  const [newListDescription, setNewListDescription] = useState("");
 
-  // Change password
+  // HANDLE FORMS
+  const handleChange = (e) =>
+    setForm({ ...form, [e.target.name]: e.target.value });
+
+  // PASSWORD CHANGE
   const handlePasswordChange = async (e) => {
     e.preventDefault();
-
-    if (form.newPassword !== form.repeatPassword) {
-      alert("New passwords do not match");
-      return;
-    }
+    if (form.newPassword !== form.repeatPassword)
+      return alert("New passwords do not match");
 
     try {
       const res = await fetch("http://localhost:5000/auth/change-password", {
@@ -55,18 +53,18 @@ export default function Profile() {
       const data = await res.json();
       if (!res.ok) return alert(data.error);
 
-      alert("Password updated successfully!");
+      alert("Password updated!");
       setForm({ oldPassword: "", newPassword: "", repeatPassword: "" });
       setShowChangePw(false);
     } catch (err) {
       console.error(err);
-      alert("Something went wrong");
+      alert("Server error");
     }
   };
 
-  // Delete account
+  // DELETE ACCOUNT
   const confirmDelete = async () => {
-    if (!deletePassword) return alert("Please enter password.");
+    if (!deletePassword) return alert("Enter password first");
 
     try {
       const res = await fetch("http://localhost:5000/auth/delete", {
@@ -79,44 +77,34 @@ export default function Profile() {
       });
 
       const data = await res.json();
-      if (!res.ok) return alert(data.error || "Failed to delete account");
+      if (!res.ok) return alert(data.error);
 
-      alert("Account deleted.");
+      alert("Account deleted");
       localStorage.removeItem("token");
       window.location.href = "/";
     } catch (err) {
       console.error(err);
-      alert("Server error.");
+      alert("Server error");
     }
   };
 
-  // Equip icon (single selection)
+  // ICONS & ACCESSORIES
   const equipIcon = async (itemId) => {
-    try {
-      await fetch(`http://localhost:5000/shop/equip/icon/${itemId}`, {
-        method: "PATCH",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      refreshShopData();
-    } catch (err) {
-      console.error("Equip icon failed:", err);
-    }
+    await fetch(`http://localhost:5000/shop/equip/icon/${itemId}`, {
+      method: "PATCH",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    refreshShopData();
   };
 
-  // Toggle accessory (multiple allowed)
   const toggleAccessory = async (itemId) => {
-    try {
-      await fetch(`http://localhost:5000/shop/equip/accessory/${itemId}`, {
-        method: "PATCH",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      refreshShopData();
-    } catch (err) {
-      console.error("Toggle accessory failed:", err);
-    }
+    await fetch(`http://localhost:5000/shop/equip/accessory/${itemId}`, {
+      method: "PATCH",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    refreshShopData();
   };
 
-  // Refresh icons, accessories & avatar
   const refreshShopData = async () => {
     try {
       const [iconsRes, accessoriesRes, equippedRes] = await Promise.all([
@@ -139,7 +127,26 @@ export default function Profile() {
     }
   };
 
-  // Fetch favourite movies
+  // FAVORITES
+  const removeFavourite = async (movieId) => {
+    try {
+      const res = await fetch("http://localhost:5000/lists/favourites", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ movieId }),
+      });
+
+      if (!res.ok) return alert("Failed to remove movie");
+      setFavourites((prev) => prev.filter((m) => m.id !== movieId));
+    } catch (err) {
+      console.error(err);
+      alert("Server error");
+    }
+  };
+
   const fetchFavourites = async () => {
     try {
       const res = await fetch("http://localhost:5000/lists/favourites", {
@@ -147,17 +154,61 @@ export default function Profile() {
       });
       const data = await res.json();
       setFavourites(data.favourites || []);
-      setShareUrl(`${window.location.origin}/lists/favourites/public/${user.id}`);
+      setShareUrl(
+        `${window.location.origin}/lists/favourites/public/${user.id}`
+      );
     } catch (err) {
-      console.error("Failed to fetch favourites:", err);
+      console.error(err);
     }
   };
 
-  // Initial data load
+  // CUSTOM LISTS
+  const fetchCustomLists = async () => {
+    try {
+      const res = await fetch("http://localhost:5000/lists", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      setCustomLists(data.lists || []);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const createNewList = async () => {
+    if (!newListName.trim()) return alert("List name is required");
+
+    try {
+      const res = await fetch("http://localhost:5000/lists", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          name: newListName,
+          description: newListDescription,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) return alert(data.error);
+
+      setCustomLists((prev) => [...prev, data.list]);
+      setNewListName("");
+      setNewListDescription("");
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // LOAD ALL DATA
   useEffect(() => {
     if (user) {
       refreshShopData();
       fetchFavourites();
+      fetchCustomLists();
     }
   }, [user]);
 
@@ -165,11 +216,10 @@ export default function Profile() {
 
   return (
     <div className="profile-grid">
-
-      {/* 🧍 HEADER WITH AVATAR */}
+      {/* TOP PROFILE BOX */}
       <div className="profile-box user-header-box">
         <div className="avatar-preview">
-          {equippedItems.length > 0 ? (
+          {equippedItems.length ? (
             equippedItems.map((item) => (
               <img
                 key={item.item_id}
@@ -186,75 +236,43 @@ export default function Profile() {
 
         <div className="profile-main-info">
           <h2>{user.username}</h2>
-          <p><strong>Credits:</strong> {user.credits}</p>
+          <p>
+            <strong>Credits:</strong> {user.credits}
+          </p>
         </div>
 
         <div className="profile-settings">
-          <button className="btn-blue" onClick={() => setShowChangePw(!showChangePw)}>
+          <button
+            className="btn-blue"
+            onClick={() => setShowChangePw(!showChangePw)}
+          >
             {showChangePw ? "Cancel" : "Change Password"}
           </button>
-          <button className="btn-yellow" onClick={() => setShowDeleteModal(true)}>
+          <button
+            className="btn-yellow"
+            onClick={() => setShowDeleteModal(true)}
+          >
             Delete Account
           </button>
         </div>
       </div>
 
-      {/* 🔒 Password Change Modal */}
-      {showChangePw && (
-        <div className="modal-overlay" onClick={() => setShowChangePw(false)}>
-          <div className="modal-box" onClick={(e) => e.stopPropagation()}>
-            <h2>Change Password</h2>
-            <form onSubmit={handlePasswordChange}>
-              <input type="password" name="oldPassword" placeholder="Old password" value={form.oldPassword} onChange={handleChange} required />
-              <input type="password" name="newPassword" placeholder="New password" value={form.newPassword} onChange={handleChange} required />
-              <input type="password" name="repeatPassword" placeholder="Repeat new password" value={form.repeatPassword} onChange={handleChange} required />
-
-              <button type="submit" className="btn-blue">Update Password</button>
-              <button type="button" className="btn-yellow" onClick={() => setShowChangePw(false)}>Cancel</button>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* ❌ Delete Account Modal */}
-      {showDeleteModal && (
-        <div className="modal-overlay">
-          <div className="modal-box">
-            <h3>Confirm Account Deletion</h3>
-            <input type="password" placeholder="Enter password" value={deletePassword} onChange={(e) => setDeletePassword(e.target.value)} />
-            <button onClick={confirmDelete}>Delete</button>
-            <button onClick={() => setShowDeleteModal(false)}>Cancel</button>
-          </div>
-        </div>
-      )}
-
-      {/* 🎨 Accessories Section */}
-      <div className="profile-box box5">
-        <h3>Your Accessories</h3>
-        <div className="item-grid">
-          {accessories.map((a) => (
-            <img
-              key={a.item_id}
-              src={a.image_url}
-              alt={a.name}
-              className={`profile-item-icon ${a.is_equipped ? "equipped" : ""}`}
-              onClick={() => toggleAccessory(a.item_id)}
-              title={a.is_equipped ? "Click to unequip" : "Click to equip"}
-            />
-          ))}
-        </div>
-      </div>
-
-      {/* 🧾 Lists Section */}
-      <div className="profile-box box3">
-        <h3>Your Movie Lists</h3>
-        <h4>Favourites</h4>
+      {/* FAVOURITES */}
+      <div className="profile-box box2">
+        <h3>Favourite Movies</h3>
         {favourites.length ? (
-          <ul>
+          <ul style={{ listStyle: "none", padding: 0 }}>
             {favourites.map((movie) => (
-              <li key={movie.id}>
-                {movie.name} ({movie.release_year})
-                <button onClick={() => removeFavourite(movie.id)}>Remove</button>
+              <li key={movie.id} style={{ display: "flex", marginBottom: "8px" }}>
+                <img
+                  src={movie.poster_url || "https://via.placeholder.com/60x90"}
+                  alt={movie.name}
+                  style={{ width: "60px", borderRadius: "6px", marginRight: "10px" }}
+                />
+                <span>{movie.name} {movie.release_year && `(${movie.release_year})`}</span>
+                <button style={{ marginLeft: "auto" }} onClick={() => removeFavourite(movie.id)}>
+                  Remove
+                </button>
               </li>
             ))}
           </ul>
@@ -264,8 +282,38 @@ export default function Profile() {
         {shareUrl && <p>Share: <a href={shareUrl}>{shareUrl}</a></p>}
       </div>
 
-      {/* 🧿 Icons Section */}
-      <div className="profile-box box4">
+      {/* CUSTOM LISTS */}
+      <div className="profile-box box3">
+        <h3>Your Custom Lists</h3>
+        <input
+          type="text"
+          placeholder="New list name"
+          value={newListName}
+          onChange={(e) => setNewListName(e.target.value)}
+        />
+        <textarea
+          placeholder="Description (optional)"
+          value={newListDescription}
+          onChange={(e) => setNewListDescription(e.target.value)}
+        />
+        <button onClick={createNewList}>Create List</button>
+
+        {customLists.length ? (
+          <ul style={{ listStyle: "none", padding: 0 }}>
+            {customLists.map((list) => (
+              <li key={list.id} style={{ marginBottom: "6px" }}>
+                <strong>{list.name}</strong>
+                {list.description && <small> – {list.description}</small>}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>No custom lists yet.</p>
+        )}
+      </div>
+
+      {/* SIDEBAR: ICONS + ACCESSORIES */}
+      <div className="profile-box box5">
         <h3>Your Icons</h3>
         <div className="item-grid">
           {icons.map((i) => (
@@ -275,16 +323,25 @@ export default function Profile() {
               alt={i.name}
               className={`profile-item-icon ${i.is_equipped ? "equipped" : ""}`}
               onClick={() => equipIcon(i.item_id)}
-              title={i.is_equipped ? "Equipped" : "Click to equip"}
+            />
+          ))}
+        </div>
+
+        <hr style={{ margin: "12px 0", border: "2px solid black" }} />
+
+        <h3>Your Accessories</h3>
+        <div className="item-grid">
+          {accessories.map((a) => (
+            <img
+              key={a.item_id}
+              src={a.image_url}
+              alt={a.name}
+              className={`profile-item-icon ${a.is_equipped ? "equipped" : ""}`}
+              onClick={() => toggleAccessory(a.item_id)}
             />
           ))}
         </div>
       </div>
-
-      <div className="profile-box box2">
-        <h3>Your Groups</h3>
-      </div>
-
     </div>
   );
 }

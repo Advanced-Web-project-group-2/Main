@@ -1,4 +1,3 @@
-// client/src/context/AuthContext.jsx
 import { createContext, useContext, useEffect, useState } from "react";
 
 const AuthContext = createContext();
@@ -6,7 +5,6 @@ const AuthContext = createContext();
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
 
-  // 🔁 Fetch logged user data (credits, username, id, etc.)
   const refreshUserData = async () => {
     const token = localStorage.getItem("token");
     if (!token) return;
@@ -20,7 +18,6 @@ export function AuthProvider({ children }) {
         const updatedUser = await res.json();
         setUser(updatedUser);
 
-        // Optional: sync for continuity
         localStorage.setItem("username", updatedUser.username);
         localStorage.setItem("userId", updatedUser.id);
         localStorage.setItem("credits", updatedUser.credits);
@@ -30,19 +27,17 @@ export function AuthProvider({ children }) {
     }
   };
 
-  // 🔓 Login — ensure UI updates IMMEDIATELY before backend request
-  const login = async (username, token) => {
+  const login = async (username, token, id = null, credits = 0) => {
     if (token) localStorage.setItem("token", token);
     localStorage.setItem("username", username);
+    if (id) localStorage.setItem("userId", id);
+    if (credits !== undefined) localStorage.setItem("credits", credits);
 
-    // 👇 This makes the top bar update *instantly*
-    setUser((prev) => ({ ...prev, username }));
+    setUser({ username, id, credits });
 
-    // Then in background, fetch credits and id from backend
     await refreshUserData();
   };
 
-  // 🔒 Logout
   const logout = () => {
     localStorage.removeItem("username");
     localStorage.removeItem("token");
@@ -51,7 +46,6 @@ export function AuthProvider({ children }) {
     setUser(null);
   };
 
-  // Load user data when app starts
   useEffect(() => {
     refreshUserData();
   }, []);
