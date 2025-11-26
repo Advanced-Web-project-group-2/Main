@@ -1,0 +1,141 @@
+/* 🌟 PAGE CONTAINER */
+.advanced-search-page {
+  width: 100%; /* Full width */
+}
+
+.advanced-search-container {
+  width: 100%;
+  min-height: 100vh;
+  padding-bottom: 50px;
+}
+
+.advanced-search-container section#advanced-search {
+  max-width: 900px;
+  margin: auto;
+  padding-top: 20px;
+}
+
+/* 🔍 SEARCH BOX (Top Section) */
+.search-box {
+  background: #ffffff;
+  border: 6px solid #000;
+  border-radius: 20px;
+  padding: 20px;
+  margin-bottom: 25px;
+
+  box-shadow:
+    6px 6px 0px #000,
+    10px 10px 0px rgba(0,0,0,0.25);
+}
+
+/* 🔎 SEARCH FORM */
+.search-form {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.search-form input,
+.search-form select {
+  flex: 1;
+  min-width: 150px;
+  max-width: 250px; /* new */
+  padding: 12px 16px;
+
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+
+  border: 3px solid #000;
+  border-radius: 999px;
+  background: white;
+  box-shadow: 3px 3px 0px #000;
+  font-size: 16px;
+  transition: 0.15s ease;
+}
+
+.search-form button {
+  padding: 12px 20px;
+  border-radius: 999px;
+  border: 3px solid #000;
+  font-size: 16px;
+  font-weight: bold;
+
+  background: white;
+  cursor: pointer;
+  box-shadow: 3px 3px 0px #000;
+}
+
+.search-form button:hover {
+  background: black;
+  color: white;
+}
+
+/* 🎬 MOVIE CARD */
+.movie-card {
+  display: flex;
+  gap: 15px;
+  padding: 20px;
+  margin-bottom: 20px;
+
+  background: #ffffff;
+  border: 6px solid #000;
+  border-radius: 20px;
+
+  box-shadow:
+    6px 6px 0px #000,
+    10px 10px 0px rgba(0,0,0,0.25);
+  align-items: center;
+}
+
+/* 🎞 MOVIE IMAGE */
+.movie-thumbnail {
+  width: 140px;
+  border: 6px solid #000;
+  border-radius: 15px;
+  box-shadow: 4px 4px 0px #000;
+}
+
+/* 📋 MOVIE TEXT DETAILS */
+.movie-details h2 {
+  margin: 0 0 5px 0;
+  font-size: 22px;
+}
+
+.movie-details p {
+  margin: 2px 0;
+  font-size: 15px;
+}
+
+/* 🔘 BUTTONS FOR MOVIE CARD */
+.movie-buttons {
+  margin-top: 8px;
+}
+
+.movie-buttons button {
+  margin-right: 8px;
+  padding: 8px 15px;
+  border-radius: 999px;
+  border: 3px solid #000;
+  background: white;
+  box-shadow: 3px 3px 0px #000;
+  cursor: pointer;
+  transition: transform 0.1s ease;
+}
+
+.movie-buttons button:hover {
+  background: black;
+  color: white;
+}
+
+.movie-buttons button:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0px #000;
+}
+
+.error {
+  color: darkred;
+  font-weight: bold;
+  margin-bottom: 15px;
+}

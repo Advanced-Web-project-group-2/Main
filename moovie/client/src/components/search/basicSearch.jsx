@@ -41,7 +41,7 @@ export default function BasicSearch({ limit = 8, placeholder = 'Search movies or
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const blurTimeoutRef = useRef(null);
-    const wrapperRef = useRef(null);
+  const wrapperRef = useRef(null);
   const [popupStyle, setPopupStyle] = useState(null);
 
   useEffect(() => {
@@ -111,61 +111,65 @@ export default function BasicSearch({ limit = 8, placeholder = 'Search movies or
   };
 
   return (
-    <div ref={wrapperRef} className="basic-search" style={{ position: 'relative', display: 'inline-block' }}>
-      <form onSubmit={onSearch} style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-        <input
-          aria-label={placeholder}
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder={placeholder}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              e.preventDefault();
-              onSearch();
+    <div ref={wrapperRef} className="basic-search">
+    <form onSubmit={onSearch} className="basic-search-form">
+      <input
+        className="basic-search-input"
+        aria-label={placeholder}
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder={placeholder}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            onSearch();
+          }
+        }}
+        onBlur={onBlur}
+        onFocus={onFocus}
+      />
+      <button type="button" onClick={onSearch} className="basic-search-btn">
+        Search
+      </button>
+    </form>
+      
+      { loading && <div style={{ position: 'absolute', top: '100%', left: 0 }}>Searching…</div> }
+
+  {
+    results && results.length > 0 && createPortal(
+      <ul className="search-popup" role="listbox" style={{ margin: 0, paddingLeft: 0, ...(popupStyle || {}) }}>
+        {results.map((r) => (
+          <li key={`${r.id}-${r.media_type || 'm'}`} onMouseDown={() => {
+            // prevent blur timeout from clearing results before click
+            if (blurTimeoutRef.current) {
+              clearTimeout(blurTimeoutRef.current);
+              blurTimeoutRef.current = null;
             }
-          }}
-          onBlur={onBlur}
-          onFocus={onFocus}
-          style={{ minWidth: 220 }}
-        />
-        <button type="button" onClick={onSearch}>Search</button>
-      </form>
+          }}>
+            <Link to={`/movie/${r.id}`} className="search-item-link">
+              <div className="search-item" style={{ display: 'flex', alignItems: 'center' }}>
+                {r.poster_path ? (
+                  <img
+                    src={`https://image.tmdb.org/t/p/w92${r.poster_path}`}
+                    alt={r.title || r.name}
+                    style={{ width: 48, height: 'auto', objectFit: 'cover', marginRight: 8, borderRadius: 4 }}
+                  />
+                ) : (
+                  <div style={{ width: 48, height: 72, background: '#eee', marginRight: 8, borderRadius: 4 }} />
+                )}
 
-      {loading && <div style={{ position: 'absolute', top: '100%', left: 0 }}>Searching…</div>}
-
-      {results && results.length > 0 && createPortal(
-        <ul className="search-popup" role="listbox" style={{ margin: 0, paddingLeft: 0, ...(popupStyle || {}) }}>
-          {results.map((r) => (
-            <li key={`${r.id}-${r.media_type || 'm'}`} onMouseDown={() => {
-              // prevent blur timeout from clearing results before click
-              if (blurTimeoutRef.current) {
-                clearTimeout(blurTimeoutRef.current);
-                blurTimeoutRef.current = null;
-              }
-            }}>
-              <Link to={`/movie/${r.id}`} className="search-item-link">
-                <div className="search-item" style={{display: 'flex', alignItems: 'center'}}>
-                  {r.poster_path ? (
-                    <img
-                      src={`https://image.tmdb.org/t/p/w92${r.poster_path}`}
-                      alt={r.title || r.name}
-                      style={{width: 48, height: 'auto', objectFit: 'cover', marginRight: 8, borderRadius: 4}}
-                    />
-                  ) : (
-                    <div style={{width:48, height:72, background:'#eee', marginRight:8, borderRadius:4}} />
-                  )}
-
-                  <div style={{display: 'flex', flexDirection: 'column'}}>
-                    <span className="search-title">{r.title || r.name}</span>
-                    <small className="search-year" style={{color:'#666'}}>{r.release_date ? `(${(r.release_date || '').slice(0,4)})` : ''}</small>
-                  </div>
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                  <span className="search-title">{r.title || r.name}</span>
+                  <small className="search-year" style={{ color: '#666' }}>{r.release_date ? `(${(r.release_date || '').slice(0, 4)})` : ''}</small>
                 </div>
-              </Link>
-            </li>
-          ))}
-        </ul>,
-        document.body
-      )}
-    </div>
+              </div>
+            </Link>
+          </li>
+        ))}
+      </ul>,
+      document.body
+    )
+  }
+    </div >
   );
 }

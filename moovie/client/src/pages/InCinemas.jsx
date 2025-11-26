@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import "../styles/InCinemas.css";
 
 export default function InCinemas() {
   const [movies, setMovies] = useState([]);
@@ -9,33 +10,52 @@ export default function InCinemas() {
   useEffect(() => {
     axios
       .get(`https://api.themoviedb.org/3/movie/now_playing?api_key=${API_KEY}`)
-      .then(res => setMovies(res.data.results))
-      .catch(err => console.error(err));
+      .then((res) => setMovies(res.data.results))
+      .catch((err) => console.error(err));
   }, []);
 
   return (
-    <>
-      <section id="cinema-list">
-        <h2>All Movies in Cinemas</h2>
+    <div className="cinemas-page">
+      <h2>🎬 Now Showing in Cinemas</h2>
 
-        <ul>
-          {movies.length === 0 ? (
-            <p>Loading movies...</p>
-          ) : (
-            movies.map(movie => (
-              <li key={movie.id}>
+      {movies.length === 0 ? (
+        <p className="loading-text">Loading movies...</p>
+      ) : (
+        <div className="cinema-grid">
+          {movies.map((movie) => (
+            <div key={movie.id} className="cinema-card">
+
+              {/* 🎥 Clickable Poster → Movie page */}
+              <Link to={`/movie/${movie.id}`}>
+                <img
+                  className="cinema-poster"
+                  src={
+                    movie.poster_path
+                      ? `https://image.tmdb.org/t/p/w200${movie.poster_path}`
+                      : "https://via.placeholder.com/200x300?text=No+Image"
+                  }
+                  alt={movie.title}
+                />
+              </Link>
+
+              {/* 🎬 Info */}
+              <div className="cinema-info">
                 <h3>{movie.title}</h3>
-                <p>Release date: {movie.release_date}</p>
-                {movie.poster_path && (
-                  <img src={`https://image.tmdb.org/t/p/w200${movie.poster_path}`} />
-                )}
-                <br />
-                <Link to={`/movie/${movie.id}`}>See Details</Link>
-              </li>
-            ))
-          )}
-        </ul>
-      </section>
-    </>
+                <p>
+                  <strong>Release:</strong>{" "}
+                  {new Date(movie.release_date).toLocaleDateString()}
+                </p>
+
+                <div className="cinema-buttons">
+                  <button className="btn-warning">❤️ Favorite</button>
+                  <button className="btn-primary">📋 Add to List</button>
+                  <button className="btn-secondary">🔗 Share</button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }

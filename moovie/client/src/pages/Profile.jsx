@@ -7,41 +7,42 @@ export default function Profile() {
   const token = localStorage.getItem("token");
 
   const [showChangePw, setShowChangePw] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deletePassword, setDeletePassword] = useState("");
+
   const [form, setForm] = useState({
     oldPassword: "",
     newPassword: "",
     repeatPassword: "",
   });
 
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [deletePassword, setDeletePassword] = useState("");
-
   const [favourites, setFavourites] = useState([]);
   const [shareUrl, setShareUrl] = useState("");
 
   const [icons, setIcons] = useState([]);
   const [accessories, setAccessories] = useState([]);
+  const [equippedItems, setEquippedItems] = useState([]);
 
-  // Handle password input
-  const handleChange = (e) => {
+  const [customLists, setCustomLists] = useState([]);
+  const [newListName, setNewListName] = useState("");
+  const [newListDescription, setNewListDescription] = useState("");
+
+  // HANDLE FORMS
+  const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
-  };
 
-  // Handle password submit
+  // PASSWORD CHANGE
   const handlePasswordChange = async (e) => {
     e.preventDefault();
-
-    if (form.newPassword !== form.repeatPassword) {
-      alert("New passwords do not match");
-      return;
-    }
+    if (form.newPassword !== form.repeatPassword)
+      return alert("New passwords do not match");
 
     try {
       const res = await fetch("http://localhost:5000/auth/change-password", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: "Bearer " + localStorage.getItem("token"),
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           oldPassword: form.oldPassword,
@@ -52,202 +53,295 @@ export default function Profile() {
       const data = await res.json();
       if (!res.ok) return alert(data.error);
 
-      alert("Password updated successfully!");
+      alert("Password updated!");
       setForm({ oldPassword: "", newPassword: "", repeatPassword: "" });
       setShowChangePw(false);
     } catch (err) {
       console.error(err);
-      alert("Something went wrong");
+      alert("Server error");
     }
   };
 
-  // Delete account
-  const handleDeleteAccount = () => setShowDeleteModal(true);
+  // DELETE ACCOUNT
   const confirmDelete = async () => {
-    if (!deletePassword) {
-      alert("Password is required.");
-      return;
-    }
+    if (!deletePassword) return alert("Enter password first");
 
     try {
       const res = await fetch("http://localhost:5000/auth/delete", {
         method: "DELETE",
         headers: {
-          "Content-type": "application/json",
+          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ password: deletePassword }),
       });
 
       const data = await res.json();
-      if (!res.ok) return alert(data.error || "Delete failed.");
+      if (!res.ok) return alert(data.error);
 
-      alert("Account deleted successfully.");
+      alert("Account deleted");
       localStorage.removeItem("token");
       window.location.href = "/";
     } catch (err) {
       console.error(err);
-      alert("Server error.");
+      alert("Server error");
     }
   };
 
-  // Fetch favourites
+  // ICONS & ACCESSORIES
+  const equipIcon = async (itemId) => {
+    await fetch(`http://localhost:5000/shop/equip/icon/${itemId}`, {
+      method: "PATCH",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    refreshShopData();
+  };
+
+  const toggleAccessory = async (itemId) => {
+    await fetch(`http://localhost:5000/shop/equip/accessory/${itemId}`, {
+      method: "PATCH",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    refreshShopData();
+  };
+
+  const refreshShopData = async () => {
+    try {
+      const [iconsRes, accessoriesRes, equippedRes] = await Promise.all([
+        fetch("http://localhost:5000/shop/user-items/icons", {
+          headers: { Authorization: `Bearer ${token}` },
+        }),
+        fetch("http://localhost:5000/shop/user-items/accessories", {
+          headers: { Authorization: `Bearer ${token}` },
+        }),
+        fetch("http://localhost:5000/shop/equipped", {
+          headers: { Authorization: `Bearer ${token}` },
+        }),
+      ]);
+
+      setIcons((await iconsRes.json()).items || []);
+      setAccessories((await accessoriesRes.json()).items || []);
+      setEquippedItems((await equippedRes.json()).equipped || []);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // FAVORITES
+  const removeFavourite = async (movieId) => {
+    try {
+      const res = await fetch("http://localhost:5000/lists/favourites", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ movieId }),
+      });
+
+      if (!res.ok) return alert("Failed to remove movie");
+      setFavourites((prev) => prev.filter((m) => m.id !== movieId));
+    } catch (err) {
+      console.error(err);
+      alert("Server error");
+    }
+  };
+
   const fetchFavourites = async () => {
-    if (!token) return;
     try {
       const res = await fetch("http://localhost:5000/lists/favourites", {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
       setFavourites(data.favourites || []);
-      setShareUrl(`${window.location.origin}/lists/favourites/public/${user.id}`);
-    } catch (err) {
-      console.error("Failed to fetch favourites:", err);
-    }
-  };
-
-  const removeFavourite = async (movieId) => {
-    try {
-      const res = await fetch("http://localhost:5000/lists/favourites", {
-        method: "DELETE",
-        headers: {
-          "Content-type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ movieId }),
-      });
-      if (!res.ok) return alert("Failed to remove from favourites");
-      setFavourites(favourites.filter((m) => m.id !== movieId));
+      setShareUrl(
+        `${window.location.origin}/lists/favourites/public/${user.id}`
+      );
     } catch (err) {
       console.error(err);
-      alert("Server error.");
     }
   };
 
-  // Fetch user shop items
-  useEffect(() => {
-    if (!user) return;
-
-    async function fetchItems() {
-      try {
-        const res1 = await fetch("http://localhost:5000/shop/user-items/icons", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const data1 = await res1.json();
-        setIcons(data1.items || []);
-
-        const res2 = await fetch("http://localhost:5000/shop/user-items/accessories", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const data2 = await res2.json();
-        setAccessories(data2.items || []);
-      } catch (err) {
-        console.error(err);
-      }
+  // CUSTOM LISTS
+  const fetchCustomLists = async () => {
+    try {
+      const res = await fetch("http://localhost:5000/lists", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      setCustomLists(data.lists || []);
+    } catch (err) {
+      console.error(err);
     }
+  };
 
-    fetchItems();
-  }, [user]);
+  const createNewList = async () => {
+    if (!newListName.trim()) return alert("List name is required");
 
-  // Fetch lists
+    try {
+      const res = await fetch("http://localhost:5000/lists", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          name: newListName,
+          description: newListDescription,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) return alert(data.error);
+
+      setCustomLists((prev) => [...prev, data.list]);
+      setNewListName("");
+      setNewListDescription("");
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // LOAD ALL DATA
   useEffect(() => {
-    if (user) fetchFavourites();
+    if (user) {
+      refreshShopData();
+      fetchFavourites();
+      fetchCustomLists();
+    }
   }, [user]);
 
   if (!user) return <p>You must be logged in to view your profile.</p>;
 
   return (
     <div className="profile-grid">
-
+      {/* TOP PROFILE BOX */}
       <div className="profile-box user-header-box">
+        <div className="avatar-preview">
+          {equippedItems.length ? (
+            equippedItems.map((item) => (
+              <img
+                key={item.item_id}
+                src={item.image_url}
+                alt={item.name}
+                className="avatar-layer"
+                style={{ zIndex: item.layer_index }}
+              />
+            ))
+          ) : (
+            <p>No avatar</p>
+          )}
+        </div>
+
         <div className="profile-main-info">
           <h2>{user.username}</h2>
-          <p><strong>Credits:</strong> {user.credits}</p>
+          <p>
+            <strong>Credits:</strong> {user.credits}
+          </p>
         </div>
 
-        <button className="change-password-btn btn-blue" onClick={() => setShowChangePw(!showChangePw)}>
-          {showChangePw ? "Cancel" : "Change Password"}
-        </button>
-
-        {showChangePw && (
-          <div className="modal-overlay" onClick={() => setShowChangePw(false)}>
-            <div className="modal-box" onClick={(e) => e.stopPropagation()}>
-              <h2>Change Password</h2>
-              <form onSubmit={handlePasswordChange}>
-                <input type="password" name="oldPassword" placeholder="Old password" value={form.oldPassword} onChange={handleChange} required />
-                <input type="password" name="newPassword" placeholder="New password" value={form.newPassword} onChange={handleChange} required />
-                <input type="password" name="repeatPassword" placeholder="Repeat new password" value={form.repeatPassword} onChange={handleChange} required />
-
-                <button type="submit" className="btn-blue">Update Password</button>
-                <button type="button" className="btn-yellow" onClick={() => setShowChangePw(false)}>Cancel</button>
-              </form>
-            </div>
-          </div>
-        )}
-
-        <button className="delete-account-btn btn-yellow" onClick={handleDeleteAccount}>
-          Delete Account
-        </button>
-      </div>
-
-      {showDeleteModal && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <h3>Confirm Account Deletion</h3>
-            <input type="password" placeholder="Enter your password" value={deletePassword} onChange={(e) => setDeletePassword(e.target.value)} />
-            <button onClick={confirmDelete}>Delete</button>
-            <button onClick={() => setShowDeleteModal(false)}>Cancel</button>
-          </div>
-        </div>
-      )}
-
-      <div className="profile-box box5">
-        <h3>Your Accessories</h3>
-        <div className="item-grid">
-          {accessories.map((a) => (
-            <img key={a.id} src={a.image_url} alt={a.name} className="profile-item-icon" />
-          ))}
+        <div className="profile-settings">
+          <button
+            className="btn-blue"
+            onClick={() => setShowChangePw(!showChangePw)}
+          >
+            {showChangePw ? "Cancel" : "Change Password"}
+          </button>
+          <button
+            className="btn-yellow"
+            onClick={() => setShowDeleteModal(true)}
+          >
+            Delete Account
+          </button>
         </div>
       </div>
 
+      {/* FAVOURITES */}
       <div className="profile-box box2">
-        <h3>Your Groups</h3>
-      </div>
-
-      <div className="profile-box box3">
-        <h3>Your Movie Lists</h3>
-
-        <h4>Favourites</h4>
-        {favourites.length > 0 ? (
-          <ul>
+        <h3>Favourite Movies</h3>
+        {favourites.length ? (
+          <ul style={{ listStyle: "none", padding: 0 }}>
             {favourites.map((movie) => (
-              <li key={movie.id}>
-                {movie.name} ({movie.release_year})
-                <button onClick={() => removeFavourite(movie.id)}>Remove</button>
+              <li key={movie.id} style={{ display: "flex", marginBottom: "8px" }}>
+                <img
+                  src={movie.poster_url || "https://via.placeholder.com/60x90"}
+                  alt={movie.name}
+                  style={{ width: "60px", borderRadius: "6px", marginRight: "10px" }}
+                />
+                <span>{movie.name} {movie.release_year && `(${movie.release_year})`}</span>
+                <button style={{ marginLeft: "auto" }} onClick={() => removeFavourite(movie.id)}>
+                  Remove
+                </button>
               </li>
             ))}
           </ul>
         ) : (
           <p>No favourites yet.</p>
         )}
+        {shareUrl && <p>Share: <a href={shareUrl}>{shareUrl}</a></p>}
+      </div>
 
-        {shareUrl && (
-          <p>
-            Share your favourites list:{" "}
-            <a href={shareUrl} target="_blank" rel="noreferrer">{shareUrl}</a>
-          </p>
+      {/* CUSTOM LISTS */}
+      <div className="profile-box box3">
+        <h3>Your Custom Lists</h3>
+        <input
+          type="text"
+          placeholder="New list name"
+          value={newListName}
+          onChange={(e) => setNewListName(e.target.value)}
+        />
+        <textarea
+          placeholder="Description (optional)"
+          value={newListDescription}
+          onChange={(e) => setNewListDescription(e.target.value)}
+        />
+        <button onClick={createNewList}>Create List</button>
+
+        {customLists.length ? (
+          <ul style={{ listStyle: "none", padding: 0 }}>
+            {customLists.map((list) => (
+              <li key={list.id} style={{ marginBottom: "6px" }}>
+                <strong>{list.name}</strong>
+                {list.description && <small> – {list.description}</small>}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>No custom lists yet.</p>
         )}
       </div>
 
-      <div className="profile-box box4">
+      {/* SIDEBAR: ICONS + ACCESSORIES */}
+      <div className="profile-box box5">
         <h3>Your Icons</h3>
         <div className="item-grid">
           {icons.map((i) => (
-            <img key={i.id} src={i.image_url} alt={i.name} className="profile-item-icon" />
+            <img
+              key={i.item_id}
+              src={i.image_url}
+              alt={i.name}
+              className={`profile-item-icon ${i.is_equipped ? "equipped" : ""}`}
+              onClick={() => equipIcon(i.item_id)}
+            />
+          ))}
+        </div>
+
+        <hr style={{ margin: "12px 0", border: "2px solid black" }} />
+
+        <h3>Your Accessories</h3>
+        <div className="item-grid">
+          {accessories.map((a) => (
+            <img
+              key={a.item_id}
+              src={a.image_url}
+              alt={a.name}
+              className={`profile-item-icon ${a.is_equipped ? "equipped" : ""}`}
+              onClick={() => toggleAccessory(a.item_id)}
+            />
           ))}
         </div>
       </div>
-
     </div>
   );
 }

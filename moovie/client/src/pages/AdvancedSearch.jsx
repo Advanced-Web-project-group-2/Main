@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import SearchResults from "../components/movies/SearchResults.jsx";
 import { getBackgroundByGenre } from "../utils/GenreBackground.js";
 import "../styles/background.css";
+import { Link } from "react-router-dom";
+import "../styles/AdvancedSearch.css";
 
 export default function AdvancedSearch() {
   const [title, setTitle] = useState("");
@@ -19,15 +21,32 @@ export default function AdvancedSearch() {
     Action: 28, Adventure: 12, Animation: 16, Comedy: 35, Crime: 80,
     Documentary: 99, Drama: 18, Family: 10751, Fantasy: 14, History: 36,
     Horror: 27, Music: 10402, Mystery: 9648, Romance: 10749,
-    ScienceFiction: 878, TVMovie: 10770, Thriller: 53,
-    War: 10752, Western: 37,
+    ScienceFiction: 878, TVMovie: 10770, Thriller: 53, War: 10752, Western: 37,
   };
 
-  useEffect(() => {
-  document.body.classList.add("advanced-search-page");
-  return () => document.body.classList.remove("advanced-search-page");
-}, []);
+  // Convert genre ID → name
+  const genreIdToName = Object.fromEntries(
+    Object.entries(genreMap).map(([name, id]) => [id, name])
+  );
 
+  useEffect(() => {
+    document.body.classList.add("advanced-search-page");
+    return () => document.body.classList.remove("advanced-search-page");
+  }, []);
+
+  useEffect(() => {
+    if (backgroundImage) {
+      document.body.style.backgroundImage = `url('${backgroundImage}')`;
+      document.body.style.backgroundSize = "cover";
+      document.body.style.backgroundPosition = "center";
+      document.body.style.backgroundAttachment = "fixed";
+    } else {
+      document.body.style.backgroundImage = ""; // Restore default
+    }
+    return () => {
+      document.body.style.backgroundImage = "";
+    };
+  }, [backgroundImage]);
 
   const handleSearch = async (e) => {
     e.preventDefault();
@@ -35,8 +54,8 @@ export default function AdvancedSearch() {
     setError("");
     setResults([]);
 
-    const bg = getBackgroundByGenre(genre);
-    setBackgroundImage(bg);
+    // 🎨 Change the background
+    setBackgroundImage(getBackgroundByGenre(genre));
 
     try {
       let actorId = null;
@@ -48,45 +67,33 @@ export default function AdvancedSearch() {
         const actorData = await actorRes.json();
         if (actorData.results?.length > 0) {
           actorId = actorData.results[0].id;
-        } else {
-          setError("Actor not found.");
-          setLoading(false);
-          return;
         }
       }
 
-      let genreId = null;
-      if (genre) {
-        const key = genre.replace(/\s/g, "");
-        genreId = genreMap[key];
-        if (!genreId) {
-          setError("Unknown genre.");
-          setLoading(false);
-          return;
-        }
-      }
+      const genreId = genreMap[genre.replace(/\s/g, "")] || null;
 
-      let url;
-      if (title) {
-        url = `https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(title)}`;
-      } else {
-        url = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}`;
-        if (genreId) url += `&with_genres=${genreId}`;
-        if (year) url += `&primary_release_year=${year}`;
-        if (actorId) url += `&with_cast=${actorId}`;
-      }
+      let url = title
+        ? `https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(title)}`
+        : `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}${genreId ? `&with_genres=${genreId}` : ""}${year ? `&primary_release_year=${year}` : ""}${actorId ? `&with_cast=${actorId}` : ""}`;
 
       const res = await fetch(url);
       const data = await res.json();
 
       if (data.results?.length > 0) {
         let filtered = data.results;
+
+        // Only apply filtering if searching via title
         if (title && genreId) {
-          filtered = filtered.filter(movie => movie.genre_ids.includes(genreId));
+          filtered = filtered.filter((movie) =>
+            movie.genre_ids?.includes(genreId)
+          );
         }
         if (title && year) {
-          filtered = filtered.filter(m => m.release_date?.startsWith(year));
+          filtered = filtered.filter((m) =>
+            m.release_date?.startsWith(year)
+          );
         }
+
         setResults(filtered.slice(0, 20));
       } else {
         setError("No results found.");
@@ -109,29 +116,69 @@ export default function AdvancedSearch() {
       <section id="advanced-search">
         <h2>Advanced Movie Search</h2>
 
-        <form onSubmit={handleSearch}>
-          <input placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)} />
+        {/* 🔍 Search Form */}
+        <div className="search-box">
+          <form onSubmit={handleSearch} className="search-form">
+            <input placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)} />
 
-          <label>Genre:</label>
-          <select value={genre} onChange={(e) => setGenre(e.target.value)}>
-            <option value="">--Any--</option>
-            {Object.keys(genreMap).map((g) => (
-              <option key={g} value={g}>
-                {g.replace(/([A-Z])/g, " $1").trim()}
-              </option>
-            ))}
-          </select>
+            <select value={genre} onChange={(e) => setGenre(e.target.value)}>
+              <option value="">Genre</option>
+              {Object.keys(genreMap).map((g) => (
+                <option key={g} value={g}>
+                  {g.replace(/([A-Z])/g, " $1").trim()}
+                </option>
+              ))}
+            </select>
 
-          <input placeholder="Year" value={year} onChange={(e) => setYear(e.target.value)} />
-          <input placeholder="Actor Name" value={actor} onChange={(e) => setActor(e.target.value)} />
+            <input placeholder="Year" value={year} onChange={(e) => setYear(e.target.value)} />
+            <input placeholder="Actor Name" value={actor} onChange={(e) => setActor(e.target.value)} />
 
-          <button disabled={loading}>{loading ? "Searching..." : "Search"}</button>
-        </form>
+            <button disabled={loading}>
+              {loading ? "Searching..." : "Search"}
+            </button>
+          </form>
+        </div>
 
         {error && <p className="error">{error}</p>}
 
-        <div style={{ color: backgroundImage ? "#ffffff" : "inherit" }}>
-          <SearchResults results={results} />
+        {/* 🎬 Search Results */}
+        <div className="results-container" style={{ color: backgroundImage ? "#fff" : "inherit" }}>
+          {results.length === 0 ? (
+            <p>No results yet.</p>
+          ) : (
+            results.map((movie) => (
+              <div key={movie.id} className="movie-card">
+                <Link to={`/movie/${movie.id}`}>
+                  <img
+                    className="movie-thumbnail"
+                    src={
+                      movie.poster_path
+                        ? `https://image.tmdb.org/t/p/w200${movie.poster_path}`
+                        : "https://via.placeholder.com/200x300?text=No+Image"
+                    }
+                    alt={movie.title}
+                  />
+                </Link>
+
+                <div className="movie-details">
+                  <h2>{movie.title}</h2>
+                  <p><strong>Year:</strong> {movie.release_date?.slice(0, 4) || "Unknown"}</p>
+                  <p>
+                    <strong>Genres:</strong>{" "}
+                    {movie.genre_ids
+                      ? movie.genre_ids.map((id) => genreIdToName[id] || id).slice(0, 5).join(", ")
+                      : "N/A"}
+                  </p>
+
+                  <div className="movie-buttons">
+                    <button>❤️ Add to Favorites</button>
+                    <button>📋 Add to List</button>
+                    <button>🔗 Share</button>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </section>
     </div>
