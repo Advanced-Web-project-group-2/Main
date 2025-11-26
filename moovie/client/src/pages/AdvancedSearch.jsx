@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import SearchResults from "../components/movies/SearchResults.jsx";
+import { getBackgroundByGenre } from "../utils/GenreBackground.js";
+import "../styles/background.css";
 
 export default function AdvancedSearch() {
   const [title, setTitle] = useState("");
@@ -9,6 +11,7 @@ export default function AdvancedSearch() {
   const [results, setResults] = useState([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [backgroundImage, setBackgroundImage] = useState(null);
 
   const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
 
@@ -20,11 +23,20 @@ export default function AdvancedSearch() {
     War: 10752, Western: 37,
   };
 
+  useEffect(() => {
+  document.body.classList.add("advanced-search-page");
+  return () => document.body.classList.remove("advanced-search-page");
+}, []);
+
+
   const handleSearch = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError("");
     setResults([]);
+
+    const bg = getBackgroundByGenre(genre);
+    setBackgroundImage(bg);
 
     try {
       let actorId = null;
@@ -34,7 +46,6 @@ export default function AdvancedSearch() {
           `https://api.themoviedb.org/3/search/person?api_key=${API_KEY}&query=${encodeURIComponent(actor)}`
         );
         const actorData = await actorRes.json();
-
         if (actorData.results?.length > 0) {
           actorId = actorData.results[0].id;
         } else {
@@ -70,15 +81,12 @@ export default function AdvancedSearch() {
 
       if (data.results?.length > 0) {
         let filtered = data.results;
-
         if (title && genreId) {
           filtered = filtered.filter(movie => movie.genre_ids.includes(genreId));
         }
-
         if (title && year) {
           filtered = filtered.filter(m => m.release_date?.startsWith(year));
         }
-
         setResults(filtered.slice(0, 20));
       } else {
         setError("No results found.");
@@ -92,35 +100,40 @@ export default function AdvancedSearch() {
   };
 
   return (
-    <>
+    <div
+      className="advanced-search-container"
+      style={{
+        backgroundImage: backgroundImage ? `url('${backgroundImage}')` : undefined,
+      }}
+    >
       <section id="advanced-search">
         <h2>Advanced Movie Search</h2>
 
         <form onSubmit={handleSearch}>
           <input placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)} />
-          <br />
 
           <label>Genre:</label>
           <select value={genre} onChange={(e) => setGenre(e.target.value)}>
             <option value="">--Any--</option>
             {Object.keys(genreMap).map((g) => (
-              <option key={g} value={g}>{g.replace(/([A-Z])/g, " $1").trim()}</option>
+              <option key={g} value={g}>
+                {g.replace(/([A-Z])/g, " $1").trim()}
+              </option>
             ))}
           </select>
-          <br />
 
           <input placeholder="Year" value={year} onChange={(e) => setYear(e.target.value)} />
-          <br />
-
           <input placeholder="Actor Name" value={actor} onChange={(e) => setActor(e.target.value)} />
-          <br />
 
           <button disabled={loading}>{loading ? "Searching..." : "Search"}</button>
         </form>
 
         {error && <p className="error">{error}</p>}
-        <SearchResults results={results} />
+
+        <div style={{ color: backgroundImage ? "#ffffff" : "inherit" }}>
+          <SearchResults results={results} />
+        </div>
       </section>
-    </>
+    </div>
   );
 }

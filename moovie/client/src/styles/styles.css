@@ -418,3 +418,9 @@ body {
   color: #333;
   font-size: 14px;
 }
+
+/* Remove global padding inside main only for Advanced Search */
+body.advanced-search-page main {
+  padding: 0 !important;
+  background-image: none !important;
+}

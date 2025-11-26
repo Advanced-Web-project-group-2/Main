@@ -1,0 +1,25 @@
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+
+.advanced-search-container {
+  width: 100vw;               
+  min-height: 100vh;          
+  background-repeat: repeat;  
+  background-size: auto;      
+  background-position: top left;
+  background-attachment: fixed;
+  transition: background-image 0.3s ease;
+  display: block;
+}
+
+#advanced-search {
+  margin: 0;
+  padding-top: 20px;        
+}
+ 
+
