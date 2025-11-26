@@ -8,9 +8,9 @@ export default function Main() {
   return (
     <div className="home-wrapper">
 
-      <div className="hero-image">
-        <img src={banner} alt="Cinema banner" />
-      </div>
+      <div className="hero-banner-wrapper">
+    <img src={banner} alt="Cinema banner" className="hero-banner" />
+  </div>
 
       {/* White card container */}
       <div className="home-card">
@@ -21,10 +21,14 @@ export default function Main() {
           <p>You can search all movies and series, make friends and share interests!</p>
         </section>
 
-        <section className="search-section">
-          <h3>Search Movies and Series</h3>
-          <BasicSearch />
-        </section>
+<section className="search-section" style={{ textAlign: "center" }}>
+  <h3>Search Movies and Series</h3>
+  <div style={{ display: "flex", justifyContent: "center" }}>
+    <BasicSearch />
+  </div>
+</section>
+
+        
 
         <section className="top-movies-section">
           <TopThreeMovies />

@@ -1,3 +1,6 @@
+/* ===============================
+   GLOBAL FONTS & BASE STYLES
+================================= */
 @font-face {
   font-family: "Gohu";
   src: url("/src/assets/fonts/GohuFont14NerdFont-Regular.ttf") format("truetype");
@@ -5,6 +8,24 @@
   font-style: normal;
 }
 
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Gohu", sans-serif;
+  background-image: url('/src/assets/images/background_1.png');
+  background-size: cover;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+/* ===============================
+   FORMS AND BUTTONS
+================================= */
 input,
 button,
 textarea,
@@ -18,55 +39,27 @@ input[type="email"] {
   width: 100%;
   padding: 12px 16px;
   margin: 8px 0;
-
   background: #ffffff;
   border: 3px solid #000;
   border-radius: 999px;
-  /* capsule */
-
   font-size: 16px;
   outline: none;
-
   box-shadow: 3px 3px 0px #000;
   transition: 0.15s ease;
 }
 
-button.btn-warning {
-  background: #ffe48f;
-  color: #000;
-}
-
-button.btn-warning:hover {
-  background: #ffd95d;
-}
-
-button.btn-primary {
-  background: #85c7ff;
-  color: #000;
-}
-
-button.btn-primary:hover {
-  background: #6ab7ff;
-}
-
 input:focus {
   border-color: #4a90e2;
-  /* blue glow */
   box-shadow: 3px 3px 0px #000, 0 0 8px rgba(74, 144, 226, 0.5);
 }
 
 button {
   cursor: pointer;
-
   padding: 12px 22px;
   border-radius: 999px;
-  /* capsule */
   border: 3px solid #000;
-
   font-size: 16px;
   font-weight: bold;
-  font-family: "Gohu", sans-serif;
-
   box-shadow: 3px 3px 0px #000;
   transition: transform 0.1s ease;
 }
@@ -76,35 +69,41 @@ button:active {
   box-shadow: 1px 1px 0px #000;
 }
 
-/* base / reset */
-* {
-  box-sizing: border-box;
+button.btn-warning {
+  background: #ffe48f;
+  color: #000;
+}
+button.btn-warning:hover {
+  background: #ffd95d;
 }
 
-body {
-  margin: 0;
-  padding: 0;
+button.btn-primary {
+  background: #85c7ff;
+  color: #000;
+}
+button.btn-primary:hover {
+  background: #6ab7ff;
 }
 
-/* Header */
+/* ===============================
+   HEADER AND NAVIGATION
+================================= */
 header.site-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 20px;
   padding: 8px 16px;
-
   background: #333333;
   color: #fff;
   box-shadow: 0 1px 0 rgba(0,0,0,0.25);
-
   width: 100%;
   max-width: 100%;
   height: auto;
   flex-wrap: wrap;
-  overflow: visible; /* ensure dropdown isn't clipped */
+  overflow: visible;
 }
-/* Logo Moo-viestar */
+
 header.site-header h1 {
   margin: 0;
   font-size: clamp(18px, 3.2vw, 28px);
@@ -113,13 +112,12 @@ header.site-header h1 {
   white-space: nowrap;
 }
 
-/* Navbar position */
 nav.main-nav {
   display: flex;
-  flex: 1 1 auto;    /* allow nav to grow and shrink */
+  flex: 1 1 auto;
   justify-content: center;
   align-items: center;
-  flex-wrap: wrap;   /* wrap items when narrow */
+  flex-wrap: wrap;
   width: auto;
   max-width: 100%;
   gap: 8px;
@@ -129,75 +127,53 @@ nav.main-nav ul {
   list-style: none;
   margin: 0;
   padding: 0;
-
   display: flex;
-  gap: 16px;          /* reduced spacing */
+  gap: 16px;
   align-items: center;
   flex-wrap: wrap;
 }
 
-
 nav.main-nav li {
   margin: 0;
+  align-items: center;
 }
 
-/* Links that are displayed in navbar */
 nav.main-nav a {
   display: inline-block;
   padding: 8px 10px;
   color: #ffffff;
-  /* Link text color */
   text-decoration: none;
   border-radius: 6px;
-  transition: background .12s, color .12s;
   font-size: 14px;
+  transition: background .12s, color .12s;
 }
 
-/* NavBar Group showing when hovering with mouse */
 nav.main-nav a:hover,
 nav.main-nav .dropbtn:hover,
 nav.main-nav .dropdown.open>dropbtn {
   background: #bdbdbd;
   color: #fff;
-  transition: background .12s, color .12s;
 }
 
-/* Shows the page you are currently in*/
 nav.main-nav a.active {
   background: #77c2c2;
-  color: #ffffff;
+  color: white;
 }
 
-/* Spacing between navbar and text below */
-main {
-  padding: 20px;
-}
-
-footer {
-  padding: 12px 20px;
-  text-align: center;
-  color: #666;
-}
-
-
-/* navbar burger menu on Groups*/
+/* ===============================
+   NAVBAR DROPDOWN
+================================= */
 nav.main-nav .dropdown {
   position: relative;
 }
 
 nav.main-nav .dropbtn {
-  cursor: pointer;
-  background: transparent;
+  background: none;
   border: none;
-  box-shadow: none;
   color: inherit;
   padding: 10px 12px;
-  font-size: 14px;
-  font-weight: normal;
   font-family: inherit;
-  border-radius: 6px;
 }
-
 
 nav.main-nav .dropdown-content {
   display: none;
@@ -206,16 +182,18 @@ nav.main-nav .dropdown-content {
   left: 0;
   min-width: 160px;
   z-index: 9999;
-  /* bring above other page content */
   background: #00076e;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
   max-height: 320px;
-  /* limit height and allow scrolling when many groups */
   overflow-y: auto;
   padding: 6px 0;
 }
 
-/* dropdown menu items: keep the grey hover bubble so the item under cursor is highlighted */
+nav.main-nav .dropdown:hover .dropdown-content,
+nav.main-nav .dropdown:focus-within {
+  display: block;
+}
+
 nav.main-nav .dropdown-content a {
   display: block;
   padding: 8px 12px;
@@ -229,32 +207,26 @@ nav.main-nav .dropdown-content a:focus {
   color: #00076e;
 }
 
-nav.main-nav .dropdown:hover .dropdown-content,
-nav.main-nav .dropdown:focus-within {
-  display: block;
-}
-
-
+/* ===============================
+   HOME PAGE
+================================= */
 .home-card {
   background: #ffffff;
   border: 4px solid #000;
   border-top: 20px;
   border-bottom-left-radius: 20px;
   border-bottom-right-radius: 20px;
-
   padding: 30px;
   padding-top: 20px;
-
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
   text-align: center;
+  overflow: hidden;
 }
 
 main {
   padding: 12px 20px;
 }
 
-
-/* Top three movies layout */
 .top-three-list {
   list-style: none;
   margin: 12px 0 0 0;
@@ -263,9 +235,7 @@ main {
   gap: 16px;
   align-items: flex-start;
   justify-content: center;
-  /* center the row */
   flex-wrap: wrap;
-  /* allow wrapping on small screens */
 }
 
 .top-three-item {
@@ -286,45 +256,37 @@ main {
   border-radius: 6px;
 }
 
-/* Minimal styles for navbar search popup */
+/* ===============================
+   NAVBAR SEARCH POPUP
+================================= */
 .nav-search {
   position: relative;
   z-index: 2200;
-  /* ensure popup sits above nav items */
 }
 
 .nav-search .basic-search input {
-  /* fit better inside navbar */
   padding: 6px 8px;
   font-size: 13px;
-  box-sizing: border-box;
 }
 
 .search-popup {
   position: absolute;
   top: 100%;
   left: 0;
-  right: auto;
   width: 100%;
-  /* match the wrapper width exactly */
   margin-top: 2px;
-  /* small gap */
   background: #ffffff;
   border: 1px solid #ddd;
   z-index: 9999;
   max-height: 220px;
   overflow-y: auto;
   overflow-x: hidden;
-  /* prevent horizontal scrolling */
   min-width: 160px;
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
-  box-sizing: border-box;
 }
 
 .search-popup li {
   padding: 6px 10px;
-  white-space: normal;
-  box-sizing: border-box;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -334,132 +296,50 @@ main {
   background: #f2f2f2;
 }
 
-/* result item styles */
-.search-item-link {
-  color: inherit;
-  text-decoration: none;
-  display: block;
-}
-
-.search-item-link .search-title {
-  color: #111;
-  font-weight: 500;
-}
-
-.search-popup img {
+.search-item img {
   display: block;
   width: 48px;
   height: 72px;
   object-fit: cover;
-  flex: 0 0 48px;
 }
 
-.search-item {
-  display: flex;
-  align-items: center;
-  width: 100%;
-}
-
-.search-item .search-title {
-  display: block;
-}
-
-
-body {
-  font-family: "Gohu", sans-serif;
-  background-image: url('/src/assets/images/background_1.png');
-  background-size: cover;
-  background-attachment: fixed;
-  background-repeat: no-repeat;
-  background-position: center;
-}
-
-
-
-
+/* ===============================
+   HOME WRAPPER / CARD
+================================= */
 .home-wrapper {
   max-width: 1000px;
   margin: 40px auto;
-  padding: 0;
 }
 
-
-/* Large white card */
 .home-card {
-  background: #ffffff;
+  background: white;
   border: 6px solid #000;
-  /* thick black border */
   border-top: 20px;
   border-bottom-left-radius: 20px;
   border-bottom-right-radius: 20px;
-
   padding: 30px;
   padding-top: 20px;
-
-  box-shadow:
-    6px 6px 0px #000,
-    10px 10px 0px rgba(0, 0, 0, 0.25);
+  box-shadow: 6px 6px 0px #000, 10px 10px 0px rgba(0, 0, 0, 0.25);
   text-align: center;
 }
 
-/* Responsive tweaks for header and nav */
+/* ===============================
+   RESPONSIVE MEDIA
+================================= */
 @media (max-width: 1200px) {
-  header.site-header {
-    padding: 6px 12px;
-  }
+  header.site-header { padding: 6px 12px; }
   nav.main-nav a { font-size: 13px; padding: 7px 10px; }
   header.site-header h1 { font-size: clamp(18px, 3.2vw, 24px); }
 }
 
 @media (max-width: 640px) {
-  header.site-header {
-    padding: 6px 10px;
-    gap: 10px;
-  }
-  header.site-header h1 {
-    font-size: clamp(16px, 5vw, 20px);
-    margin-right: 8px;
-  }
-  nav.main-nav {
-    justify-content: flex-end;
-  }
-  nav.main-nav ul { gap: 8px; }
+  header.site-header { padding: 6px 10px; }
   nav.main-nav a { font-size: 13px; padding: 6px 8px; }
 }
 
-
-.intro-section h2 {
-  margin-top: 0;
-  font-size: 28px;
-}
-
-.intro-section p {
-  margin: 10px 0;
-  font-size: 16px;
-}
-
-.search-section,
-.top-movies-section {
-  margin-top: 30px;
-}
-
-.cinema-link a {
-  color: #0077cc;
-  text-decoration: none;
-  font-weight: 600;
-}
-
-.cinema-link a:hover {
-  text-decoration: underline;
-}
-
-.hero-image img {
-  width: 100%;
-  display: block;
-}
-
-
-
+/* ===============================
+   GROUPS PAGE
+================================= */
 .groups-header {
   display: flex;
   justify-content: space-between;
@@ -467,7 +347,6 @@ body {
   margin-bottom: 1rem;
 }
 
-/* Grid layout for groups: side-by-side responsive tiles */
 .groups-list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
@@ -499,25 +378,115 @@ body {
   padding: 2rem;
 }
 
-/* Search input and caption for Groups page */
-.group-search {
-  width: 260px;
-  max-width: 40vw;
-  padding: 8px 12px;
+/* ===============================
+   MOVIE CARD
+================================= */
+.top-movie-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  transition: transform .15s ease;
+  color: black;
+}
+
+.top-movie-card:hover {
+  transform: translateY(-4px);
+}
+
+.top-movie-image-wrapper {
+  width: 120px;
+  aspect-ratio: 2 / 3;
+  border: 6px solid black;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 6px 6px 0px black, 10px 10px 0px rgba(0,0,0,0.25);
+}
+
+.top-movie-title h3 {
+  margin: 6px 0 0 0;
+}
+
+/* ===============================
+   BASIC SEARCH
+================================= */
+.basic-search {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.basic-search-form {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.basic-search-input {
+  width: 300px;
+  padding: 12px 16px;
+  background: #fff;
+  border: 3px solid #000;
   border-radius: 999px;
-  border: 2px solid #222;
-  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.25);
-  font-size: 14px;
+  font-size: 16px;
+  box-shadow: 3px 3px 0px #000;
+  outline: none;
 }
 
-.groups-search-caption {
-  margin: 0.5rem 0 1rem 0;
-  color: #333;
-  font-size: 14px;
+.basic-search-input:focus {
+  border-color: #4a90e2;
+  box-shadow: 3px 3px 0px #000, 0 0 8px rgba(74,144,226,0.5);
 }
 
-/* Remove global padding inside main only for Advanced Search */
-body.advanced-search-page main {
-  padding: 0 !important;
-  background-image: none !important;
+.basic-search-btn {
+  padding: 12px 22px;
+  border-radius: 999px;
+  border: 3px solid #000;
+  background: white;
+  cursor: pointer;
+  font-weight: bold;
+  box-shadow: 3px 3px 0px #000;
+}
+
+.basic-search-btn:hover {
+  background: black;
+  color: white;
+}
+
+.basic-search-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0px #000;
+}
+
+/* ===============================
+   BUTTONS
+================================= */
+.btn-white {
+  background: white;
+  border: 3px solid black;
+  color: black;
+  padding: 10px 16px;
+  font-size: 15px;
+  border-radius: 999px;
+  box-shadow: 3px 3px 0px #000;
+  transition: 0.15s ease;
+}
+
+.btn-white:hover {
+  background: black;
+  color: white;
+}
+
+
+.hero-banner-wrapper {
+  width: 100%;
+  max-width: inherit; /* Follow parent width */
+  margin: 0 auto;
+}
+
+.hero-banner {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: cover; /* Or contain if you prefer full view */
 }
