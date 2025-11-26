@@ -231,7 +231,7 @@ export const rejectRequest = async (req, res) => {
     if (find.rowCount === 0) return res.status(400).json({ error: 'No such request' });
     const row = find.rows[0];
     if (row.is_member) {
-      // already a member
+      // already a member — nothing to reject
       return res.status(400).json({ error: 'User already a member' });
     }
     await pool.query('DELETE FROM group_user WHERE id = $1', [row.id]);
@@ -242,9 +242,30 @@ export const rejectRequest = async (req, res) => {
   }
 };
 
+// DELETE /api/groups/:id/leave - Group member leaves the group
+export const leaveGroup = async (req, res) => {
+  try {
+    const userId = req.user?.id;
+    const groupId = req.params.id;
+    if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+
+    const find = await pool.query('SELECT id, is_member, is_admin FROM group_user WHERE group_id=$1 AND user_id=$2', [groupId, userId]);
+    if (find.rowCount === 0) return res.status(400).json({ error: 'Not a member' });
+    const row = find.rows[0];
+    if (!row.is_member) return res.status(400).json({ error: 'Not a member' });
+    if (row.is_admin) return res.status(400).json({ error: 'Admin cannot leave the group' });
+
+    // remove membership row
+    await pool.query('DELETE FROM group_user WHERE id = $1', [row.id]);
+    return res.json({ status: 'left' });
+  } catch (err) {
+    console.error('leaveGroup error', err);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
 
 // getMyGroups 
-
 export const getMyGroups = async (req, res) => {
   try {
     const userId = req.user?.id;

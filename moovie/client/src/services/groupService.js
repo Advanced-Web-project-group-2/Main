@@ -1,4 +1,4 @@
-// Group API helpers used by GroupPage
+// Minimal group API helpers used by GroupPage
 const API_ROOT = '/api/groups';
 
 function authHeaders() {
@@ -51,6 +51,12 @@ export async function rejectRequest(groupId, userId) {
   return res.json();
 }
 
+export async function leaveGroup(groupId) {
+  const res = await fetch(`${API_ROOT}/${groupId}/leave`, { method: 'DELETE', headers: authHeaders() });
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
 export default {
   fetchJoinStatus,
   sendJoinRequest,
@@ -59,4 +65,5 @@ export default {
   fetchPendingRequests,
   approveRequest,
   rejectRequest,
+  leaveGroup,
 };

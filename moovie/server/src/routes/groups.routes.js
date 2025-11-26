@@ -10,6 +10,7 @@ import {
 	getPendingRequests,
 	approveRequest,
 	rejectRequest,
+	leaveGroup,
 } from '../controllers/groups.controller.js';
 import authMiddleware from '../middleware/auth.js';
 
@@ -31,6 +32,8 @@ router.get('/:id', getGroupById);
 router.post('/:id/join', authMiddleware, sendJoinRequest);
 router.delete('/:id/join', authMiddleware, cancelJoinRequest);
 router.get('/:id/join-status', authMiddleware, getJoinStatus);
+// leave group
+router.delete('/:id/leave', authMiddleware, leaveGroup);
 
 // Admin: list pending requests
 router.get('/:id/requests', authMiddleware, getPendingRequests);

@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import React, { useEffect, useState, useRef } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import groupService from '../services/groupService';
 
 export default function GroupPage() {
@@ -9,8 +10,12 @@ export default function GroupPage() {
   const [members, setMembers] = useState([]);
   const [requests, setRequests] = useState([]);
   const [error, setError] = useState(null);
+  const [message, setMessage] = useState(null);
   const [busy, setBusy] = useState(false);
   const [busyRequests, setBusyRequests] = useState([]);
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const prevUserRef = useRef(user);
 
   async function loadAll() {
     setError(null);
@@ -47,6 +52,14 @@ export default function GroupPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [groupId]);
 
+  // if user logs out while viewing a group, redirect to home
+  useEffect(() => {
+    if (prevUserRef.current && !user) {
+      navigate('/', { replace: true });
+    }
+    prevUserRef.current = user;
+  }, [user, navigate]);
+
   const handleSend = async () => {
     setBusy(true);
     setError(null);
@@ -66,6 +79,25 @@ export default function GroupPage() {
     try {
       await groupService.cancelJoinRequest(groupId);
       setStatus('not_member');
+    } catch (err) {
+      setError(err.message || String(err));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const handleLeave = async () => {
+    setBusy(true);
+    setError(null);
+    setMessage(null);
+    try {
+      await groupService.leaveGroup(groupId);
+      setStatus('not_member');
+      // reload group info to refresh members list
+      await loadAll();
+      setMessage('Group left successfully');
+      // clear message after a short while
+      setTimeout(() => setMessage(null), 4000);
     } catch (err) {
       setError(err.message || String(err));
     } finally {
@@ -131,6 +163,9 @@ export default function GroupPage() {
                 <button onClick={handleCancel} disabled={busy} className="btn">Cancel Request</button>
               </>
             )}
+            {status === 'member' && (
+              <button onClick={handleLeave} disabled={busy} className="btn">Leave Group</button>
+            )}
             <p>
               Status: <strong>{
                 status === 'not_member'
@@ -144,6 +179,7 @@ export default function GroupPage() {
         )}
 
         {error && <div className="error">{error}</div>}
+        {message && <div className="message">{message}</div>}
       </section>
 
       <section id="group-content">
