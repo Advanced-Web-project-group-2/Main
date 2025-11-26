@@ -110,7 +110,7 @@ export const updateUser = async (req, res) => {
 export const deleteUser = async (req, res) => {
   try {
     const userId = req.user.id;
-    console.log('Deleting user with ID:', req.user.id);
+    // Deleting user requested
     const result = await pool.query('DELETE FROM users WHERE id = $1 RETURNING *', [userId]);
 
     if (result.rowCount === 0) {
