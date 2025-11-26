@@ -21,7 +21,7 @@ import listsRoutes from "./routes/lists.routes.js";
 import groupsRoutes from './routes/groups.routes.js';
 
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const __dirname = path.resolve();
 
 const PORT = 5000; 
 const app = express();
@@ -39,7 +39,7 @@ app.use("/lists", listsRoutes);
 app.use("/shop", shopRoutes);
 app.use("/users", usersRoutes);
 app.use('/api/groups', groupsRoutes);
-
+app.use("/src/assets", express.static(path.join(__dirname, "../client/src/assets")));
 
 
 // Fetch now-playing movies from TMDB

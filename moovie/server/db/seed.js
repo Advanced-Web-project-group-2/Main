@@ -28,39 +28,39 @@ export default async function seedShop() {
     }
 
     await pool.query(`
-      INSERT INTO shop (name, price, type, image_url) VALUES
-      ('Black & White Basic', 10, 'icon', '/src/assets/images/Shop/Lehmat/bw_basic.png'),
-      ('Black & White Horns', 20, 'icon', '/src/assets/images/Shop/Lehmat/bw_horns.png'),
-      ('Black & White Hair', 30, 'icon', '/src/assets/images/Shop/Lehmat/bw_hair.png'),
+      INSERT INTO shop (name, price, type, image_url, layer_index) VALUES
+      ('Black & White Basic', 10, 'icon', '/src/assets/images/Shop/Lehmat/bw_basic.png', 0),
+      ('Black & White Horns', 20, 'icon', '/src/assets/images/Shop/Lehmat/bw_horns.png', 0),
+      ('Black & White Hair', 30, 'icon', '/src/assets/images/Shop/Lehmat/bw_hair.png', 0),
 
-      ('Brown Basic', 10, 'icon', '/src/assets/images/Shop/Lehmat/brown_basic.png'),
-      ('Brown Horns', 20, 'icon', '/src/assets/images/Shop/Lehmat/brown_horns.png'),
-      ('Brown Hair', 30, 'icon', '/src/assets/images/Shop/Lehmat/brown_hair.png'),
+      ('Brown Basic', 10, 'icon', '/src/assets/images/Shop/Lehmat/brown_basic.png', 0),
+      ('Brown Horns', 20, 'icon', '/src/assets/images/Shop/Lehmat/brown_horns.png', 0),
+      ('Brown Hair', 30, 'icon', '/src/assets/images/Shop/Lehmat/brown_hair.png', 0),
 
-      ('Heavy Basic', 10, 'icon', '/src/assets/images/Shop/Lehmat/heavy_basic.png'),
-      ('Heavy Horns', 20, 'icon', '/src/assets/images/Shop/Lehmat/heavy_horns.png'),
-      ('Heavy Hair', 30, 'icon', '/src/assets/images/Shop/Lehmat/heavy_hair.png'),
+      ('Heavy Basic', 10, 'icon', '/src/assets/images/Shop/Lehmat/heavy_basic.png', 0),
+      ('Heavy Horns', 20, 'icon', '/src/assets/images/Shop/Lehmat/heavy_horns.png', 0),
+      ('Heavy Hair', 30, 'icon', '/src/assets/images/Shop/Lehmat/heavy_hair.png', 0),
 
-      ('Kiffe Basic', 10, 'icon', '/src/assets/images/Shop/Lehmat/kiffe_basic.png'),
-      ('Kiffe Horns', 20, 'icon', '/src/assets/images/Shop/Lehmat/kiffe_horns.png'),
-      ('Kiffe Hair', 30, 'icon', '/src/assets/images/Shop/Lehmat/kiffe_hair.png'),
+      ('Kiffe Basic', 10, 'icon', '/src/assets/images/Shop/Lehmat/kiffe_basic.png', 0),
+      ('Kiffe Horns', 20, 'icon', '/src/assets/images/Shop/Lehmat/kiffe_horns.png', 0),
+      ('Kiffe Hair', 30, 'icon', '/src/assets/images/Shop/Lehmat/kiffe_hair.png', 0),
 
-      ('Pink Basic', 50, 'icon', '/src/assets/images/Shop/Lehmat/pink_basic.png'),
-      ('Pink Horns', 80, 'icon', '/src/assets/images/Shop/Lehmat/pink_horns.png'),
-      ('Pink Hair', 100, 'icon', '/src/assets/images/Shop/Lehmat/pink_hair.png'),
+      ('Pink Basic', 50, 'icon', '/src/assets/images/Shop/Lehmat/pink_basic.png', 0),
+      ('Pink Horns', 80, 'icon', '/src/assets/images/Shop/Lehmat/pink_horns.png', 0),
+      ('Pink Hair', 100, 'icon', '/src/assets/images/Shop/Lehmat/pink_hair.png', 0),
 
-      ('Star Basic', 50, 'icon', '/src/assets/images/Shop/Lehmat/star_basic.png'),
-      ('Star Horns', 80, 'icon', '/src/assets/images/Shop/Lehmat/star_horns.png'),
-      ('Star Hair', 100, 'icon', '/src/assets/images/Shop/Lehmat/star_hair.png'),
+      ('Star Basic', 50, 'icon', '/src/assets/images/Shop/Lehmat/star_basic.png', 0),
+      ('Star Horns', 80, 'icon', '/src/assets/images/Shop/Lehmat/star_horns.png', 0),
+      ('Star Hair', 100, 'icon', '/src/assets/images/Shop/Lehmat/star_hair.png', 0),
 
-      ('Paula Horns', 150, 'icon', '/src/assets/images/Shop/Lehmat/paula_horns.png'),
+      ('Paula Horns', 150, 'icon', '/src/assets/images/Shop/Lehmat/paula_horns.png', 0),
 
-      ('3D Glasses', 50, 'accessory', '/src/assets/images/Shop/Accessories/3dclasses.png'),
-      ('Sunglasses', 50, 'accessory', '/src/assets/images/Shop/Accessories/sunglasses.png'),
-      ('Earings', 20, 'accessory', '/src/assets/images/Shop/Accessories/earings.png'),
-      ('Hat', 30, 'accessory', '/src/assets/images/Shop/Accessories/hat.png'),
-      ('Ribbon', 30, 'accessory', '/src/assets/images/Shop/Accessories/ribbon.png'),
-      ('Tongue', 20, 'accessory', '/src/assets/images/Shop/Accessories/tongue.png')
+      ('3D Glasses', 50, 'accessory', '/src/assets/images/Shop/Accessories/3dclasses.png', 30),
+      ('Sunglasses', 50, 'accessory', '/src/assets/images/Shop/Accessories/sunglasses.png', 30),
+      ('Earings', 20, 'accessory', '/src/assets/images/Shop/Accessories/earings.png', 10),
+      ('Hat', 30, 'accessory', '/src/assets/images/Shop/Accessories/hat.png', 20),
+      ('Ribbon', 30, 'accessory', '/src/assets/images/Shop/Accessories/ribbon.png', 20),
+      ('Tongue', 20, 'accessory', '/src/assets/images/Shop/Accessories/tongue.png', 40)
     `);
 
     console.log("Shop seeded successfully.");
