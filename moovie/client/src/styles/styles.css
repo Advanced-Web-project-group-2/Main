@@ -90,40 +90,52 @@ body {
 header.site-header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 20px;
   padding: 8px 16px;
+
   background: #333333;
   color: #fff;
-  box-shadow: 0 1px 0 rgba(0, 0, 0, .25);
-  height: 48px;
-}
+  box-shadow: 0 1px 0 rgba(0,0,0,0.25);
 
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  flex-wrap: wrap;
+  overflow: visible; /* ensure dropdown isn't clipped */
+}
 /* Logo Moo-viestar */
 header.site-header h1 {
   margin: 0;
-  font-size: 25px;
+  font-size: clamp(18px, 3.2vw, 28px);
   font-weight: 700;
   color: #ffffff;
+  white-space: nowrap;
 }
 
 /* Navbar position */
 nav.main-nav {
-  margin-left: auto;
-  margin-right: auto;
   display: flex;
-  flex: 0 0 auto;
+  flex: 1 1 auto;    /* allow nav to grow and shrink */
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;   /* wrap items when narrow */
+  width: auto;
+  max-width: 100%;
+  gap: 8px;
 }
 
 nav.main-nav ul {
   list-style: none;
   margin: 0;
   padding: 0;
+
   display: flex;
-  gap: 20px;
-  /* spacing */
+  gap: 16px;          /* reduced spacing */
   align-items: center;
-  height: 100%;
+  flex-wrap: wrap;
 }
+
 
 nav.main-nav li {
   margin: 0;
@@ -132,7 +144,7 @@ nav.main-nav li {
 /* Links that are displayed in navbar */
 nav.main-nav a {
   display: inline-block;
-  padding: 10px 12px;
+  padding: 8px 10px;
   color: #ffffff;
   /* Link text color */
   text-decoration: none;
@@ -390,6 +402,31 @@ body {
   text-align: center;
 }
 
+/* Responsive tweaks for header and nav */
+@media (max-width: 1200px) {
+  header.site-header {
+    padding: 6px 12px;
+  }
+  nav.main-nav a { font-size: 13px; padding: 7px 10px; }
+  header.site-header h1 { font-size: clamp(18px, 3.2vw, 24px); }
+}
+
+@media (max-width: 640px) {
+  header.site-header {
+    padding: 6px 10px;
+    gap: 10px;
+  }
+  header.site-header h1 {
+    font-size: clamp(16px, 5vw, 20px);
+    margin-right: 8px;
+  }
+  nav.main-nav {
+    justify-content: flex-end;
+  }
+  nav.main-nav ul { gap: 8px; }
+  nav.main-nav a { font-size: 13px; padding: 6px 8px; }
+}
+
 
 .intro-section h2 {
   margin-top: 0;
@@ -477,4 +514,10 @@ body {
   margin: 0.5rem 0 1rem 0;
   color: #333;
   font-size: 14px;
+}
+
+/* Remove global padding inside main only for Advanced Search */
+body.advanced-search-page main {
+  padding: 0 !important;
+  background-image: none !important;
 }
