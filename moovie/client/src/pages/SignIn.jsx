@@ -13,8 +13,8 @@ export default function SignIn() {
   const [cowImg, setCowImg] = useState(cowRead);
 
   const [form, setForm] = useState({
-    username: "",
-    password: "",
+    email: "",
+    password: ""
   });
 
   const handleFocus = () => setCowImg(cowHide);
@@ -51,12 +51,11 @@ export default function SignIn() {
       <form onSubmit={handleSubmit}>
 
         <input
-          type="text"
-          name="username"
-          placeholder="Username"
-          value={form.username}
-          onChange={(e) =>
-            setForm({ ...form, [e.target.name]: e.target.value })
+          type="email"
+          name="email"
+          placeholder="Email"
+          value={form.email}
+          onChange={(e) => setForm({ ...form, email: e.target.value })/*  */
           }
           required
         />

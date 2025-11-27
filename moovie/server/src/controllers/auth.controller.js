@@ -31,21 +31,27 @@ function validatePassword(password) {
 // POST /auth/register
 export const register = async (req, res) => {
   try {
-    const { username, password } = req.body;
+    const { username, email, password } = req.body;
 
-    if (!username || !password) {
-      return res
-        .status(400)
-        .json({ error: "Username and password required" });
+    if (!username || !email || !password) {
+      return res.status(400).json({ error: "Username, email and password required" });
     }
 
-    const userCheck = await pool.query(
-      "SELECT id FROM users WHERE username = $1",
-      [username]
-    );
+    // Check if email is taken
+    const emailCheck = await pool.query("SELECT id FROM users WHERE email = $1", [email]);
+    if (emailCheck.rows.length > 0) {
+      return res.status(400).json({ error: "Email already in use" });
+    }
 
+    // Check if username is taken
+    const userCheck = await pool.query("SELECT id FROM users WHERE username = $1", [username]);
     if (userCheck.rows.length > 0) {
       return res.status(400).json({ error: "Username already taken" });
+    }
+
+    // Simple email validation (can be improved)
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return res.status(400).json({ error: "Invalid email format" });
     }
 
     if (!validatePassword(password)) {
@@ -55,20 +61,24 @@ export const register = async (req, res) => {
     const passhash = await bcrypt.hash(password, 10);
 
     const result = await pool.query(
-      `INSERT INTO users (username, passhash)
-       VALUES ($1, $2)
-       RETURNING id, username, credits, created_at`,
-      [username, passhash]
+      `INSERT INTO users (username, email, passhash)
+       VALUES ($1, $2, $3)
+       RETURNING id, username, email, credits, created_at`,
+      [username, email, passhash]
     );
 
     const user = result.rows[0];
     const token = generateToken(user);
 
-    // Create an empty Favourites list automatically
+    // Default inventory icons
     await pool.query(
-      "INSERT INTO lists (owner_id, name) VALUES ($1, 'Favourites')",
+      `INSERT INTO user_items (user_id, item_id)
+       SELECT $1, id FROM shop WHERE name IN ('Black & White Basic', 'Brown Basic')`,
       [user.id]
     );
+
+    // Create default Favourites list
+    await pool.query("INSERT INTO lists (owner_id, name) VALUES ($1, 'Favourites')", [user.id]);
 
     res.status(201).json({
       message: "User created",
@@ -84,49 +94,34 @@ export const register = async (req, res) => {
 // POST /auth/login
 export const login = async (req, res) => {
   try {
-    const { username, password } = req.body;
+    const { email, password } = req.body;
 
-    if (!username || !password)
-      return res
-        .status(400)
-        .json({ error: "Username and password required" });
+    if (!email || !password)
+      return res.status(400).json({ error: "Email and password required" });
 
-    const userRes = await pool.query(
-      "SELECT * FROM users WHERE username = $1",
-      [username]
-    );
+    const userRes = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
 
     if (userRes.rows.length === 0) {
-      return res
-        .status(400)
-        .json({ error: "Invalid username or password" });
+      return res.status(400).json({ error: "Invalid email or password" });
     }
 
     const user = userRes.rows[0];
-
     const isMatch = await bcrypt.compare(password, user.passhash);
-    if (!isMatch) {
-      return res
-        .status(400)
-        .json({ error: "Invalid username or password" });
-    }
+    if (!isMatch) return res.status(400).json({ error: "Invalid email or password" });
 
     const token = generateToken(user);
 
     res.json({
       message: "Logged in",
       token,
-      user: {
-        id: user.id,
-        username: user.username,
-        credits: user.credits,
-      },
+      user: { id: user.id, username: user.username, email: user.email, credits: user.credits },
     });
   } catch (err) {
     console.error("LOGIN ERROR:", err);
     res.status(500).json({ error: "Internal server error" });
   }
 };
+
 
 // PUT /auth/change-password
 export async function changePassword(req, res) {
