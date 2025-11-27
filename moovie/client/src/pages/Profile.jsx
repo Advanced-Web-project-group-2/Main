@@ -270,8 +270,12 @@ export default function Profile() {
                   style={{ width: "60px", borderRadius: "6px", marginRight: "10px" }}
                 />
                 <span>{movie.name} {movie.release_year && `(${movie.release_year})`}</span>
-                <button style={{ marginLeft: "auto" }} onClick={() => removeFavourite(movie.id)}>
-                  Remove
+                <button
+                  className="remove-fav-btn"
+                  onClick={() => removeFavourite(movie.id)}
+                  title="Remove from favorites"
+                >
+                  <span className="heart-icon">💔</span>
                 </button>
               </li>
             ))}
@@ -279,7 +283,19 @@ export default function Profile() {
         ) : (
           <p>No favourites yet.</p>
         )}
-        {shareUrl && <p>Share: <a href={shareUrl}>{shareUrl}</a></p>}
+        {shareUrl && (
+          <div>
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(shareUrl);
+                alert("Share link copied to clipboard!");
+              }}
+              className="btn-primary"
+            >
+              Share 󰒗
+            </button>
+          </div>
+        )}
       </div>
 
       {/* CUSTOM LISTS */}
