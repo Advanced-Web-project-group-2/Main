@@ -12,7 +12,8 @@ export default function SignUp() {
 
   const [form, setForm] = useState({
     username: "",
-    password: "",
+    email: "",
+    password: ""
   });
 
   const handleFocus = () => setCowImg(cowHide);
@@ -49,12 +50,19 @@ export default function SignUp() {
           name="username"
           placeholder="Username"
           value={form.username}
-          onChange={(e) =>
-            setForm({ ...form, [e.target.name]: e.target.value })
-          }
+          onChange={(e) => setForm({ ...form, username: e.target.value })}
           required
         />
+        <br />
 
+        <input
+          type="email"
+          name="email"
+          placeholder="Email"
+          value={form.email}
+          onChange={(e) => setForm({ ...form, email: e.target.value })}
+          required
+        />
         <br />
 
         <input
