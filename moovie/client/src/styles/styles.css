@@ -477,6 +477,18 @@ main {
   color: white;
 }
 
+/* Add to lists (in cinema) button  */
+.add-to-list-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  font-size: 15px;
+}
+.add-to-list-button svg {
+  display: block;
+}
+
 
 .hero-banner-wrapper {
   width: 100%;

@@ -313,3 +313,100 @@ export const searchGroups = async (req, res) => {
     return res.status(500).json({ error: 'Internal server error' });
   }
 };
+
+
+// POST /api/groups/:id/movies
+export const addMovieToGroup = async (req, res) => {
+  try {
+    const userId = req.user?.id;
+    const groupId = parseInt(req.params.id, 10);
+    const { movieId, movieName, posterUrl, releaseYear, genre } = req.body;
+
+    if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+    if (!movieId) return res.status(400).json({ error: 'movieId required' });
+    if (!groupId) return res.status(400).json({ error: 'groupId required' });
+
+    // Verify if group exists
+    const grp = await pool.query('SELECT id FROM groups WHERE id = $1', [groupId]);
+    if (grp.rowCount === 0) return res.status(404).json({ error: 'Group not found' });
+
+    // Verifying users membership and permission to add
+    const membership = await pool.query(
+      'SELECT is_member FROM group_user WHERE group_id = $1 AND user_id = $2',
+      [groupId, userId]
+    );
+    if (membership.rowCount === 0 || !membership.rows[0].is_member) {
+      return res.status(403).json({ error: 'Not a group member' });
+    }
+
+    // Insert into movies cache/table if missing
+    await pool.query(
+      `INSERT INTO movies (id, name, genre, release_year, poster_url)
+       VALUES ($1, $2, $3, $4, $5)
+       ON CONFLICT (id) DO NOTHING`,
+      [movieId, movieName || '-', genre || null, releaseYear || null, posterUrl || null]
+    );
+
+    // Insert into group_movies; do nothing on conflict (idempotent)
+    await pool.query(
+      `INSERT INTO group_movies (group_id, movie_id, added_by)
+       VALUES ($1, $2, $3)
+       ON CONFLICT (group_id, movie_id) DO NOTHING`,
+      [groupId, movieId, userId]
+    );
+
+    // Optionally return a standardized result: true if added or already present
+    return res.json({ added: true });
+  } catch (err) {
+    console.error('addMovieToGroup error:', err);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+// GET /api/groups/:id/movies - list movies added to a group
+export const getGroupMovies = async (req, res) => {
+  try {
+    const groupId = parseInt(req.params.id, 10);
+    if (Number.isNaN(groupId)) return res.status(400).json({ error: 'Invalid group id' });
+
+    const q = `SELECT m.id, m.name as title, m.genre, m.release_year, m.poster_url, gm.added_by, gm.created_at
+      FROM group_movies gm
+      JOIN movies m ON m.id = gm.movie_id
+      WHERE gm.group_id = $1
+      ORDER BY gm.created_at DESC`;
+    const r = await pool.query(q, [groupId]);
+    return res.json({ movies: r.rows });
+  } catch (err) {
+    console.error('getGroupMovies error', err);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+// DELETE - admin removes a member from group
+export const removeMember = async (req, res) => {
+  try {
+    const adminId = req.user?.id;
+    const groupId = req.params.id;
+    const targetUser = req.params.userId;
+    if (!adminId) return res.status(401).json({ error: 'Unauthorized' });
+
+    // Making sure if the user is admin
+    const isAdmin = await pool.query('SELECT 1 FROM group_user WHERE group_id=$1 AND user_id=$2 AND is_admin = true', [groupId, adminId]);
+    if (isAdmin.rowCount === 0) return res.status(403).json({ error: 'Forbidden' });
+
+    // Prevent admin removal
+    if (String(adminId) === String(targetUser)) return res.status(400).json({ error: 'Admin cannot remove themselves' });
+
+    const find = await pool.query('SELECT id, is_admin, is_member FROM group_user WHERE group_id=$1 AND user_id=$2', [groupId, targetUser]);
+    if (find.rowCount === 0) return res.status(400).json({ error: 'User not found in group' });
+    const row = find.rows[0];
+    if (row.is_admin) return res.status(400).json({ error: 'Cannot remove another admin' });
+
+    // Delete membership
+    await pool.query('DELETE FROM group_user WHERE id = $1', [row.id]);
+    return res.json({ removed: true, kicked: true });
+  } catch (err) {
+    console.error('removeMember error', err);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+};

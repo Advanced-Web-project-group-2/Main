@@ -130,7 +130,7 @@ export default function Profile() {
   // FAVORITES
   const removeFavourite = async (movieId) => {
     try {
-      const res = await fetch("http://localhost:5000/lists/favourites", {
+      const res = await fetch(`/api/lists/favourites`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -149,7 +149,7 @@ export default function Profile() {
 
   const fetchFavourites = async () => {
     try {
-      const res = await fetch("http://localhost:5000/lists/favourites", {
+      const res = await fetch(`/api/lists/favourites`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -165,7 +165,7 @@ export default function Profile() {
   // CUSTOM LISTS
   const fetchCustomLists = async () => {
     try {
-      const res = await fetch("http://localhost:5000/lists", {
+      const res = await fetch(`/api/lists`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -179,7 +179,7 @@ export default function Profile() {
     if (!newListName.trim()) return alert("List name is required");
 
     try {
-      const res = await fetch("http://localhost:5000/lists", {
+      const res = await fetch(`/api/lists`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

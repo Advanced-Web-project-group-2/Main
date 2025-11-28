@@ -11,6 +11,9 @@ import {
 	approveRequest,
 	rejectRequest,
 	leaveGroup,
+	removeMember,
+	getGroupMovies,
+	addMovieToGroup,
 } from '../controllers/groups.controller.js';
 import authMiddleware from '../middleware/auth.js';
 
@@ -28,6 +31,9 @@ router.get('/', searchGroups);
 // Get group by id
 router.get('/:id', getGroupById);
 
+// Get movies added to this group
+router.get('/:id/movies', getGroupMovies);
+
 // Join request endpoints
 router.post('/:id/join', authMiddleware, sendJoinRequest);
 router.delete('/:id/join', authMiddleware, cancelJoinRequest);
@@ -39,5 +45,11 @@ router.delete('/:id/leave', authMiddleware, leaveGroup);
 router.get('/:id/requests', authMiddleware, getPendingRequests);
 router.post('/:id/requests/:userId/approve', authMiddleware, approveRequest);
 router.post('/:id/requests/:userId/reject', authMiddleware, rejectRequest);
+
+// Admin: remove a member from group
+router.delete('/:id/members/:userId', authMiddleware, removeMember);
+
+// Movie adding to group (requires to be a member in group)
+router.post('/:id/movies', authMiddleware, addMovieToGroup);
 
 export default router;

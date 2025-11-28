@@ -115,3 +115,17 @@ CREATE TABLE list_movies (
     list_id INT NOT NULL REFERENCES lists(id) ON DELETE CASCADE,
     movie_id INT NOT NULL REFERENCES movies(id) ON DELETE CASCADE
 );
+
+-- =====================
+-- GROUP MOVIES
+-- =====================
+CREATE TABLE IF NOT EXISTS group_movies (
+    id SERIAL PRIMARY KEY,
+    group_id INT NOT NULL REFERENCES groups(id) ON DELETE CASCADE,
+    movie_id INT NOT NULL REFERENCES movies(id) ON DELETE CASCADE,
+    added_by UUID NOT NULL REFERENCES users(id) ON DELETE SET NULL,
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Duplicates not allowed
+CREATE UNIQUE INDEX IF NOT EXISTS group_movies_unique_idx ON group_movies (group_id, movie_id);
