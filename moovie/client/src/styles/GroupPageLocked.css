@@ -1,0 +1,37 @@
+/* Notification bar - User must be part of group*/
+.locked {
+  display: flex;
+  margin: 1rem 0;
+}
+
+.locked-inner {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: #ffc021;
+  border: 2.5px solid #000000; 
+  color: #1a1a1a;             
+  max-width: 720px;
+}
+
+.locked-icon {
+  width: 25px;
+  height: 25px;
+  flex-shrink: 0;
+  color: inherit;
+}
+
+.locked-text {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.2;
+  color: inherit;
+}
+
+.locked--pending .locked-inner {
+  background: #ffc021;
+  border-color: #000000;
+  color: #1a1a1a;
+}

@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import "../styles/InCinemas.css";
 
+import AddToListButton from '../components/AddToListButton';
+
 export default function InCinemas() {
   const [movies, setMovies] = useState([]);
   const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
@@ -48,7 +50,7 @@ export default function InCinemas() {
 
                 <div className="cinema-buttons">
                   <button className="btn-warning">❤️ Favorite</button>
-                  <button className="btn-primary">📋 Add to List</button>
+                  <AddToListButton movie={movie} />
                   <button className="btn-secondary">🔗 Share</button>
                 </div>
               </div>
