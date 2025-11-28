@@ -250,9 +250,9 @@ export default function Profile() {
         <div className="profile-settings">
           <button
             className="btn-blue"
-            onClick={() => setShowChangePw(!showChangePw)}
+            onClick={() => setShowChangePw(true)}
           >
-            {showChangePw ? "Cancel" : "Change Password"}
+            Change Password
           </button>
           <button
             className="btn-yellow"
@@ -364,6 +364,73 @@ export default function Profile() {
           ))}
         </div>
       </div>
+      {/* MODALS */}
+      {showChangePw && (
+        <div className="modal-overlay" onClick={() => setShowChangePw(false)}>
+          <div className="modal-box" onClick={(e) => e.stopPropagation()}>
+            <h3>Change Password</h3>
+            <form className="password-form" onSubmit={handlePasswordChange}>
+              <input
+                type="password"
+                name="oldPassword"
+                placeholder="Current password"
+                value={form.oldPassword}
+                onChange={handleChange}
+              />
+              <input
+                type="password"
+                name="newPassword"
+                placeholder="New password"
+                value={form.newPassword}
+                onChange={handleChange}
+              />
+              <input
+                type="password"
+                name="repeatPassword"
+                placeholder="Repeat new password"
+                value={form.repeatPassword}
+                onChange={handleChange}
+              />
+              <div style={{ display: "flex", gap: 10 }}>
+                <button type="submit" className="btn-blue">Save</button>
+                <button
+                  type="button"
+                  className="btn-yellow"
+                  onClick={() => {
+                    setForm({ oldPassword: "", newPassword: "", repeatPassword: "" });
+                    setShowChangePw(false);
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {showDeleteModal && (
+        <div className="modal-overlay" onClick={() => setShowDeleteModal(false)}>
+          <div className="modal-box" onClick={(e) => e.stopPropagation()}>
+            <h3>Confirm Account Deletion</h3>
+            <p>Enter your password to permanently delete your account.</p>
+            <input
+              type="password"
+              placeholder="Password"
+              value={deletePassword}
+              onChange={(e) => setDeletePassword(e.target.value)}
+            />
+            <div style={{ display: "flex", gap: 10, marginTop: 12 }}>
+              <button className="btn-yellow" onClick={confirmDelete}>
+                Delete
+              </button>
+              <button className="btn-blue" onClick={() => setShowDeleteModal(false)}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
