@@ -89,7 +89,7 @@ export default function Movie() {
     if (!token) return alert("You must be logged in!");
 
     try {
-      await fetch("http://localhost:5000/lists/favourites", {
+      const res = await fetch(`/api/lists/favourites`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -97,14 +97,25 @@ export default function Movie() {
         },
         body: JSON.stringify({
           movieId: movie.id,
-          movieName: movie.title,                              
-          genre: movie.genres?.map(g => g.name).join(", "),
-          releaseYear: movie.release_date?.split("-")[0],      
-          posterUrl: movie.poster_path                         
+          movieName: movie.title,
+          genre: movie.genres?.map((g) => g.name).join(", "),
+          releaseYear: movie.release_date?.split("-")[0],
+          posterUrl: movie.poster_path
             ? `https://image.tmdb.org/t/p/w300${movie.poster_path}`
             : null,
         }),
       });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || 'Failed to add to favourites');
+      }
+
+      try {
+        window.dispatchEvent(new CustomEvent('movieAddedToFavourites', { detail: { movieId: movie.id } }));
+      } catch (e) {
+        // ignore if dispatch fails
+      }
 
       alert("Added to Favourites!");
     } catch (err) {

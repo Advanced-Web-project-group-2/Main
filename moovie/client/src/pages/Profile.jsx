@@ -162,6 +162,12 @@ export default function Profile() {
     }
   };
 
+  useEffect(() => {
+    const handler = () => fetchFavourites();
+    window.addEventListener('movieAddedToFavourites', handler);
+    return () => window.removeEventListener('movieAddedToFavourites', handler);
+  }, []);
+
   // CUSTOM LISTS
   const fetchCustomLists = async () => {
     try {
