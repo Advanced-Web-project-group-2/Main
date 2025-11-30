@@ -12,6 +12,8 @@ export default function Movie() {
   const [rating, setRating] = useState(5);
   const [avatarCache, setAvatarCache] = useState({}); // 🔥 NEW
   const { user } = useAuth();
+  const [lists, setLists] = useState([]);
+  const [showLists, setShowLists] = useState(false);
 
   const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
   const token = localStorage.getItem("token");
@@ -113,6 +115,40 @@ export default function Movie() {
     }
   };
 
+  // Add to Custom List (Add to List button)
+  const fetchLists = async () => {
+    try {
+      const res = await axios.get("http://localhost:5000/lists", {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setLists(res.data.lists);
+      setShowLists(true);
+      } catch (error) {
+        console.error("Error fetching lists:", error);
+      }
+  };
+
+  const addMovieToList = async (listId) => {
+    try {
+      await axios.post(
+        `http://localhost:5000/lists/${listId}/movies`,
+        {
+          movieId: movie.id,
+          movie_name: movie.title,
+          genre: movie.genres?.map(g => g.name).join(", "),
+          release_year: movie.release_date?.split("-")[0],
+          poster_url: movie.poster_path
+            ? `https://image.tmdb.org/t/p/w300${movie.poster_path}`
+            : null,
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      alert("Movie added successfully!");
+      setShowLists(false);
+    } catch (err) {
+        console.error("Error adding movie:", err);
+    }
+  };
 
   return (
     <div className="movie-page">
@@ -136,7 +172,7 @@ export default function Movie() {
               <button className="btn-white" onClick={handleAddFavourite}>
                 ❤️ Add to Favorites
               </button>
-              <button className="btn-white">
+              <button className="btn-white" onClick={fetchLists}>
                 ➕ Add to List
               </button>
               <button className="btn-white">
@@ -146,6 +182,28 @@ export default function Movie() {
           </div>
         </div>
       </div>
+
+      {/* Modal for Lists - Conditional to display the user's list */}
+      {showLists && (
+        <div className="list-modal">
+          <h3>Select a list:</h3>
+          <ul>
+            {lists.map((list) => (
+              <li key={list.id}>
+                <button
+                  className="btn-white"
+                  onClick={() => addMovieToList(list.id)}
+                >
+                  {list.name}
+                </button>
+              </li>
+            ))}
+          </ul>
+          <button className="btn-white" onClick={() => setShowLists(false)}>
+            Cancel
+          </button>
+        </div>
+      )}
 
       {/* ✍ Write Review */}
       <div className="movie-box">
@@ -167,7 +225,7 @@ export default function Movie() {
             {reviews.map((r) => (
               <li key={r.id} className="review-card">
 
-         // client/src/context/AuthContext.jsx       {/* 🔥 Avatar */}
+              {/* 🔥 Avatar */}
                 <div className="review-avatar">
                   {avatarCache[r.user_id]?.length ? (
                     avatarCache[r.user_id].map((layer, i) => (
