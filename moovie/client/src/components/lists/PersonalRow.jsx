@@ -1,22 +1,6 @@
 import React, { useState } from 'react';
 import listService from '../../services/listService';
 
-function OutlineHeartIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden focusable="false">
-      <path fill="none" stroke="currentColor" strokeWidth="1.5"
-        d="M12 21s-6.172-4.873-9.172-8.07C-0.02 8.548 3.2 4 6.5 4 8.76 4 10 6 12 8c2-2 3.24-4 5.5-4 3.3 0 6.52 4.548 3.672 8.93C18.172 16.127 12 21 12 21z" />
-    </svg>
-  );
-}
-function FilledHeartIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden focusable="false">
-      <path fill="currentColor"
-        d="M12 21s-6.172-4.873-9.172-8.07C-0.02 8.548 3.2 4 6.5 4 8.76 4 10 6 12 8c2-2 3.24-4 5.5-4 3.3 0 6.52 4.548 3.672 8.93C18.172 16.127 12 21 12 21z" />
-    </svg>
-  );
-}
 function Spinner() {
   return (
     <svg width="18" height="18" viewBox="0 0 50 50" aria-hidden focusable="false">
@@ -74,7 +58,13 @@ export default function PersonalRow({ list, movie, initiallyAdded = false, onAdd
         onClick={handleAddToList}
         title={isAdded ? 'Added' : 'Add to list'}
       >
-        {loading ? <Spinner /> : isAdded ? <FilledHeartIcon /> : <OutlineHeartIcon />}
+        {loading ? (
+          <Spinner />
+        ) : (
+          <span aria-hidden className="list-picker__icon-symbol">
+            {isAdded ? '✔️' : '➕'}
+          </span>
+        )}
       </button>
     </div>
   );

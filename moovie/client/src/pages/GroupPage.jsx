@@ -253,7 +253,15 @@ export default function GroupPage() {
             {groupMovies.length === 0 && <p>No movies added to this group yet.</p>}
             <ul className="group-movies-list">
               {groupMovies.map((m) => (
-                <li key={m.id} className="group-movie-row">
+                <li
+                  key={m.id}
+                  className="group-movie-row"
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => navigate(`/movie/${m.id}`)}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate(`/movie/${m.id}`); }}
+                  style={{ cursor: 'pointer' }}
+                >
                   <img
                     className="group-movie-poster"
                     src={getPosterUrl(m.poster_url) || '/src/assets/placeholder-56x84.png'}

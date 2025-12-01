@@ -1,23 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import groupService from '../../services/groupService';
 
-// Heart icon inside popup window in section In cinemas
-function OutlineHeartIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden focusable="false">
-      <path fill="none" stroke="currentColor" strokeWidth="1.5"
-        d="M12 21s-6.172-4.873-9.172-8.07C-0.02 8.548 3.2 4 6.5 4 8.76 4 10 6 12 8c2-2 3.24-4 5.5-4 3.3 0 6.52 4.548 3.672 8.93C18.172 16.127 12 21 12 21z" />
-    </svg>
-  );
-}
-function FilledHeartIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden focusable="false">
-      <path fill="currentColor"
-        d="M12 21s-6.172-4.873-9.172-8.07C-0.02 8.548 3.2 4 6.5 4 8.76 4 10 6 12 8c2-2 3.24-4 5.5-4 3.3 0 6.52 4.548 3.672 8.93C18.172 16.127 12 21 12 21z" />
-    </svg>
-  );
-}
 function Spinner() {
   return (
     <svg width="18" height="18" viewBox="0 0 50 50" aria-hidden focusable="false">
@@ -25,11 +8,14 @@ function Spinner() {
     </svg>
   );
 }
-// End
 
 export default function GroupRow({ group, movie, initiallyAdded = false, onAdded }) {
   const [isAdded, setIsAdded] = useState(Boolean(initiallyAdded));
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    setIsAdded(Boolean(initiallyAdded));
+  }, [initiallyAdded]);
 
   const handleAddToGroup = async () => {
     if (loading || isAdded) return; // prevent duplicate clicks 
@@ -78,11 +64,17 @@ export default function GroupRow({ group, movie, initiallyAdded = false, onAdded
         aria-pressed={isAdded}
         aria-label={`${isAdded ? 'Added to ' : 'Add to '}${group.name}`}
         aria-busy={loading || undefined}
-        disabled={loading}
+        disabled={loading || isAdded}
         onClick={handleAddToGroup}
         title={isAdded ? 'Added' : 'Add to group'}
       >
-        {loading ? <Spinner /> : isAdded ? <FilledHeartIcon /> : <OutlineHeartIcon />}
+        {loading ? (
+          <Spinner />
+        ) : (
+          <span aria-hidden className="list-picker__icon-symbol">
+            {isAdded ? '✔️' : '➕'}
+          </span>
+        )}
       </button>
     </div>
   );
