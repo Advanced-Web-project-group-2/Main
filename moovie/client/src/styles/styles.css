@@ -95,7 +95,7 @@ header.site-header {
   gap: 20px;
   padding: 8px 16px;
   background: #333333;
-  color: #fff;
+  color: #ffffff;
   box-shadow: 0 1px 0 rgba(0,0,0,0.25);
   width: 100%;
   max-width: 100%;
@@ -108,7 +108,7 @@ header.site-header h1 {
   margin: 0;
   font-size: clamp(18px, 3.2vw, 28px);
   font-weight: 700;
-  color: #ffffff;
+  color: inherit;
   white-space: nowrap;
 }
 
@@ -141,7 +141,7 @@ nav.main-nav li {
 nav.main-nav a {
   display: inline-block;
   padding: 8px 10px;
-  color: #ffffff;
+  color: #fff;
   text-decoration: none;
   border-radius: 6px;
   font-size: 14px;
@@ -501,4 +501,37 @@ main {
   width: 100%;
   height: auto;
   object-fit: cover; /* Or contain if you prefer full view */
+}
+
+
+/* ===============================
+    BACKGROUN AND TEXT COLORS
+  ================================= */
+  /* Text color for light/dark backgrounds */
+.text-light {
+  color: #ffffff; /* white text for dark backgrounds */
+}
+
+.text-dark {
+  color: #000000; /* black text for light backgrounds */
+}
+
+/* Make links inherit the text color automatically */
+.text-light a,
+.text-dark a {
+  color: inherit;
+}
+
+.layout-background > main {
+  flex: 1; /* stretches main to push footer down */
+}
+
+/* ===============================
+    FOOTER
+    ============================== */
+ footer {
+  text-align: center;        /* Center the text */
+  font-size: 16px;           /* Make font bigger, adjust as needed */
+  padding: 18px 0;           /* Add some vertical spacing */
+  color: inherit;            /* Keep text color consistent with dark/light backgrounds */
 }
