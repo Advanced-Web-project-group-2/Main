@@ -3,6 +3,7 @@ import SearchResults from "../components/movies/SearchResults.jsx";
 import { getBackgroundByGenre } from "../utils/GenreBackground.js";
 import "../styles/background.css";
 import { Link } from "react-router-dom";
+import AddToListButton from "../components/AddToListButton";
 import "../styles/AdvancedSearch.css";
 
 export default function AdvancedSearch() {
@@ -172,7 +173,7 @@ export default function AdvancedSearch() {
 
                   <div className="movie-buttons">
                     <button>❤️ Add to Favorites</button>
-                    <button>📋 Add to List</button>
+                    <AddToListButton movie={movie} /> {/* Popup window for "Add to List" */}
                     <button>🔗 Share</button>
                   </div>
                 </div>

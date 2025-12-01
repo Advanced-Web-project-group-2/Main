@@ -50,7 +50,7 @@ export default function InCinemas() {
 
                 <div className="cinema-buttons">
                   <button className="btn-warning">❤️ Favorite</button>
-                  <AddToListButton movie={movie} />
+                  <AddToListButton movie={movie} /> {/* Popup window for "Add to List" */} 
                   <button className="btn-secondary">🔗 Share</button>
                 </div>
               </div>
