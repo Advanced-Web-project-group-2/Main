@@ -13,7 +13,7 @@ export default function AddToListButton({ movie }) {
         aria-haspopup="dialog"
         aria-label={`Add ${movie?.title || 'movie'} to list`}
       >
-        <span>❤️ Add to list</span>
+        <span>📋 Add to list</span>
       </button>
 
       <ListPickerPopup movie={movie} open={open} onClose={() => setOpen(false)} />
