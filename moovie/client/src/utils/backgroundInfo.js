@@ -3,7 +3,7 @@ export const backgroundBrightness = {
   "default-bg.jpg": "light",      // default page background
   "action.jpg": "dark",
   "adventure.jpg": "light",
-  "animation.jpg": "light", // don't know
+  "animation.jpg": "light", 
   "comedy.jpg": "light",
   "crime.jpg": "dark",
   "documentary.jpg": "light",
@@ -12,12 +12,12 @@ export const backgroundBrightness = {
   "fantasy.jpg": "light",
   "history.jpg": "light",
   "horror.jpg": "dark",
-  "music.jpg": "light", // don't know
-  "mystery.jpg": "dark", // don't know
-  "romance.jpg": "light", // don't know
+  "music.jpg": "light", 
+  "mystery.jpg": "dark",
+  "romance.jpg": "light",
   "sciencefiction.jpg": "dark",
   "tvmovie.jpg": "light",
-  "thriller.jpg": "dark",// don't know
-  "war.jpg": "dark", // don't know
-  "western.jpg": "dark", // don't know
+  "thriller.jpg": "dark",
+  "war.jpg": "dark", 
+  "western.jpg": "dark",
 };
