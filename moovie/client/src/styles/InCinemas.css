@@ -57,55 +57,7 @@ h2 {
   gap: 12px;
   margin-top: 10px;
 }
-
-.btn-primary,
-.btn-warning,
-.btn-secondary {
-  padding: 8px 16px;
-  border-radius: 999px;
-  border: 3px solid black;
-  font-family: "Gohu", sans-serif;
-  cursor: pointer;
-  text-decoration: none;
-  font-weight: bold;
-  box-shadow: 3px 3px 0px black;
-  transition: transform 0.1s ease;
-}
-
-/* Button color styles */
-.btn-primary {
-  background: #85c7ff;
-  color: black;
-}
-.btn-primary:hover {
-  background: #6ab7ff;
-}
-
-.btn-warning {
-  background: #ffe48f;
-  color: black;
-}
-.btn-warning:hover {
-  background: #ffd95d;
-}
-
-.btn-secondary {
-  background: white;
-  color: black;
-}
-.btn-secondary:hover {
-  background: black;
-  color: white;
-}
-
-/* Animate button press */
-button:active,
-.btn-primary:active,
-.btn-warning:active,
-.btn-secondary:active {
-  transform: translate(2px, 2px);
-  box-shadow: 1px 1px 0px black;
-}
+/* Buttons use global styles from styles.css to keep consistent appearance */
 
 .loading-text {
   font-size: 18px;

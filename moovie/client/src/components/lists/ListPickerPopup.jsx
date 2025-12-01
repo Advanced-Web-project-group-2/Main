@@ -8,6 +8,7 @@ import PersonalRow from './PersonalRow';
 export default function ListPickerPopup({ movie, open, onClose }) {
   const [groups, setGroups] = useState([]);
   const [lists, setLists] = useState([]);
+  const [addedMap, setAddedMap] = useState({});
   const [loading, setLoading] = useState(false);
   
   const [error, setError] = useState(null);
@@ -36,6 +37,39 @@ export default function ListPickerPopup({ movie, open, onClose }) {
     };
   }, [open]);
 
+  // When groups are loaded and a movie is provided, check which groups already contain this movie
+  useEffect(() => {
+    if (!open || !movie || !groups || groups.length === 0) {
+      setAddedMap({});
+      return;
+    }
+
+    let mounted = true;
+    (async () => {
+      try {
+        const checks = await Promise.all(groups.map(g =>
+          groupService.fetchGroupMovies(g.id).catch(() => null)
+        ));
+        if (!mounted) return;
+        const map = {};
+        checks.forEach((res, idx) => {
+          const g = groups[idx];
+          if (!res || !Array.isArray(res.movies)) {
+            map[g.id] = false;
+            return;
+          }
+          map[g.id] = res.movies.some(mm => String(mm.id) === String(movie.id));
+        });
+        setAddedMap(map);
+      } catch (err) {
+        // ignore — leave map empty
+        if (mounted) setAddedMap({});
+      }
+    })();
+
+    return () => { mounted = false; };
+  }, [open, groups, movie]);
+
   if (!open) return null;
 
   
@@ -60,7 +94,7 @@ export default function ListPickerPopup({ movie, open, onClose }) {
               {groups.length === 0 && <div className="list-picker__empty">You're not in any groups yet.</div>}
               <div className="list-picker__list">
                 {groups.map((g) => (
-                  <GroupRow key={g.id} group={g} movie={movie} initiallyAdded={false} />
+                  <GroupRow key={g.id} group={g} movie={movie} initiallyAdded={Boolean(addedMap[g.id])} />
                 ))}
               </div>
             </>
