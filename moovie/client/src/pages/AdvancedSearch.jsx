@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import SearchResults from "../components/movies/SearchResults.jsx";
 import { getBackgroundByGenre } from "../utils/GenreBackground.js";
-import "../styles/background.css";
-import { Link } from "react-router-dom";
+import { useOutletContext, Link } from "react-router-dom";
 import "../styles/AdvancedSearch.css";
 
 export default function AdvancedSearch() {
@@ -13,7 +12,8 @@ export default function AdvancedSearch() {
   const [results, setResults] = useState([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [backgroundImage, setBackgroundImage] = useState(null);
+
+  const { setBackground } = useOutletContext(); // Layout background
 
   const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
 
@@ -29,24 +29,11 @@ export default function AdvancedSearch() {
     Object.entries(genreMap).map(([name, id]) => [id, name])
   );
 
+  // Set page background on mount
   useEffect(() => {
-    document.body.classList.add("advanced-search-page");
-    return () => document.body.classList.remove("advanced-search-page");
-  }, []);
-
-  useEffect(() => {
-    if (backgroundImage) {
-      document.body.style.backgroundImage = `url('${backgroundImage}')`;
-      document.body.style.backgroundSize = "cover";
-      document.body.style.backgroundPosition = "center";
-      document.body.style.backgroundAttachment = "fixed";
-    } else {
-      document.body.style.backgroundImage = ""; // Restore default
-    }
-    return () => {
-      document.body.style.backgroundImage = "";
-    };
-  }, [backgroundImage]);
+    setBackground("/src/assets/images/advancedsearch-bg.jpg");
+    return () => setBackground(null); // Reset on unmount
+  }, [setBackground]);
 
   const handleSearch = async (e) => {
     e.preventDefault();
@@ -54,8 +41,8 @@ export default function AdvancedSearch() {
     setError("");
     setResults([]);
 
-    // 🎨 Change the background
-    setBackgroundImage(getBackgroundByGenre(genre));
+    // Update background based on selected genre
+    if (genre) setBackground(getBackgroundByGenre(genre));
 
     try {
       let actorId = null;
@@ -82,17 +69,9 @@ export default function AdvancedSearch() {
       if (data.results?.length > 0) {
         let filtered = data.results;
 
-        // Only apply filtering if searching via title
-        if (title && genreId) {
-          filtered = filtered.filter((movie) =>
-            movie.genre_ids?.includes(genreId)
-          );
-        }
-        if (title && year) {
-          filtered = filtered.filter((m) =>
-            m.release_date?.startsWith(year)
-          );
-        }
+        // Additional filtering if searching via title
+        if (title && genreId) filtered = filtered.filter(m => m.genre_ids?.includes(genreId));
+        if (title && year) filtered = filtered.filter(m => m.release_date?.startsWith(year));
 
         setResults(filtered.slice(0, 20));
       } else {
@@ -107,16 +86,11 @@ export default function AdvancedSearch() {
   };
 
   return (
-    <div
-      className="advanced-search-container"
-      style={{
-        backgroundImage: backgroundImage ? `url('${backgroundImage}')` : undefined,
-      }}
-    >
+    <div className="advanced-search-container">
       <section id="advanced-search">
-        <h2>Advanced Movie Search</h2>
+        <h1 className="page-title">Advanced Movie Search</h1>
 
-        {/* 🔍 Search Form */}
+        {/* Search Form */}
         <div className="search-box">
           <form onSubmit={handleSearch} className="search-form">
             <input placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)} />
@@ -133,16 +107,14 @@ export default function AdvancedSearch() {
             <input placeholder="Year" value={year} onChange={(e) => setYear(e.target.value)} />
             <input placeholder="Actor Name" value={actor} onChange={(e) => setActor(e.target.value)} />
 
-            <button disabled={loading}>
-              {loading ? "Searching..." : "Search"}
-            </button>
+            <button disabled={loading}>{loading ? "Searching..." : "Search"}</button>
           </form>
         </div>
 
         {error && <p className="error">{error}</p>}
 
-        {/* 🎬 Search Results */}
-        <div className="results-container" style={{ color: backgroundImage ? "#fff" : "inherit" }}>
+        {/* Search Results */}
+        <div className="results-container">
           {results.length === 0 ? (
             <p>No results yet.</p>
           ) : (
@@ -151,11 +123,9 @@ export default function AdvancedSearch() {
                 <Link to={`/movie/${movie.id}`}>
                   <img
                     className="movie-thumbnail"
-                    src={
-                      movie.poster_path
-                        ? `https://image.tmdb.org/t/p/w200${movie.poster_path}`
-                        : "https://via.placeholder.com/200x300?text=No+Image"
-                    }
+                    src={movie.poster_path
+                      ? `https://image.tmdb.org/t/p/w200${movie.poster_path}`
+                      : "https://via.placeholder.com/200x300?text=No+Image"}
                     alt={movie.title}
                   />
                 </Link>

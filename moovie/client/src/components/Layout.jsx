@@ -1,15 +1,18 @@
 import { Link, Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useEffect, useState } from "react";
+import { backgroundBrightness } from "../utils/backgroundInfo.js";
 
 export default function Layout() {
   const { user, logout } = useAuth();
   const [groups, setGroups] = useState(null);
   const [groupsError, setGroupsError] = useState(null);
+  const [background, setBackground] = useState(null); // for dynamic backgrounds
   const navigate = useNavigate();
 
   useEffect(() => {
     let cancelled = false;
+
     async function loadGroups() {
       setGroups(null);
       setGroupsError(null);
@@ -24,9 +27,8 @@ export default function Layout() {
         });
         if (!res.ok) {
           if (res.status === 401) {
-            // token invalid or missing — clear auth and redirect to sign-in
             logout();
-            navigate('/signin', { replace: true });
+            navigate("/signin", { replace: true });
             return;
           }
           throw new Error("Failed to load groups");
@@ -40,25 +42,45 @@ export default function Layout() {
         }
       }
     }
+
     loadGroups();
-    // listen for newly created groups and prepend to dropdown list
+
     function onGroupCreated(e) {
       if (cancelled) return;
       const g = e?.detail;
       if (!g) return;
-      setGroups(prev => {
+      setGroups((prev) => {
         if (!prev) return [g];
-        if (prev.find(x => x.id === g.id)) return prev;
+        if (prev.find((x) => x.id === g.id)) return prev;
         return [g, ...prev];
       });
     }
-    window.addEventListener('group:created', onGroupCreated);
-    return () => { cancelled = true; };
+
+    window.addEventListener("group:created", onGroupCreated);
+    return () => {
+      cancelled = true;
+      window.removeEventListener("group:created", onGroupCreated);
+    };
   }, [user]);
-  
+
+  // Determine if background is dark or light
+  const fileName = background?.split("/").pop();
+  const isDark = backgroundBrightness[fileName] === "dark";
 
   return (
-    <>
+    <div
+      className="layout-background"
+      style={{
+        minHeight: "100vh",
+        backgroundImage: background
+          ? `url(${background})`
+          : "url('/default-bg.jpg')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundAttachment: "fixed",
+      }}
+    >
+      {/* NAVBAR: keep colors hardcoded so links are always visible */}
       <header className="site-header">
         <h1>Moo-viestar</h1>
 
@@ -70,8 +92,8 @@ export default function Layout() {
               <Link className="dropbtn" to="/groups">Groups</Link>
 
               <div className="dropdown-content" role="menu" aria-label="Available groups">
-                {groups === null && <div style={{padding: '8px 12px'}}>Loading…</div>}
-                {groupsError && <div style={{padding: '8px 12px', color: 'salmon'}}>Error</div>}
+                {groups === null && <div style={{ padding: "8px 12px" }}>Loading…</div>}
+                {groupsError && <div style={{ padding: "8px 12px", color: "salmon" }}>Error</div>}
                 {!user ? (
                   <>
                     <Link role="menuitem" to="/signin">Sign in to view groups</Link>
@@ -82,9 +104,10 @@ export default function Layout() {
                     {groups && groups.length === 0 && (
                       <Link role="menuitem" to="/groups/create">Create or join a group</Link>
                     )}
-                    {groups && groups.map(g => (
-                      <Link key={g.id} role="menuitem" to={`/group/${g.id}`}>{g.name}</Link>
-                    ))}
+                    {groups &&
+                      groups.map((g) => (
+                        <Link key={g.id} role="menuitem" to={`/group/${g.id}`}>{g.name}</Link>
+                      ))}
                   </>
                 )}
               </div>
@@ -109,13 +132,30 @@ export default function Layout() {
         </nav>
       </header>
 
-      <main>
-        <Outlet />
-      </main>
+      {/* MAIN & FOOTER: text adapts to background */}
+      <div className={`${isDark ? "text-light" : "text-dark"}`}
+      style={{
+        minHeight: "100vh",
+        height: "100%",        // ensure full height
+        display: "flex",
+        flexDirection: "column",
+        backgroundImage: background
+          ? `url(${background})`
+          : `url('/default-bg.jpg')`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+        backgroundAttachment: "fixed",
+    }}
+      >
+        <main>
+          <Outlet context={{ setBackground }} /> {/* child pages can set background */}
+        </main>
 
-      <footer>
-        <p>2025 Moo-viestar</p>
-      </footer>
-    </>
+        <footer>
+          <p>2025 Moo-viestar</p>
+        </footer>
+      </div>
+    </div>
   );
 }
