@@ -168,7 +168,7 @@ export default function Groups() {
 
           <div className="groups-list">
             {groups && groups.map(g => (
-              <Link key={g.id} to={`/group/${g.id}`} className="group-card">
+              <Link key={g.id} to={`/groups/${g.id}`} className="group-card">
                 {g.banner_url && <img src={g.banner_url} alt={`${g.name} banner`} className="group-banner" />}
                 <div className="group-info">
                   <h3>{g.name}</h3>

@@ -20,7 +20,7 @@ router.post("/favourites", authMiddleware, addFavourite);
 router.delete("/favourites", authMiddleware, removeFavourite);
 
 // Public route
-router.get("/favourites/public/:userId", getPublicFavourites); 
+router.get("/favorites/public/:userId", getPublicFavourites); 
 
 // Custom List Routes
 router.post("/", authMiddleware, createList); // Create a new custom list
