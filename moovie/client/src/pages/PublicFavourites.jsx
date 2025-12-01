@@ -1,4 +1,3 @@
-// src/pages/PublicFavourites.jsx
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
@@ -10,7 +9,11 @@ export default function PublicFavourites() {
   useEffect(() => {
     const fetchPublicFavourites = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/lists/favourites/public/${userId}`);
+
+        const res = await fetch(
+          `http://localhost:5000/api/lists/favorites/public/${userId}`
+        );
+
         const data = await res.json();
         setFavourites(data.favourites || []);
       } catch (err) {

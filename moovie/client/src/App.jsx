@@ -2,7 +2,6 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 import Layout from "./components/Layout.jsx";
-
 import Main from "./pages/Main.jsx";
 import Groups from "./pages/Groups.jsx";
 import GroupPage from "./pages/GroupPage.jsx";
@@ -23,14 +22,22 @@ export default function App() {
         <Route element={<Layout />}>
           <Route path="/" element={<Main />} />
           <Route path="/groups" element={<Groups />} />
-          <Route path="/group/:groupId" element={<GroupPage />} />
+          <Route path="/groups/:groupId" element={<GroupPage />} />
           <Route path="/in-cinemas" element={<InCinemas />} />
           <Route path="/advanced-search" element={<AdvancedSearch />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/shop" element={<Shop />} />
           <Route path="/movie/:movieId" element={<Movie />} />
-          <Route path="/public-favourites/:userId" element={<PublicFavourites />} />
-          <Route path="/test" element={<h1>Test Page Works</h1>} />
+
+          {/* Public favourites – both URLs use same component **/}
+          <Route
+            path="/public-favourites/:userId"
+            element={<PublicFavourites />}
+          />
+          <Route
+            path="/lists/favourites/public/:userId"
+            element={<PublicFavourites />}
+          />
         </Route>
 
         {/* Auth pages WITHOUT the layout */}
