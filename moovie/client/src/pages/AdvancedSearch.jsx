@@ -5,6 +5,7 @@ import "../styles/background.css";
 import { Link } from "react-router-dom";
 import AddToListButton from "../components/AddToListButton";
 import "../styles/AdvancedSearch.css";
+import { useOutletContext } from "react-router-dom";
 
 export default function AdvancedSearch() {
   const [title, setTitle] = useState("");

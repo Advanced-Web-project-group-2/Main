@@ -1,4 +1,4 @@
-// src/layouts/Layout.jsx
+
 import { Link, Outlet } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useEffect, useState } from "react";
@@ -7,6 +7,21 @@ import { backgroundBrightness } from "../utils/backgroundInfo.js";
 export default function Layout() {
   const { user, logout } = useAuth();
   const [groups, setGroups] = useState([]);
+
+
+  const [background, setBackground] = useState(null);
+  const [isDark, setIsDark] = useState(false);
+
+  
+  useEffect(() => {
+    if (background) {
+      const fileName = background.split("/").pop();
+      const brightness = backgroundBrightness[fileName];
+      setIsDark(brightness === "dark");
+    } else {
+      setIsDark(false);
+    }
+  }, [background]);
 
   useEffect(() => {
     const fetchGroups = async () => {
@@ -41,7 +56,6 @@ export default function Layout() {
         backgroundAttachment: "fixed",
       }}
     >
-      {/* NAVBAR: keep colors hardcoded so links are always visible */}
       <header className="site-header">
         <h1>Moo-viestar</h1>
         <nav className="main-nav">
@@ -57,7 +71,9 @@ export default function Layout() {
                   </>
                 ) : (
                   <>
-                    {groups.length === 0 && <Link to="/groups/create">Create or join a group</Link>}
+                    {groups.length === 0 && (
+                      <Link to="/groups/create">Create or join a group</Link>
+                    )}
                     {groups.map(g => (
                       <Link key={g.id} to={`/group/${g.id}`}>{g.name}</Link>
                     ))}
@@ -84,24 +100,25 @@ export default function Layout() {
         </nav>
       </header>
 
-      {/* MAIN & FOOTER: text adapts to background */}
-      <div className={`${isDark ? "text-light" : "text-dark"}`}
-      style={{
-        minHeight: "100vh",
-        height: "100%",        // ensure full height
-        display: "flex",
-        flexDirection: "column",
-        backgroundImage: background
-          ? `url(${background})`
-          : `url('/default-bg.jpg')`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat",
-        backgroundAttachment: "fixed",
-    }}
+      {/* MAIN & FOOTER */}
+      <div
+        className={`${isDark ? "text-light" : "text-dark"}`}
+        style={{
+          minHeight: "100vh",
+          height: "100%",
+          display: "flex",
+          flexDirection: "column",
+          backgroundImage: background
+            ? `url(${background})`
+            : `url('/default-bg.jpg')`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+          backgroundAttachment: "fixed",
+        }}
       >
         <main>
-          <Outlet context={{ setBackground }} /> {/* child pages can set background */}
+          <Outlet context={{ setBackground, setIsDark }} />
         </main>
 
         <footer>
