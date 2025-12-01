@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import "../styles/Profile.css";
+import { Link } from "react-router-dom";
 
 export default function Profile() {
   const { user } = useAuth();
@@ -26,6 +27,8 @@ export default function Profile() {
   const [customLists, setCustomLists] = useState([]);
   const [newListName, setNewListName] = useState("");
   const [newListDescription, setNewListDescription] = useState("");
+
+  const [copied, setCopied] = useState(false);
 
   // HANDLE FORMS
   const handleChange = (e) =>
@@ -154,9 +157,9 @@ export default function Profile() {
       });
       const data = await res.json();
       setFavourites(data.favourites || []);
-      setShareUrl(
-        `${window.location.origin}/lists/favourites/public/${user.id}`
-      );
+      if (user?.id) {
+        setShareUrl(`${window.location.origin}/lists/favourites/public/${user.id}`);
+      }
     } catch (err) {
       console.error(err);
     }
@@ -290,16 +293,30 @@ export default function Profile() {
           <p>No favourites yet.</p>
         )}
         {shareUrl && (
-          <div>
-            <button
-              onClick={() => {
-                navigator.clipboard.writeText(shareUrl);
-                alert("Share link copied to clipboard!");
-              }}
+          <div style={{ marginTop: 10 }}>
+            <Link
+              to={`/public-favourites/${user.id}`}  // frontend route
               className="btn-primary"
             >
-              Share 󰒗
+              View Shared Favourites
+            </Link>
+
+            <button
+              onClick={() => {
+                try {
+                  navigator.clipboard.writeText(shareUrl);
+                  setCopied(true);
+                  setTimeout(() => setCopied(false), 2000); // auto-hide message
+                } catch (err) {
+                  console.error(err);
+                }
+              }}
+              className="btn-secondary"
+              style={{ marginLeft: 8 }}
+            >
+              Copy Link
             </button>
+            {copied && <small style={{ color: "green", marginLeft: 8 }}>Link copied!</small>}
           </div>
         )}
       </div>
