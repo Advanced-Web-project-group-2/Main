@@ -13,5 +13,7 @@ export default defineConfig({
         secure: false,
       },
     },
+    // Important: enable SPA fallback so React Router works on direct URL access
+    historyApiFallback: true,
   },
 })
