@@ -12,6 +12,7 @@ import {
 	rejectRequest,
 	leaveGroup,
 	removeMember,
+	deleteGroup,
 	getGroupMovies,
 	addMovieToGroup,
 } from '../controllers/groups.controller.js';
@@ -30,6 +31,9 @@ router.get('/', searchGroups);
 
 // Get group by id
 router.get('/:id', getGroupById);
+
+// Admin: delete group
+router.delete('/:id', authMiddleware, deleteGroup);
 
 // Get movies added to this group
 router.get('/:id/movies', getGroupMovies);
