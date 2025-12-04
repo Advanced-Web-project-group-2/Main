@@ -117,6 +117,9 @@ CREATE TABLE list_movies (
     movie_id INT NOT NULL REFERENCES movies(id) ON DELETE CASCADE
 );
 
+-- Prevent duplicate movies in the same list
+CREATE UNIQUE INDEX IF NOT EXISTS list_movies_unique_idx ON list_movies (list_id, movie_id);
+
 -- =====================
 -- GROUP MOVIES
 -- =====================

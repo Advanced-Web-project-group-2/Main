@@ -115,6 +115,24 @@ router.get('/', searchGroups);
 router.get('/:id', getGroupById);
 
 // Admin: delete group
+/**
+ * @swagger
+ * /api/groups/{id}:
+ *   delete:
+ *     summary: Delete a group by ID
+ *     tags: [Groups]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Group deleted successfully
+ *       404:
+ *         description: Group not found
+ */
 router.delete('/:id', authMiddleware, deleteGroup);
 
 // Get movies added to this group
