@@ -1,9 +1,10 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import '../styles/GroupSearch.css';
 
 export default function Groups() {
-  const [groups, setGroups] = useState(null); // null = loading, [] = empty
+  const [groups, setGroups] = useState(null);
   const [error, setError] = useState(null);
   const [query, setQuery] = useState('');
   const debounceRef = useRef(null);
@@ -12,7 +13,7 @@ export default function Groups() {
   const navigate = useNavigate();
   const prevUserRef = useRef(user);
 
-  // Load groups (either my groups when query is empty, or search results)
+
   useEffect(() => {
     let cancelled = false;
     async function load() {
@@ -35,7 +36,6 @@ export default function Groups() {
           });
         }
         if (!res.ok) {
-          // on 401 Unauthorized — show inline sign-in message instead of redirecting
           if (res.status === 401) {
             try { await res.json(); } catch (_) { /* ignore */ }
             if (!cancelled) {
@@ -45,13 +45,11 @@ export default function Groups() {
             }
             return;
           }
-          // parse response and throw a concise error message for the UI
           let bodyText = '';
           try { const body = await res.json(); bodyText = JSON.stringify(body); } catch (e) { bodyText = await res.text().catch(()=>'' ); }
           throw new Error(`Failed to load groups: ${res.status} ${res.statusText} ${bodyText}`);
         }
         const data = await res.json();
-        // loaded successfully; Update UI
         if (!cancelled) setGroups(data.groups || []);
       } catch (err) {
         if (!cancelled) {
@@ -61,7 +59,6 @@ export default function Groups() {
       }
     }
 
-    // debounce searches, but load immediately when clearing the query
     if (query && query.trim() !== '') {
       if (debounceRef.current) clearTimeout(debounceRef.current);
       debounceRef.current = setTimeout(() => load(), 300);
@@ -103,7 +100,6 @@ export default function Groups() {
     return () => { cancelled = true; window.removeEventListener('group:created', onGroupCreated); };
   }, []);
 
-  // reload when auth state changes so the inline prompt disappears after sign-in
   useEffect(() => {
     // on sign in, trigger reload
     if (user) {
@@ -120,24 +116,26 @@ export default function Groups() {
 
   return (
     <div className="groups-page">
-      <div className="groups-header">
-        <h1>Your Groups</h1>
-        <div className="groups-actions">
-          {(!unauthenticated && user) ? (
-            <>
-              <input
-                type="search"
-                className="group-search"
-                placeholder="Search groups by name..."
-                value={query}
-                onChange={e => setQuery(e.target.value)}
-                aria-label="Search groups"
-              />
-              <Link to="/groups/create" className="btn btn-primary">Create a group</Link>
-            </>
-          ) : (
-            <div style={{color: 'rgba(0,0,0,0.6)', paddingTop: 6}}>Sign in to search groups</div>
-          )}
+      <div className={`groups-topbar ${query && query.trim() !== '' ? 'wide' : 'narrow'}`}>
+        <div className="groups-header">
+          <h1>Your Groups</h1>
+          <div className="groups-actions">
+            {(!unauthenticated && user) ? (
+              <>
+                <input
+                  type="search"
+                  className="group-search"
+                  placeholder="Search groups by name..."
+                  value={query}
+                  onChange={e => setQuery(e.target.value)}
+                  aria-label="Search groups"
+                />
+                <Link to="/groups/create" className="btn btn-primary">Create a group</Link>
+              </>
+            ) : (
+              <Link to="/signin" className="btn btn-primary">Sign in</Link>
+            )}
+          </div>
         </div>
       </div>
 
@@ -145,9 +143,6 @@ export default function Groups() {
       {unauthenticated ? (
         <div className="groups-unauthenticated">
           <p>Please sign in to view groups.</p>
-          <div style={{marginTop: 12}}>
-            <Link to="/signin" className="btn btn-primary">Sign in to view groups</Link>
-          </div>
         </div>
       ) : (
         <>
@@ -161,8 +156,17 @@ export default function Groups() {
 
           {groups && groups.length === 0 && (
             <div className="groups-empty">
-              <p>You aren't a member of any groups yet.</p>
-              <Link to="/groups/create" className="btn">Create your first group</Link>
+              {query && query.trim() !== '' ? (
+                <>
+                  <p>No groups were found matching "{query}".</p>
+                  <p style={{marginTop:12}}>Try a different search or <Link to="/groups/create">create a new group</Link>.</p>
+                </>
+              ) : (
+                <>
+                  <p>You aren't a member of any groups yet.</p>
+                  <Link to="/groups/create" className="btn">Create your first group</Link>
+                </>
+              )}
             </div>
           )}
 

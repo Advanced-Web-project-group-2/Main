@@ -66,6 +66,7 @@ CREATE TABLE groups (
     creator_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     banner_url VARCHAR(255),
     icon_url VARCHAR(255),
+    description TEXT,
     created_at TIMESTAMP DEFAULT NOW()
 );
 
@@ -115,6 +116,9 @@ CREATE TABLE list_movies (
     list_id INT NOT NULL REFERENCES lists(id) ON DELETE CASCADE,
     movie_id INT NOT NULL REFERENCES movies(id) ON DELETE CASCADE
 );
+
+-- Prevent duplicate movies in the same list
+CREATE UNIQUE INDEX IF NOT EXISTS list_movies_unique_idx ON list_movies (list_id, movie_id);
 
 -- =====================
 -- GROUP MOVIES

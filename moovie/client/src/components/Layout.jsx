@@ -41,6 +41,22 @@ export default function Layout() {
       }
     };
     fetchGroups();
+
+    const onGroupCreated = (e) => {
+      try {
+        const g = e?.detail;
+        if (!g || !g.id) return;
+        setGroups(prev => {
+          const exists = (prev || []).some(x => String(x.id) === String(g.id));
+          if (exists) return prev;
+          return [g, ...(prev || [])];
+        });
+      } catch (err) {
+        console.error('onGroupCreated handler error', err);
+      }
+    };
+    window.addEventListener('group:created', onGroupCreated);
+    return () => window.removeEventListener('group:created', onGroupCreated);
   }, [user]);
 
   return (
@@ -75,7 +91,7 @@ export default function Layout() {
                       <Link to="/groups/create">Create or join a group</Link>
                     )}
                     {groups.map(g => (
-                      <Link key={g.id} to={`/group/${g.id}`}>{g.name}</Link>
+                      <Link key={g.id} to={`/groups/${g.id}`}>{g.name}</Link>
                     ))}
                   </>
                 )}
