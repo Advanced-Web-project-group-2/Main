@@ -16,8 +16,16 @@ import authRoutes from "./routes/auth.routes.js";
 import listsRoutes from "./routes/lists.routes.js";
 import groupsRoutes from './routes/groups.routes.js';
 
+import swaggerJsdoc from 'swagger-jsdoc';
+import swaggerUi from 'swagger-ui-express';
+import { setupSwagger } from "./swagger.js";
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.resolve();
+
+
+
+
 
 const PORT = 5000;
 const app = express();
@@ -25,6 +33,10 @@ const app = express();
 // ---------------------- MIDDLEWARE ----------------------
 app.use(cors());
 app.use(express.json());
+
+// ---------------------- SWAGGER SETUP ----------------------
+
+setupSwagger(app);
 
 // ---------------------- ROUTES ----------------------
 // Put listsRoutes here, early in the chain

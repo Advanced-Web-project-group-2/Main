@@ -15,11 +15,8 @@ const options = {
       description: "Authentication and user services",
     },
     servers: [
-      {
-        url: "http://localhost:5000",
-      },
+      { url: "http://localhost:5000" },
     ],
-
     components: {
       securitySchemes: {
         BearerAuth: {
@@ -29,15 +26,9 @@ const options = {
         },
       },
     },
-
-    security: [
-      {
-        BearerAuth: [],
-      },
-    ],
+    security: [{ BearerAuth: [] }],
   },
-
-  apis: [path.join(__dirname, "/routes/*.js")],
+  apis: [path.join(__dirname, "routes/*.js")],
 };
 
 const swaggerSpec = swaggerJSDoc(options);
