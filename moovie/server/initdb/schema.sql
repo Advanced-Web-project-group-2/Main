@@ -66,6 +66,7 @@ CREATE TABLE groups (
     creator_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     banner_url VARCHAR(255),
     icon_url VARCHAR(255),
+    description TEXT,
     created_at TIMESTAMP DEFAULT NOW()
 );
 

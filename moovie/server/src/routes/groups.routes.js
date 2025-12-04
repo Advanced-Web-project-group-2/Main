@@ -1,19 +1,21 @@
 import express from 'express';
 import {
-  createGroup,
-  getGroupById,
-  getMyGroups,
-  searchGroups,
-  sendJoinRequest,
-  cancelJoinRequest,
-  getJoinStatus,
-  getPendingRequests,
-  approveRequest,
-  rejectRequest,
-  leaveGroup,
-  removeMember,
-  getGroupMovies,
-  addMovieToGroup
+	createGroup,
+	getGroupById,
+	getMyGroups,
+	searchGroups,
+	sendJoinRequest,
+	cancelJoinRequest,
+	getJoinStatus,
+	getPendingRequests,
+	approveRequest,
+	rejectRequest,
+	leaveGroup,
+	removeMember,
+	deleteGroup,
+	getGroupMovies,
+	addMovieToGroup,
+
 } from '../controllers/groups.controller.js';
 import authMiddleware from '../middleware/auth.js';
 
@@ -112,6 +114,10 @@ router.get('/', searchGroups);
  */
 router.get('/:id', getGroupById);
 
+// Admin: delete group
+router.delete('/:id', authMiddleware, deleteGroup);
+
+// Get movies added to this group
 /**
  * @swagger
  * /api/groups/{id}/movies:

@@ -35,3 +35,10 @@
   border-color: #000000;
   color: #1a1a1a;
 }
+
+.group-locked-card {
+  padding: 0.5rem 0;
+  border: none;
+  background: transparent;
+  max-width: 720px;
+}

@@ -377,6 +377,15 @@ main {
   color: inherit;
 }
 
+/* Description box for group page. */
+.group-description-box {
+  margin-top: 0.6rem;
+  padding: 8px 12px;
+  background: transparent;
+  color: inherit;
+  max-width: 720px;
+}
+
 .group-banner {
   width: 100%;
   height: 120px;

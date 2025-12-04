@@ -3,7 +3,7 @@ import pool from '../db.js';
 // POST /api/groups
 export const createGroup = async (req, res) => {
   try {
-    const { name, banner_url = null, icon_url = null } = req.body;
+    const { name, banner_url = null, icon_url = null, description = null } = req.body;
     const userId = req.user && req.user.id;
 
     if (!userId) return res.status(401).json({ error: 'Unauthorized' });
@@ -17,11 +17,11 @@ export const createGroup = async (req, res) => {
       await client.query('BEGIN');
 
       const insertGroupText = `
-        INSERT INTO groups (name, creator_id, banner_url, icon_url)
-        VALUES ($1, $2, $3, $4)
-        RETURNING id, name, creator_id, created_at
+        INSERT INTO groups (name, creator_id, banner_url, icon_url, description)
+        VALUES ($1, $2, $3, $4, $5)
+        RETURNING id, name, creator_id, created_at, description
       `;
-      const groupRes = await client.query(insertGroupText, [name, userId, banner_url, icon_url]);
+      const groupRes = await client.query(insertGroupText, [name, userId, banner_url, icon_url, description]);
       const group = groupRes.rows[0];
 
       // ensure membership row exists (idempotent): insert if missing, otherwise ensure flags set
@@ -69,7 +69,7 @@ export const getGroupById = async (req, res) => {
   try {
     const groupId = req.params.id;
     // getGroupById called
-    const groupRes = await pool.query('SELECT id, name, creator_id, banner_url, icon_url, created_at FROM groups WHERE id = $1', [groupId]);
+    const groupRes = await pool.query('SELECT id, name, creator_id, banner_url, icon_url, description, created_at FROM groups WHERE id = $1', [groupId]);
     if (groupRes.rowCount === 0) return res.status(404).json({ error: 'Group not found' });
 
     const group = groupRes.rows[0];
@@ -407,6 +407,30 @@ export const removeMember = async (req, res) => {
     return res.json({ removed: true, kicked: true });
   } catch (err) {
     console.error('removeMember error', err);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+// DELETE /api/groups/:id - Admin deletes the entire group
+export const deleteGroup = async (req, res) => {
+  try {
+    const userId = req.user?.id;
+    const groupId = req.params.id;
+    if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+
+    // only admins can delete the group
+    const isAdmin = await pool.query('SELECT 1 FROM group_user WHERE group_id=$1 AND user_id=$2 AND is_admin = true', [groupId, userId]);
+    if (isAdmin.rowCount === 0) return res.status(403).json({ error: 'Forbidden' });
+
+    // Making sure that group exists before deleting
+    const grp = await pool.query('SELECT id FROM groups WHERE id = $1', [groupId]);
+    if (grp.rowCount === 0) return res.status(404).json({ error: 'Group not found' });
+
+    // delete group
+    await pool.query('DELETE FROM groups WHERE id = $1', [groupId]);
+    return res.json({ deleted: true });
+  } catch (err) {
+    console.error('deleteGroup error', err);
     return res.status(500).json({ error: 'Internal server error' });
   }
 };
