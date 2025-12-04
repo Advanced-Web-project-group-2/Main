@@ -273,11 +273,13 @@ export default function Profile() {
           <ul style={{ listStyle: "none", padding: 0 }}>
             {favourites.map((movie) => (
               <li key={movie.id} style={{ display: "flex", marginBottom: "8px" }}>
-                <img
-                  src={movie.poster_url || "https://via.placeholder.com/60x90"}
-                  alt={movie.name}
-                  style={{ width: "60px", borderRadius: "6px", marginRight: "10px" }}
-                />
+                <Link to={`/movie/${movie.id}`}>
+                  <img
+                    src={movie.poster_url || "https://via.placeholder.com/60x90"}
+                    alt={movie.name}
+                    style={{ width: "60px", borderRadius: "6px", marginRight: "10px" }}
+                  />
+                </Link>
                 <span>{movie.name} {movie.release_year && `(${movie.release_year})`}</span>
                 <button
                   className="remove-fav-btn"

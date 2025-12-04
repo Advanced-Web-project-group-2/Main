@@ -169,10 +169,10 @@ export const addMovieToList = async (req, res) => {
       [movieId, movieName || "-", genre || null, releaseYear || null, posterUrl || null]
     );
 
-    await pool.query("INSERT INTO list_movies (list_id, movie_id) VALUES ($1, $2)", [
-      listId,
-      movieId,
-    ]);
+    await pool.query(
+      "INSERT INTO list_movies (list_id, movie_id) VALUES ($1, $2) ON CONFLICT DO NOTHING",
+      [listId, movieId]
+    );
 
     res.json({ message: "Movie added to list" });
   } catch (err) {

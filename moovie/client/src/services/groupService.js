@@ -68,6 +68,12 @@ export async function leaveGroup(groupId) {
   return res.json();
 }
 
+export async function deleteGroup(groupId) {
+  const res = await fetch(`${API_ROOT}/${groupId}`, { method: 'DELETE', headers: authHeaders() });
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
 // Fetch groups the current user is a member of 
 export async function fetchMyGroups() {
   const res = await fetch(`${API_ROOT}/mine`, { headers: authHeaders() });
@@ -105,6 +111,7 @@ export default {
   rejectRequest,
   removeMember,
   leaveGroup,
+  deleteGroup,
   fetchMyGroups,
   addMovieToGroup,
 };
