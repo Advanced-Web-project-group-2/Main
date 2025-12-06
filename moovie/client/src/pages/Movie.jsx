@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import axios from "axios";
 import "../styles/Movie.css";
-import "../styles/likes.css"
+import "../styles/likes.css";
 
 export default function Movie() {
   const { movieId } = useParams();
@@ -14,7 +14,6 @@ export default function Movie() {
   const [avatarCache, setAvatarCache] = useState({});
   const [votes, setVotes] = useState({}); // { reviewId: 'like' | 'dislike' | null }
   const { user } = useAuth();
-
 
   const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
   const token = localStorage.getItem("token");
@@ -131,7 +130,7 @@ export default function Movie() {
 
   // Like a review
   const handleLike = async (reviewId) => {
-    if (!user) return alert("You must be logged in to vote!");
+    if (!user) return; // guests cannot vote
     try {
       const res = await fetch(`http://localhost:5000/api/reviews/${reviewId}/like`, {
         method: "POST",
@@ -139,9 +138,7 @@ export default function Movie() {
       });
       const data = await res.json();
 
-      if (!res.ok) {
-        return alert(data.error || "Failed to vote");
-      }
+      if (!res.ok) return alert(data.error || "Failed to vote");
 
       setVotes((prev) => ({ ...prev, [reviewId]: data.liked ? "like" : null }));
       fetchReviews();
@@ -153,7 +150,7 @@ export default function Movie() {
 
   // Dislike a review
   const handleDislike = async (reviewId) => {
-    if (!user) return alert("You must be logged in to vote!");
+    if (!user) return; // guests cannot vote
     try {
       const res = await fetch(`http://localhost:5000/api/reviews/${reviewId}/dislike`, {
         method: "POST",
@@ -161,9 +158,7 @@ export default function Movie() {
       });
       const data = await res.json();
 
-      if (!res.ok) {
-        return alert(data.error || "Failed to vote");
-      }
+      if (!res.ok) return alert(data.error || "Failed to vote");
 
       setVotes((prev) => ({ ...prev, [reviewId]: data.disliked ? "dislike" : null }));
       fetchReviews();
@@ -197,18 +192,20 @@ export default function Movie() {
       </div>
 
       {/* Write Review */}
-      <div className="movie-box">
-        <h3>Write a Review</h3>
-        <form onSubmit={handleSubmit}>
-          <select value={rating} onChange={(e) => setRating(Number(e.target.value))}>
-            {[1, 2, 3, 4, 5].map((n) => (
-              <option value={n} key={n}>{'⭐'.repeat(n)}</option>
-            ))}
-          </select>
-          <textarea value={reviewText} onChange={(e) => setReviewText(e.target.value)} rows="3" />
-          <button type="submit">Submit</button>
-        </form>
-      </div>
+      {user && (
+        <div className="movie-box">
+          <h3>Write a Review</h3>
+          <form onSubmit={handleSubmit}>
+            <select value={rating} onChange={(e) => setRating(Number(e.target.value))}>
+              {[1, 2, 3, 4, 5].map((n) => (
+                <option value={n} key={n}>{'⭐'.repeat(n)}</option>
+              ))}
+            </select>
+            <textarea value={reviewText} onChange={(e) => setReviewText(e.target.value)} rows="3" />
+            <button type="submit">Submit</button>
+          </form>
+        </div>
+      )}
 
       {/* Reviews */}
       <div className="movie-box">
@@ -245,24 +242,30 @@ export default function Movie() {
                   <div className="review-votes">
                     <button
                       className={`btn-vote ${votes[r.id] === "like" ? "active" : ""}`}
-                      onClick={() => {
-                        if (r.user_id === user.id) return alert("You cannot vote your own review");
-                        handleLike(r.id);
-                      }}
-                      disabled={r.user_id === user.id}
-                      title={r.user_id === user.id ? "You cannot vote your own review" : "Like"}
+                      onClick={() => user && handleLike(r.id)}
+                      disabled={!user || r.user_id === user.id}
+                      title={
+                        !user
+                          ? "Log in to vote"
+                          : r.user_id === user.id
+                          ? "You cannot vote your own review"
+                          : "Like"
+                      }
                     >
                       👍 {r.likes ?? 0}
                     </button>
 
                     <button
                       className={`btn-vote ${votes[r.id] === "dislike" ? "active" : ""}`}
-                      onClick={() => {
-                        if (r.user_id === user.id) return alert("You cannot vote your own review");
-                        handleDislike(r.id);
-                      }}
-                      disabled={r.user_id === user.id}
-                      title={r.user_id === user.id ? "You cannot vote your own review" : "Dislike"}
+                      onClick={() => user && handleDislike(r.id)}
+                      disabled={!user || r.user_id === user.id}
+                      title={
+                        !user
+                          ? "Log in to vote"
+                          : r.user_id === user.id
+                          ? "You cannot vote your own review"
+                          : "Dislike"
+                      }
                     >
                       👎 {r.dislikes ?? 0}
                     </button>
