@@ -52,10 +52,21 @@ CREATE TABLE reviews (
     movie_name VARCHAR(255) NOT NULL,
     content TEXT,
     rating INT CHECK (rating >= 1 AND rating <= 5),
-    likes INT DEFAULT 0,
-    dislikes INT DEFAULT 0,
     created_at TIMESTAMP DEFAULT NOW()
 );
+
+-- =========================================================
+-- LIKES AND DISLIKES
+-- =========================================================
+CREATE TABLE IF NOT EXISTS review_votes (
+  id SERIAL PRIMARY KEY,
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  review_id INT NOT NULL REFERENCES reviews(id) ON DELETE CASCADE,
+  vote_type VARCHAR(10) NOT NULL, -- 'like' or 'dislike'
+  created_at TIMESTAMP DEFAULT NOW(),
+  UNIQUE (user_id, review_id)
+);
+
 
 -- =========================================================
 -- GROUPS
