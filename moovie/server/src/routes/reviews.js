@@ -1,8 +1,11 @@
 import express from "express";
-import { getReviews, addReview } from "../controllers/reviews.controller.js";
+import { getReviews, addReview, likeReview, dislikeReview } from "../controllers/reviews.controller.js";
 import authMiddleware from "../middleware/auth.js";
 
 const router = express.Router();
+
+router.post("/:reviewId/like", authMiddleware, likeReview);
+router.post("/:reviewId/dislike", authMiddleware, dislikeReview);
 
 /**
  * @swagger
