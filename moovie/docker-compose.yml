@@ -10,8 +10,21 @@ services:
       - "5432:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
-      # - ./server/schema.sql:/docker-entrypoint-initdb.d/schema.sql
       - ./server/initdb:/docker-entrypoint-initdb.d
+
+  db_test:
+    image: postgres:15
+    container_name: moovie-db-test
+    environment:
+      POSTGRES_USER: moovie_test
+      POSTGRES_PASSWORD: moovie_test123
+      POSTGRES_DB: moovie_test_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - db_test_data:/var/lib/postgresql/data
+      - ./server/initdb:/docker-entrypoint-initdb.d
+    # No need to depend_on
 
   pgadmin:
     image: dpage/pgadmin4
@@ -42,3 +55,4 @@ services:
 volumes:
   db_data:
   pgadmin_data:
+  db_test_data:

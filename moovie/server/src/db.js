@@ -1,4 +1,4 @@
-import pkg from 'pg';
+import pkg from "pg";
 const { Pool } = pkg;
 
 const pool = new Pool({
@@ -6,7 +6,7 @@ const pool = new Pool({
   host: process.env.PGHOST,
   database: process.env.PGDATABASE,
   password: process.env.PGPASSWORD,
-  port: parseInt(process.env.PGPORT),
+  port: Number(process.env.PGPORT),
 });
 
 export default pool;
