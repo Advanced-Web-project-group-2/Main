@@ -1,6 +1,6 @@
 export default {
   testEnvironment: "node",
   transform: {},
-  setupFiles: ["<rootDir>/src/loadEnv.js"],
+  setupFiles: ["<rootDir>/tests/loadEnvForJest.js"],
   setupFilesAfterEnv: ["<rootDir>/tests/setup.js"],
 };
