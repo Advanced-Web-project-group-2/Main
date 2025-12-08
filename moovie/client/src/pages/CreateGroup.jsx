@@ -51,9 +51,11 @@ export default function CreateGroup(){
 
   return (
     <div className="create-group-container">
-      <img src={cowWrite} alt="Cow" className="create-cow-img" />
-      <div className="create-cow-bottom-line" />
       <div className="create-group-box">
+        <div className="create-cow-wrapper">
+          <img src={cowWrite} alt="Cow" className="create-cow-img" />
+          <div className="create-cow-bottom-line" />
+        </div>
         <h2 className="create-group-title">Create Group</h2>
         <form onSubmit={handleSubmit} className="create-group-form">
           <div className="create-group-inner">

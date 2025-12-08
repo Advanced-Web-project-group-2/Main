@@ -114,6 +114,9 @@ export default function GroupPage() {
       setStatus('not_member');
       await loadAll();
       setMessage('Group left successfully');
+      try {
+        window.dispatchEvent(new CustomEvent('group:left', { detail: { id: groupId } }));
+      } catch (e) {}
       setTimeout(() => setMessage(null), 4000);
     } catch (err) { setError(err.message || String(err)); } finally { setBusy(false); }
   };
@@ -124,6 +127,9 @@ export default function GroupPage() {
     setBusy(true); setError(null);
     try {
       await groupService.deleteGroup(groupId);
+      try {
+        window.dispatchEvent(new CustomEvent('group:left', { detail: { id: groupId } }));
+      } catch (e) {}
       navigate('/groups');
     } catch (err) { setError(err.message || String(err)); } finally { setBusy(false); }
   };
@@ -175,7 +181,7 @@ export default function GroupPage() {
 
                 {status !== 'loading' && (
                   <>
-                    {status === 'not_member' && (
+                    {status === 'not_member' && user && (
                       <button onClick={handleSend} disabled={busy} className="group-list-button">Send Join Request</button>
                     )}
                     {status === 'pending' && (
