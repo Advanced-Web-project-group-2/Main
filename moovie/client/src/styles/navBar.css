@@ -1,0 +1,316 @@
+/* ===============================
+   HEADER AND NAVIGATION
+================================= */
+header.site-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 8px 16px;
+  background: #333333;
+  color: #ffffff;
+  box-shadow: none;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  flex-wrap: wrap;
+  overflow: visible;
+  position: relative;
+}
+
+header.site-header h1 {
+  margin: 0;
+  font-size: clamp(18px, 3.2vw, 28px);
+  font-weight: 700;
+  color: inherit;
+  white-space: nowrap;
+}
+
+nav.main-nav {
+  display: flex;
+  flex: 1 1 auto;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  width: auto;
+  max-width: 100%;
+  gap: 8px;
+}
+
+nav.main-nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+nav.main-nav li {
+  margin: 0;
+  align-items: center;
+}
+
+nav.main-nav a {
+  display: inline-block;
+  padding: 8px 10px;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: background .12s, color .12s;
+}
+
+nav.main-nav a:hover {
+  background: #bdbdbd;
+  color: #000;
+}
+
+nav.main-nav a.active {
+  background: #77c2c2;
+  color: #000;
+}
+
+/* ===============================
+   HAMBURGER MENU (MOBILE)
+================================= */
+.hamburger-menu {
+  display: none;
+  flex-direction: column;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  z-index: 3000;
+  gap: 5px;
+}
+
+.hamburger-menu span {
+  width: 25px;
+  height: 3px;
+  background: #fff;
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+
+.hamburger-menu:hover span {
+  background: #bdbdbd;
+}
+
+/* ===============================
+   NAVBAR DROPDOWN
+================================= */
+nav.main-nav .dropdown {
+  position: relative;
+}
+
+nav.main-nav .dropbtn {
+  background: none !important;
+  border: none !important;
+  color: inherit;
+  padding: 8px 10px;
+  font-family: inherit;
+  cursor: pointer;
+  display: inline-block;
+  font-size: 14px;
+  transition: background .12s, color .12s;
+  box-shadow: none !important;
+}
+
+nav.main-nav .dropbtn:hover {
+  background: #bdbdbd;
+  color: #000;
+}
+
+nav.main-nav .dropdown-content {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 160px;
+  z-index: 9999;
+  background: #444444;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  max-height: 320px;
+  overflow-y: auto;
+  padding: 6px 0;
+}
+
+nav.main-nav .dropdown:hover .dropdown-content,
+nav.main-nav .dropdown:focus-within .dropdown-content,
+nav.main-nav .dropdown.open .dropdown-content {
+  display: block;
+}
+
+nav.main-nav .dropdown-content a {
+  display: block;
+  padding: 8px 12px;
+  color: #fff;
+  text-decoration: none;
+}
+
+nav.main-nav .dropdown-content a:hover,
+nav.main-nav .dropdown-content a:focus {
+  background: #bdbdbd;
+  color: #00076e;
+}
+
+/* Logout button styling in nav */
+nav.main-nav .logout-btn {
+  background: #ffffff;
+  border: 3px solid #000;
+  color: #000;
+  padding: 12px 22px;
+  cursor: pointer;
+  font-size: 14px;
+  border-radius: 999px;
+  font-weight: bold;
+  box-shadow: 3px 3px 0px #000;
+  transition: background .12s, color .12s;
+}
+
+nav.main-nav .logout-btn:hover {
+  background: #000;
+  color: #fff;
+}
+
+nav.main-nav .logout-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0px #000;
+}
+
+/* ===============================
+   RESPONSIVE MEDIA (TABLET)
+================================= */
+@media (max-width: 1200px) {
+  header.site-header { 
+    padding: 6px 12px; 
+  }
+  nav.main-nav a { 
+    font-size: 13px; 
+    padding: 7px 10px; 
+  }
+  header.site-header h1 { 
+    font-size: clamp(18px, 3.2vw, 24px); 
+  }
+}
+
+/* ===============================
+   RESPONSIVE MEDIA (MOBILE)
+================================= */
+@media (max-width: 768px) {
+  header.site-header {
+    flex-wrap: nowrap;
+    padding: 8px 12px;
+  }
+
+  header.site-header h1 {
+    font-size: clamp(16px, 4vw, 22px);
+  }
+
+  .hamburger-menu {
+    display: flex;
+  }
+
+  nav.main-nav {
+    position: fixed;
+    top: 10px;
+    left: 0;
+    right: 0;
+    background: #333333;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 0;
+    z-index: 2999;
+  }
+
+  nav.main-nav.open {
+    max-height: 600px;
+  }
+
+  nav.main-nav ul {
+    flex-direction: column;
+    width: 100%;
+    gap: 0;
+    align-items: stretch;
+  }
+
+  nav.main-nav li {
+    width: 100%;
+    align-items: stretch;
+  }
+
+  nav.main-nav a,
+  nav.main-nav .dropbtn {
+    display: block;
+    width: 100%;
+    padding: 12px 16px;
+    border-radius: 0;
+    font-size: 15px;
+    border-bottom: 1px solid #555;
+  }
+
+  nav.main-nav a.active {
+    background: transparent;
+    color: #fff;
+  }
+
+  nav.main-nav .dropdown {
+    position: static;
+  }
+
+  nav.main-nav .dropdown-content {
+    position: static;
+    display: none;
+    max-height: 400px;
+    background: #444444;
+    box-shadow: none;
+    padding: 0;
+    min-width: auto;
+  }
+
+  nav.main-nav .dropdown.open .dropdown-content {
+    display: block;
+  }
+
+
+  nav.main-nav .dropdown-content a {
+    padding: 10px 16px 10px 32px;
+    border-bottom: 1px solid #555;
+  } 
+
+  nav.main-nav .logout-btn {
+    width: 100%;
+    padding: 12px 16px;
+    text-align: left;
+    border-radius: 0;
+    border: none;
+    border-bottom: 1px solid #555;
+    box-shadow: none;
+    background: #444444;
+    color: #fff;
+  }
+
+  nav.main-nav .logout-btn:hover {
+    background: #555555;
+  }
+
+  nav.main-nav .logout-btn:active {
+    transform: none;
+    box-shadow: none;
+  }
+}
+
+@media (max-width: 640px) {
+  header.site-header { 
+    padding: 6px 10px; 
+  }
+  nav.main-nav a { 
+    font-size: 14px; 
+    padding: 10px 14px;
+  }
+}

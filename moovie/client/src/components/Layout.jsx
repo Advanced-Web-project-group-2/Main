@@ -7,7 +7,8 @@ import { backgroundBrightness } from "../utils/backgroundInfo.js";
 export default function Layout() {
   const { user, logout } = useAuth();
   const [groups, setGroups] = useState([]);
-
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [groupsDropdownOpen, setGroupsDropdownOpen] = useState(false);
 
   const [background, setBackground] = useState(null);
   const [isDark, setIsDark] = useState(false);
@@ -76,6 +77,11 @@ export default function Layout() {
     };
   }, [user]);
 
+  const closeMenu = () => {
+    setMenuOpen(false);
+    setGroupsDropdownOpen(false);
+  };
+
   return (
     <div
       className="layout-background"
@@ -91,42 +97,65 @@ export default function Layout() {
     >
       <header className="site-header">
         <h1>Moo-viestar</h1>
-        <nav className="main-nav">
+        
+        {/* Hamburger Menu Button */}
+        <button 
+          className="hamburger-menu"
+          onClick={() => setMenuOpen(!menuOpen)}
+          aria-label="Toggle navigation menu"
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
+        <nav className={`main-nav ${menuOpen ? "open" : ""}`}>
           <ul>
-            <li><Link to="/">Home</Link></li>
-            <li className="dropdown">
-              <Link className="dropbtn" to="/groups">Groups</Link>
+            <li><Link to="/" onClick={closeMenu}>Home</Link></li>
+            <li className={`dropdown ${groupsDropdownOpen ? "open" : ""}`}>
+              <Link to="/groups" className="dropbtn" onClick={(e) => {
+                const isMobile = window.innerWidth <= 768;
+                if (isMobile) {
+                  e.preventDefault();
+                  setGroupsDropdownOpen(!groupsDropdownOpen);
+                } else {
+                  closeMenu();
+                }
+              }}>
+                Groups
+              </Link>
               <div className="dropdown-content">
+                <Link to="/groups" onClick={closeMenu}>View all groups</Link>
                 {!user ? (
                   <>
-                    <Link to="/signin">Sign in to view groups</Link>
-                    <Link to="/signup">Create account</Link>
+                    <Link to="/signin" onClick={closeMenu}>Sign in to view groups</Link>
+                    <Link to="/signup" onClick={closeMenu}>Create account</Link>
                   </>
                 ) : (
                   <>
                     {groups.length === 0 && (
-                      <Link to="/groups/create">Create or join a group</Link>
+                      <Link to="/groups/create" onClick={closeMenu}>Create or join a group</Link>
                     )}
                     {groups.map(g => (
-                      <Link key={g.id} to={`/groups/${g.id}`}>{g.name}</Link>
+                      <Link key={g.id} to={`/groups/${g.id}`} onClick={closeMenu}>{g.name}</Link>
                     ))}
                   </>
                 )}
               </div>
             </li>
-            <li><Link to="/in-cinemas">In Cinemas</Link></li>
-            <li><Link to="/advanced-search">Advanced Search</Link></li>
-            <li><Link to="/shop">Shop</Link></li>
+            <li><Link to="/in-cinemas" onClick={closeMenu}>In Cinemas</Link></li>
+            <li><Link to="/advanced-search" onClick={closeMenu}>Advanced Search</Link></li>
+            <li><Link to="/shop" onClick={closeMenu}>Shop</Link></li>
 
             {user ? (
               <>
-                <li><Link to="/profile">{user.username}</Link></li>
-                <li><button onClick={logout}>Log Out</button></li>
+                <li><Link to="/profile" onClick={closeMenu}>{user.username}</Link></li>
+                <li><button className="logout-btn" onClick={() => { logout(); closeMenu(); }}>Log Out</button></li>
               </>
             ) : (
               <>
-                <li><Link to="/signup">Sign up</Link></li>
-                <li><Link to="/signin">Sign In</Link></li>
+                <li><Link to="/signup" onClick={closeMenu}>Sign up</Link></li>
+                <li><Link to="/signin" onClick={closeMenu}>Sign In</Link></li>
               </>
             )}
           </ul>

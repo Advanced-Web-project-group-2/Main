@@ -1,26 +1,25 @@
-/* MOBILE-FIRST GRID: everything stacked */
+/* ================================
+   GLOBAL BOXES
+   ================================ */
 .profile-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr 260px; /* 4 wide columns + sidebar */
-  grid-template-rows: auto auto;
-  grid-template-areas:
-    "box1 box1 box1 box1 box5"
-    "box2 box2 box3 box3 box5";
   gap: 20px;
-  padding: 30px;
-  max-width: 1600px;
-  margin: 40px auto;
-}
-
-/* Boxes take full width by default */
-.profile-box,
-.user-header-box {
-  width: 100%;
-  padding: 12px;
+  padding: 20px;
   box-sizing: border-box;
 }
 
-/* User header: stack avatar + info + buttons */
+/* Boxes */
+.profile-box {
+  background: white;
+  border: 5px solid black;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 6px 6px 0px black;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* User header */
 .user-header-box {
   display: flex;
   flex-direction: column;
@@ -32,173 +31,60 @@
 .avatar-preview {
   width: 120px;
   height: 120px;
-  margin: 0 auto;
-}
-
-
-
-
-/* Universal box styling */
-.profile-box {
-  background: white;
-  border: 5px solid black;
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 6px 6px 0px black;
-}
-
-/* AREA PLACEMENT */
-.box1 { grid-area: box1; } /* Profile */
-.box2 { grid-area: box2; } /* Favorites */
-.box3 { grid-area: box3; } /* Custom Lists */
-.box4 { display: none; }  /* Old area no longer used */
-.box5 { grid-area: box5; min-width: 220px; min-height: 100%; } /* Icons & Accessories */
-
-
-/* Avatar + header layout */
-.user-header-box {
-  grid-area: box1;
-  display: grid;
-  grid-template-columns: 150px 1fr 250px;
-  align-items: center;
-  gap: 20px;
-}
-
-/* Avatar */
-.avatar-preview {
-  width: 120px;
-  height: 120px;
   border: 4px solid black;
+  border-radius: 12px;
   background: #eee;
-  border-radius: 10px;
+  position: relative;
+  overflow: hidden;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-weight: bold;
 }
 
+/* Main info */
 .profile-main-info h2 {
   margin: 0;
-  font-size: 1.8rem;
+  font-size: 1.5rem;
 }
 
-/* Right side buttons */
 .profile-settings {
   display: flex;
-  flex-direction: column;
   gap: 10px;
-}
-
-/* Password form */
-.password-form input {
-  width: 100%;
-  padding: 6px 10px;
-  border: 3px solid black;
-  border-radius: 8px;
-  margin-bottom: 6px;
-}
-
-.password-form button {
-  width: 100%;
+  flex-wrap: wrap;
 }
 
 /* Buttons */
-.btn-blue {
-  background: #7ecbff;
-  border: 3px solid black;
-  border-radius: 10px;
+.btn-blue, .btn-yellow {
   padding: 8px;
-  cursor: pointer;
   font-weight: bold;
-}
-
-.btn-yellow {
-  background: #ffe88a;
-  border: 3px solid black;
   border-radius: 10px;
-  padding: 8px;
+  border: 3px solid black;
   cursor: pointer;
-  font-weight: bold;
 }
+.btn-blue { background: #7ecbff; }
+.btn-yellow { background: #ffe88a; }
 
-/* Item grids */
+/* Item grid */
 .item-grid {
-  margin-top: 10px;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
   gap: 10px;
   justify-items: center;
 }
-
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0,0,0,0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 2000;
-}
-
-/* Popup box */
-.modal-box {
-  background: white;
-  border: 5px solid black;
-  border-radius: 12px;
-  padding: 25px;
-  width: 380px;
-  box-shadow: 6px 6px 0px black;
-  position: relative;
-  animation: popupFade 0.15s ease-out;
-}
-
-@keyframes popupFade {
-  from { transform: scale(0.85); opacity: 0; }
-  to   { transform: scale(1); opacity: 1; }
-}
-
 
 .profile-item-icon {
   width: 64px;
   height: 64px;
   cursor: pointer;
   transition: transform 0.1s ease;
-}
-
-.profile-item-icon:hover {
-  transform: scale(1.05);
-}
-
-.profile-item-icon.equipped {
-  border: 4px solid #4CAF50; /* Green highlight */
-  box-shadow: 0 0 8px #4CAF50;
   border-radius: 8px;
 }
-
-.avatar-preview {
-  width: 120px;
-  height: 120px;
-  border: 4px solid black;
-  border-radius: 12px;
-  background: #eee;
-  position: relative;
-  overflow: hidden;
+.profile-item-icon.equipped {
+  border: 4px solid #4CAF50;
+  box-shadow: 0 0 8px #4CAF50;
 }
 
-.avatar-layer {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  pointer-events: none;
-}
-
-/* Remove Favorite Button */
+/* Favourites remove button */
 .remove-fav-btn {
   width: 50px;
   height: 50px;
@@ -211,20 +97,111 @@
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  margin-left: auto;
-  transition: 0.15s ease-in-out;
   box-shadow: 3px 3px 0px black;
-  padding: 0;
+  transition: 0.15s ease-in-out;
 }
-
 .remove-fav-btn:hover {
   background: #ffcccc;
   transform: scale(1.05);
 }
 
-.heart-icon {
-  font-size: 18px;
-  line-height: 18px;
-  color: red; /* 🔴 Make broken heart red */
+/* Avatar layers */
+.avatar-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
   pointer-events: none;
+}
+
+/* Modal overlay */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+.modal-box {
+  background: white;
+  border: 5px solid black;
+  border-radius: 12px;
+  padding: 25px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 6px 6px 0px black;
+  position: relative;
+  animation: popupFade 0.15s ease-out;
+}
+@keyframes popupFade {
+  from { transform: scale(0.85); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* ================================
+   MOBILE FIRST (default)
+   ================================ */
+.profile-grid {
+  grid-template-columns: 1fr; /* everything stacked */
+  grid-template-areas:
+    "header"
+    "favourites"
+    "customLists"
+    "sidebar";
+}
+
+.user-header-box { grid-area: header; }
+.box2 { grid-area: favourites; }
+.box3 { grid-area: customLists; }
+.box5 { grid-area: sidebar; }
+
+/* ================================
+   TABLET (601px - 900px)
+   ================================ */
+@media (min-width: 601px) and (max-width: 900px) {
+  .profile-grid {
+    grid-template-columns: 2fr 1fr; /* main content + sidebar */
+    grid-template-areas:
+      "header header"
+      "favourites sidebar"
+      "customLists sidebar";
+  }
+
+  .user-header-box {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .profile-settings {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
+/* ================================
+   DESKTOP (901px+)
+   ================================ */
+@media (min-width: 901px) {
+  .profile-grid {
+    grid-template-columns: repeat(4, 1fr) 260px; /* 4 columns + sidebar */
+    grid-template-areas:
+      "header header header header sidebar"
+      "favourites favourites customLists customLists sidebar";
+  }
+
+  .user-header-box {
+    display: grid;
+    grid-template-columns: 150px 1fr 250px;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .profile-main-info h2 {
+    font-size: 1.8rem;
+  }
 }
