@@ -27,7 +27,10 @@ export default function Layout() {
     const fetchGroups = async () => {
       try {
         const token = localStorage.getItem("token");
-        if (!token) return;
+        if (!token) {
+          setGroups([]);
+          return;
+        }
 
         const res = await fetch("/api/groups/mine", {
           headers: { Authorization: `Bearer ${token}` },
@@ -55,8 +58,22 @@ export default function Layout() {
         console.error('onGroupCreated handler error', err);
       }
     };
+    const onGroupLeft = (e) => {
+      try {
+        const d = e?.detail;
+        if (!d || !d.id) return;
+        setGroups(prev => (prev || []).filter(g => String(g.id) !== String(d.id)));
+      } catch (err) {
+        console.error('onGroupLeft handler error', err);
+      }
+    };
+
     window.addEventListener('group:created', onGroupCreated);
-    return () => window.removeEventListener('group:created', onGroupCreated);
+    window.addEventListener('group:left', onGroupLeft);
+    return () => {
+      window.removeEventListener('group:created', onGroupCreated);
+      window.removeEventListener('group:left', onGroupLeft);
+    };
   }, [user]);
 
   return (

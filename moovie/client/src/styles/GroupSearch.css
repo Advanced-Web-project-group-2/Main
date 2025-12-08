@@ -60,15 +60,6 @@
 	box-shadow: 6px 6px 0px #000;
 }
 
-.groups-search-caption {
-	max-width: 1200px;
-	margin: 12px auto 18px auto;
-	color: #000;
-	text-align: center;
-	font-weight: 700;
-	font-size: 1.05rem;
-}
-
 .groups-topbar {
 	margin: 0 auto 18px auto;
 	background: #fff;
@@ -77,30 +68,83 @@
 	padding: 14px 20px;
 	box-shadow: 6px 6px 0px #000;
 	box-sizing: border-box;
-}
-
-
-.groups-topbar.narrow {
-	max-width: 800px;
-}
-
-
-.groups-topbar.wide {
-	max-width: 800px;
+	max-width: 1400px;
 }
 
 .groups-topbar .groups-header {
 	margin: 0;
 }
 
-.groups-list {
-	max-width: 1200px;
-	margin: 0 auto;
+.groups-signin-message {
+	max-width: 1400px;
+	margin: 0 auto 16px auto;
+	padding: 14px 18px;
+	background: #fff;
+	border: 4px solid #000;
+	border-radius: 20px;
+	box-shadow: 4px 4px 0px #000;
+	text-align: center;
+	font-weight: 600;
+	color: #000;
+}
+
+.groups-signin-message p {
+	margin: 0;
+	font-size: 0.95rem;
+}
+
+.groups-signin-message a {
+	color: #0066cc;
+	text-decoration: underline;
+	font-weight: 700;
+}
+
+.groups-signin-message a:hover {
+	color: #0052a3;
+}
+
+.groups-container {
 	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-	gap: 18px;
-	align-items: start;
+	grid-template-columns: 1fr 1fr;
+	gap: 24px;
+	max-width: 1400px;
+	margin: 0 auto;
 	padding-bottom: 48px;
+}
+
+.groups-column {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.groups-column-box {
+	background: #fff;
+	border: 6px solid #000;
+	border-radius: 20px;
+	padding: 18px;
+	box-shadow: 6px 6px 0px #000;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.groups-column-header {
+	padding: 0;
+	margin: 0;
+}
+
+.groups-column-header h2 {
+	margin: 0 0 6px 0;
+	font-size: 1.15rem;
+	font-weight: 700;
+	color: #000;
+}
+
+.groups-list {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
 }
 
 .groups-page .group-card {
@@ -134,6 +178,9 @@
 	margin: 0 0 8px 0;
 	font-size: 1.15rem;
 	font-weight: 700;
+	word-break: break-word;
+	overflow-wrap: break-word;
+	hyphens: auto;
 }
 
 .group-info small {
@@ -144,8 +191,7 @@
 .groups-empty,
 .groups-unauthenticated,
 .error {
-	max-width: 600px;
-	margin: 18px auto;
+	margin: 0;
 	text-align: center;
 	background: #fff;
 	border: 6px solid #000;
@@ -163,6 +209,11 @@
 	margin-top: 6px;
 }
 
+.loading-text {
+	text-align: center;
+	color: rgba(0, 0, 0, 0.7);
+	margin: 18px 0;
+}
 
 .groups-page .group-card:focus,
 .groups-page .group-card:focus-visible,
@@ -172,23 +223,177 @@
     outline-offset: 6px;
 }
 
+@media (max-width: 1200px) {
+	.groups-container {
+		grid-template-columns: 1fr;
+	}
+}
+
 @media (max-width: 899px) {
+	.groups-page {
+		padding: 120px 16px;
+	}
+
 	.groups-header {
 		flex-direction: column;
 		align-items: stretch;
 		gap: 10px;
 	}
 
+	.groups-header h1 {
+		font-size: 1.75rem;
+	}
+
 	.groups-actions {
-		justify-content: space-between;
+		flex-direction: column;
+		gap: 10px;
 	}
 
 	.group-search {
 		width: 100%;
+		padding: 10px 12px;
+		font-size: 0.9rem;
+	}
+
+	.btn.btn-primary {
+		width: 100%;
+		text-align: center;
+		padding: 10px 16px;
+		font-size: 0.95rem;
+	}
+
+	.groups-topbar {
+		padding: 12px 16px;
+		border-radius: 24px;
+		border: 5px solid #000;
+		margin-bottom: 16px;
+	}
+
+	.groups-container {
+		grid-template-columns: 1fr;
+		gap: 16px;
+		padding-bottom: 32px;
+	}
+
+	.groups-column-box {
+		border-radius: 16px;
+		padding: 16px;
+		border: 5px solid #000;
+		gap: 10px;
+	}
+
+	.groups-column-header h2 {
+		font-size: 1.05rem;
 	}
 
 	.groups-list {
-		grid-template-columns: 1fr;
-		padding: 0 12px 48px 12px;
+		gap: 10px;
+	}
+
+	.groups-page .group-card {
+		border-radius: 16px;
+		padding: 14px;
+		border: 5px solid #000;
+	}
+
+	.group-banner {
+		height: 100px;
+		margin-bottom: 10px;
+	}
+
+	.group-info h3 {
+		font-size: 1rem;
+		margin-bottom: 6px;
+	}
+
+	.group-info small {
+		font-size: 0.8rem;
+	}
+
+	.groups-empty {
+		border-radius: 16px;
+		padding: 16px;
+		border: 5px solid #000;
+	}
+
+	.groups-empty p {
+		font-size: 0.95rem;
+	}
+
+	.groups-signin-message {
+		margin: 0 auto 12px auto;
+		padding: 12px 14px;
+		border-radius: 16px;
+		border: 4px solid #000;
+		font-size: 0.9rem;
+	}
+
+	.groups-signin-message p {
+		font-size: 0.9rem;
+	}
+}
+
+@media (max-width: 600px) {
+	.groups-page {
+		padding: 100px 12px;
+	}
+
+	.groups-header h1 {
+		font-size: 1.5rem;
+	}
+
+	.groups-topbar {
+		padding: 12px 14px;
+		border-radius: 20px;
+		border: 4px solid #000;
+		margin-bottom: 14px;
+	}
+
+	.groups-actions {
+		flex-direction: column;
+		gap: 8px;
+	}
+
+	.group-search {
+		width: 100%;
+		padding: 8px 10px;
+		font-size: 0.85rem;
+		border: 4px solid #000;
+	}
+
+	.btn.btn-primary {
+		padding: 8px 12px;
+		font-size: 0.9rem;
+		border: 3px solid #000;
+	}
+
+	.groups-container {
+		gap: 12px;
+	}
+
+	.groups-column-box {
+		border-radius: 14px;
+		padding: 14px;
+		border: 4px solid #000;
+		gap: 8px;
+	}
+
+	.groups-column-header h2 {
+		font-size: 1rem;
+	}
+
+	.groups-page .group-card {
+		border-radius: 14px;
+		padding: 12px;
+		border: 4px solid #000;
+	}
+
+	.group-banner {
+		height: 90px;
+		margin-bottom: 8px;
+	}
+
+	.group-info h3 {
+		font-size: 0.95rem;
 	}
 }
