@@ -68,7 +68,7 @@ export default function GroupPage() {
       for (const id of ids) {
         if (newCache[id]) continue;
         try {
-          const res = await fetch(`http://localhost:5000/shop/equipped/${id}`);
+          const res = await fetch(`/shop/equipped/${id}`);
           const data = await res.json();
           newCache[id] = data.equipped || [];
         } catch (err) {
