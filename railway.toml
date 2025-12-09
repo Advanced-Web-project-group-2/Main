@@ -1,0 +1,5 @@
+[build]
+dockerfilePath = "moovie/Dockerfile"
+
+[deploy]
+startCommand = "npm start"
