@@ -32,6 +32,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const PORT = process.env.PORT || 5000;
+const TMDB_API_KEY = process.env.TMDB_API_KEY || "e7b2a2baf908be99c03d69f99197bea2"; // fallback if env not set
 const app = express();
 
 // ---------------------- MIDDLEWARE ----------------------
@@ -56,7 +57,7 @@ app.use("/src/assets", express.static(path.join(__dirname, "../client/src/assets
 app.get('/api/now-playing', async (req, res) => {
   try {
     const response = await axios.get('https://api.themoviedb.org/3/movie/now_playing', {
-      params: { api_key: process.env.TMDB_API_KEY, language: 'en-US', page: 1 }
+      params: { api_key: TMDB_API_KEY, language: 'en-US', page: 1 }
     });
     res.json(response.data);
   } catch (err) {
@@ -70,7 +71,7 @@ app.get('/api/search', async (req, res) => {
 
   try {
     const response = await axios.get('https://api.themoviedb.org/3/search/movie', {
-      params: { api_key: process.env.TMDB_API_KEY, query: q, language: 'en-US', page: 1, include_adult: false }
+      params: { api_key: TMDB_API_KEY, query: q, language: 'en-US', page: 1, include_adult: false }
     });
     res.json(response.data);
   } catch (err) {
