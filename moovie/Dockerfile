@@ -1,4 +1,3 @@
-# Use official Node.js image (upgraded to Node 20 for Vite 7 compatibility)
 FROM node:20
 
 # Build frontend
@@ -23,6 +22,6 @@ RUN cp -r /app/client/dist/* /app/server/client/dist/
 # Expose the port for Railway
 EXPOSE 3000
 
-# Start backend from the src directory
-WORKDIR /app/server/src
-CMD ["node", "index.js"]
+# Start backend - stay in /app/server and run src/index.js
+WORKDIR /app/server
+CMD ["node", "src/index.js"]
