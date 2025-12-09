@@ -1,5 +1,13 @@
 import dotenv from 'dotenv';
-dotenv.config();
+import fs from 'fs';
+import path from 'path';
+
+// Only load .env if it exists (for local development)
+if (fs.existsSync(path.resolve('.env'))) {
+  dotenv.config();
+}
+
+console.log('Environment variables loaded. NODE_ENV:', process.env.NODE_ENV || 'production');
 
 import express from 'express';
 import cors from 'cors';
