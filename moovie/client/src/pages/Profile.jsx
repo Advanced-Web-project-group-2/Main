@@ -28,7 +28,10 @@ export default function Profile() {
   const [newListName, setNewListName] = useState("");
   const [newListDescription, setNewListDescription] = useState("");
 
-  const [copied, setCopied] = useState(false);
+  const [customShareUrl, setCustomShareUrl] = useState("");
+
+  const [copiedFavourites, setCopiedFavourites] = useState(false);
+  const [copiedCustomListId, setCopiedCustomListId] = useState(null);
 
   // HANDLE FORMS
   const handleChange = (e) =>
@@ -179,6 +182,9 @@ export default function Profile() {
       });
       const data = await res.json();
       setCustomLists(data.lists || []);
+      if (user?.id) {
+        setCustomShareUrl(`${window.location.origin}/lists/custom/`);
+      }
     } catch (err) {
       console.error(err);
     }
@@ -307,8 +313,8 @@ export default function Profile() {
               onClick={() => {
                 try {
                   navigator.clipboard.writeText(shareUrl);
-                  setCopied(true);
-                  setTimeout(() => setCopied(false), 2000); // auto-hide message
+                  setCopiedFavourites(true);
+                  setTimeout(() => setCopiedFavourites(false), 2000); // auto-hide message
                 } catch (err) {
                   console.error(err);
                 }
@@ -318,7 +324,7 @@ export default function Profile() {
             >
               Copy Link
             </button>
-            {copied && <small style={{ color: "green", marginLeft: 8 }}>Link copied!</small>}
+            {copiedFavourites && <small style={{ color: "green", marginLeft: 8 }}>Link copied!</small>}
           </div>
         )}
       </div>
@@ -342,9 +348,38 @@ export default function Profile() {
         {customLists.length ? (
           <ul style={{ listStyle: "none", padding: 0 }}>
             {customLists.map((list) => (
-              <li key={list.id} style={{ marginBottom: "6px" }}>
-                <strong>{list.name}</strong>
-                {list.description && <small> – {list.description}</small>}
+              <li
+                key={list.id}
+                style={{ marginBottom: "12px", display: "flex", alignItems: "center", justifyContent: "space-between" }}
+              >
+                <div>
+                  <strong>{list.name}</strong>
+                  {list.description && <small> – {list.description}</small>}
+                </div>
+                <div>
+                  <Link
+                    to={`/lists/custom/${list.id}`}
+                    className="btn-primary"
+                    style={{ marginRight: 8 }}
+                  >
+                    View
+                  </Link>
+                  <button
+                    className="btn-secondary"
+                    onClick={() => {
+                      const url = `${window.location.origin}/lists/custom/${list.id}`;
+                      try {
+                        navigator.clipboard.writeText(url);
+                        setCopiedCustomListId(list.id);
+                        setTimeout(() => setCopiedCustomListId(null), 2000);
+                      } catch (err) {
+                        console.error(err);
+                      }
+                    }}
+                  >
+                    {copiedCustomListId === list.id ? "Copied!" : "Share Link"}
+                  </button>
+                </div>
               </li>
             ))}
           </ul>

@@ -21,9 +21,15 @@ export default function PersonalRow({ list, movie, initiallyAdded = false, onAdd
       const res = await listService.addMovieToList(list.id, {
         movieId: movie.id,
         movieName: movie.title,
-        posterUrl: movie.poster_path,
-        releaseYear: movie.release_year,
-        genre: movie.genre,
+        // Store full TMDB image URL (same pattern as favourites)
+        posterUrl: movie.poster_path
+          ? `https://image.tmdb.org/t/p/w300${movie.poster_path}`
+          : null,
+        releaseYear: movie.release_date?.split('-')[0] || movie.release_year,
+        genre:
+          movie.genres?.map((g) => g.name).join(', ') ||
+          movie.genre ||
+          null,
       });
 
       if (typeof onAdded === 'function') onAdded({ target: 'list', listId: list.id, movieId: movie.id, result: res });
