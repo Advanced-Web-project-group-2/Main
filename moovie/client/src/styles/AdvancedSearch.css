@@ -1,6 +1,6 @@
-/* 🌟 PAGE CONTAINER */
+/* PAGE CONTAINER */
 .advanced-search-page {
-  width: 100%; /* Full width */
+  width: 100%;
 }
 
 .advanced-search-container {
@@ -15,7 +15,7 @@
   padding-top: 20px;
 }
 
-/* 🔍 SEARCH BOX (Top Section) */
+/* SEARCH BOX (Top Section) */
 .search-box {
   background: #ffffff;
   border: 6px solid #000;
@@ -28,7 +28,7 @@
     10px 10px 0px rgba(0,0,0,0.25);
 }
 
-/* 🔎 SEARCH FORM */
+/* SEARCH FORM */
 .search-form {
   display: flex;
   gap: 10px;
@@ -40,7 +40,7 @@
 .search-form select {
   flex: 1;
   min-width: 150px;
-  max-width: 250px; /* new */
+  max-width: 250px; 
   padding: 12px 16px;
 
   display: flex;
@@ -72,7 +72,7 @@
   color: white;
 }
 
-/* 🎬 MOVIE CARD */
+/* MOVIE CARD */
 .movie-card {
   display: flex;
   gap: 15px;
@@ -87,9 +87,16 @@
     6px 6px 0px #000,
     10px 10px 0px rgba(0,0,0,0.25);
   align-items: center;
+  flex-wrap: wrap;
+  align-items: flex-start;
 }
 
-/* 🎞 MOVIE IMAGE */
+.movie-details {
+  flex: 1 1 0;  
+  min-width: 0; 
+}
+
+/* MOVIE IMAGE */
 .movie-thumbnail {
   width: 140px;
   border: 6px solid #000;
@@ -97,18 +104,20 @@
   box-shadow: 4px 4px 0px #000;
 }
 
-/* 📋 MOVIE TEXT DETAILS */
+/* MOVIE TEXT DETAILS */
 .movie-details h2 {
   margin: 0 0 5px 0;
   font-size: 22px;
+  color: black !important;
 }
 
 .movie-details p {
   margin: 2px 0;
   font-size: 15px;
+  color: black !important;
 }
 
-/* 🔘 BUTTONS FOR MOVIE CARD */
+/* BUTTONS FOR MOVIE CARD */
 .movie-buttons {
   margin-top: 8px;
 }
@@ -117,7 +126,6 @@
   margin-right: 8px;
   padding: 8px 15px;
   border-radius: 999px;
-  /* Don't set background/border/box-shadow here — use global .btn-* variants so colors are consistent */
   cursor: pointer;
   transition: transform 0.1s ease;
 }
@@ -148,8 +156,30 @@
   color: inherit;
 }
 
-/* Make buttons adapt if you want (optional) */
 .advanced-search-page button {
   color: inherit;
 }
 
+@media (max-width: 600px) {
+  .movie-thumbnail {
+    width: 100%;
+    max-width: 200px; 
+    margin: 0 auto;
+    margin-bottom: 10px;
+  }
+
+  .movie-card {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .movie-details {
+    text-align: center;
+    width: 100%;
+  }
+
+  .movie-buttons {
+    justify-content: center;
+  }
+}
