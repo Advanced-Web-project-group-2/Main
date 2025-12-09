@@ -30,7 +30,7 @@ export default function Movie() {
   // Fetch reviews
   const fetchReviews = async () => {
     try {
-      const res = await axios.get(`http://localhost:5000/api/reviews/${movieId}`);
+      const res = await axios.get(`/api/reviews/${movieId}`);
       setReviews(res.data.reviews);
     } catch (err) {
       console.error(err);
@@ -50,7 +50,7 @@ export default function Movie() {
       for (const userId of uniqueUserIds) {
         if (!newAvatars[userId]) {
           try {
-            const res = await fetch(`http://localhost:5000/shop/equipped/${userId}`);
+            const res = await fetch(`/shop/equipped/${userId}`);
             const data = await res.json();
             newAvatars[userId] = data.equipped || [];
           } catch {
@@ -73,7 +73,7 @@ export default function Movie() {
 
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/reviews",
+        "/api/reviews",
         {
           movie_id: Number(movieId),
           movie_name: movie.title,
@@ -133,7 +133,7 @@ export default function Movie() {
   const handleLike = async (reviewId) => {
     if (!user) return; // guests cannot vote
     try {
-      const res = await fetch(`http://localhost:5000/api/reviews/${reviewId}/like`, {
+      const res = await fetch(`/api/reviews/${reviewId}/like`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -153,7 +153,7 @@ export default function Movie() {
   const handleDislike = async (reviewId) => {
     if (!user) return; // guests cannot vote
     try {
-      const res = await fetch(`http://localhost:5000/api/reviews/${reviewId}/dislike`, {
+      const res = await fetch(`/api/reviews/${reviewId}/dislike`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
       });

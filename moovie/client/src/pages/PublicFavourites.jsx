@@ -11,7 +11,7 @@ export default function PublicFavourites() {
       try {
 
         const res = await fetch(
-          `http://localhost:5000/api/lists/favorites/public/${userId}`
+          `/api/lists/favorites/public/${userId}`
         );
 
         const data = await res.json();

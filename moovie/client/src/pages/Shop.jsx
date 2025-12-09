@@ -11,7 +11,7 @@ export default function Shop() {
   useEffect(() => {
     async function fetchItems() {
       try {
-        const res = await fetch("http://localhost:5000/shop", {
+        const res = await fetch("/shop", {
           headers: { Authorization: "Bearer " + localStorage.getItem("token") },
         });
         const data = await res.json();
@@ -32,7 +32,7 @@ export default function Shop() {
 
   const buy = async (itemId) => {
     try {
-      const res = await fetch(`http://localhost:5000/shop/buy/${itemId}`, {
+      const res = await fetch(`/shop/buy/${itemId}`, {
         method: "POST",
         headers: { Authorization: "Bearer " + localStorage.getItem("token") },
       });

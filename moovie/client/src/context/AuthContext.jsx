@@ -10,7 +10,7 @@ export function AuthProvider({ children }) {
     if (!token) return;
 
     try {
-      const res = await fetch("http://localhost:5000/users/me", {
+      const res = await fetch("/users/me", {
         headers: { Authorization: `Bearer ${token}` },
       });
 
