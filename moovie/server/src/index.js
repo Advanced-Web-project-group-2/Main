@@ -12,7 +12,6 @@ console.log('Environment variables loaded. NODE_ENV:', process.env.NODE_ENV || '
 import express from 'express';
 import cors from 'cors';
 import axios from 'axios';
-import path from 'path';
 import { fileURLToPath } from 'url';
 
 import pool from './db.js';
