@@ -1,40 +1,55 @@
+/* ===============================
+   IN CINEMAS PAGE WRAPPER
+================================== */
 .cinemas-page {
   max-width: 1000px;
-  margin: auto;
+  margin: 40px auto;
+  padding: 0 16px;
   text-align: center;
+  box-sizing: border-box;
 }
 
-h2 {
+.cinemas-page h2 {
   margin-bottom: 20px;
   font-size: 28px;
   color: #000;
 }
 
-/* Grid layout */
+/* ===============================
+   GRID LAYOUT
+================================== */
 .cinema-grid {
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
-/* Card styling */
+/* ===============================
+   MOVIE CARD
+================================== */
 .cinema-card {
   display: flex;
+  flex-direction: row;
   align-items: flex-start;
+
   background: white;
   padding: 20px;
+  gap: 20px;
+
   border: 6px solid black;
   border-radius: 20px;
-  gap: 20px;
   box-shadow:
     6px 6px 0px black,
     10px 10px 0px rgba(0, 0, 0, 0.25);
 }
 
-/* Poster Image */
+/* ===============================
+   POSTER IMAGE
+================================== */
 .cinema-poster {
-  width: 120px;
-  height: auto;
+  width: 140px;
+  flex-shrink: 0;
+
   border: 4px solid black;
   border-radius: 12px;
   object-fit: cover;
@@ -45,20 +60,69 @@ h2 {
   transform: scale(1.03);
 }
 
-/* Info section */
+/* ===============================
+   INFO SECTION
+================================== */
 .cinema-info {
   flex: 1;
   text-align: left;
 }
 
-/* Buttons capsule-style */
+.cinema-info h3 {
+  margin-top: 0;
+}
+
+/* ===============================
+   BUTTON GROUP
+================================== */
 .cinema-buttons {
   display: flex;
+  flex-wrap: wrap;
   gap: 12px;
-  margin-top: 10px;
+  margin-top: 12px;
 }
-/* Buttons use global styles from styles.css to keep consistent appearance */
 
+/* ===============================
+   LOADING TEXT
+================================== */
 .loading-text {
   font-size: 18px;
+}
+
+/* ===============================
+   RESPONSIVE DESIGN
+================================== */
+
+/* 📱 Mobile */
+@media (max-width: 700px) {
+
+  .cinema-card {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .cinema-info {
+    text-align: center;
+  }
+
+  .cinema-poster {
+    width: 60%;
+    max-width: 220px;
+  }
+
+  .cinema-buttons {
+    justify-content: center;
+  }
+}
+
+/* 🟧 Tablet */
+@media (min-width: 701px) and (max-width: 1000px) {
+  .cinema-card {
+    flex-direction: row;
+  }
+
+  .cinema-poster {
+    width: 130px;
+  }
 }

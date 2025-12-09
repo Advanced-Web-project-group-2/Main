@@ -18,6 +18,21 @@
   z-index: 10;
 }
 
+@media (max-width: 768px) {
+  .credits-box {
+    position: static;
+    margin-bottom: 20px;
+    width: 90%;
+    text-align: center;
+    right: auto;
+    top: auto;
+  }
+
+  .shop-page {
+    padding-top: 20px;
+  }
+}
+
 .shop-category-box {
   width: 60%;
   max-width: 900px;

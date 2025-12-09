@@ -4,6 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import axios from "axios";
 import "../styles/Movie.css";
 import "../styles/likes.css";
+import AddToListButton from "../components/AddToListButton";
 
 export default function Movie() {
   const { movieId } = useParams();
@@ -184,7 +185,7 @@ export default function Movie() {
             <p>{movie.overview}</p>
             <div className="movie-actions">
               <button className="btn-white" onClick={handleAddFavourite}>❤️ Add to Favorites</button>
-              <button className="btn-white">➕ Add to List</button>
+              <AddToListButton movie={movie} /> {/* Popup window for "Add to List" */}
               <button className="btn-white">🔗 Share</button>
             </div>
           </div>
