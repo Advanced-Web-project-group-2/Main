@@ -1,9 +1,13 @@
 const path = require("path");
 
+const rootDir = __dirname; 
+
 module.exports = {
-  rootDir: path.resolve(__dirname), 
+  rootDir: "./",
   testEnvironment: "node",
   transform: {},
-  setupFiles: ["<rootDir>/tests/setupEnv.js"],
-  setupFilesAfterEnv: ["<rootDir>/tests/setup.js"],
+  setupFilesAfterEnv: [
+    path.join(rootDir, "tests/setupEnv.js"),
+    path.join(rootDir, "tests/setup.js"),
+  ],
 };
