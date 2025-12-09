@@ -18,7 +18,7 @@ export default function AdvancedSearch() {
 
   const { setBackground } = useOutletContext(); // Layout background
 
-  const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
+  const API_KEY = import.meta.env.VITE_TMDB_API_KEY || "e7b2a2baf908be99c03d69f99197bea2"; // fallback for production build
 
   const genreMap = {
     Action: 28, Adventure: 12, Animation: 16, Comedy: 35, Crime: 80,

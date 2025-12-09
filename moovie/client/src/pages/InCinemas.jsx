@@ -7,7 +7,7 @@ import AddToListButton from '../components/AddToListButton';
 
 export default function InCinemas() {
   const [movies, setMovies] = useState([]);
-  const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
+  const API_KEY = import.meta.env.VITE_TMDB_API_KEY || "e7b2a2baf908be99c03d69f99197bea2"; // fallback for production build
 
   useEffect(() => {
     axios
