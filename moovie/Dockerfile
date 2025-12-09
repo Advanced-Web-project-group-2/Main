@@ -15,6 +15,9 @@ COPY moovie/server/package*.json ./
 RUN npm install
 COPY moovie/server/ ./
 
+# Copy raw client assets so image URLs like /src/assets/... work in production
+COPY moovie/client/src/assets /app/server/assets
+
 # Copy built frontend to where server expects it
 RUN mkdir -p /app/server/client/dist
 RUN cp -r /app/client/dist/* /app/server/client/dist/

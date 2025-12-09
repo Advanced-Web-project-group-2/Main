@@ -80,6 +80,9 @@ app.get('/api/search', async (req, res) => {
 });
 
 // ---------------------- STATIC FRONTEND ----------------------
+// Serve raw client assets referenced by seeded image URLs (/src/assets/...)
+app.use('/src/assets', express.static(path.resolve(__dirname, '../assets')));
+
 // Place this after *all* API/server routes!
 const distPath = path.resolve(__dirname, '../client/dist');
 console.log('Serving static files from:', distPath);
