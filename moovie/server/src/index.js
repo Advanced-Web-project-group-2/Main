@@ -20,14 +20,11 @@ import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 import { setupSwagger } from "./swagger.js";
 
+// Correct __dirname setup for ESM:
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.resolve();
+const __dirname = path.dirname(__filename);
 
-
-
-
-
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 const app = express();
 
 // ---------------------- MIDDLEWARE ----------------------
@@ -35,13 +32,10 @@ app.use(cors());
 app.use(express.json());
 
 // ---------------------- SWAGGER SETUP ----------------------
-
 setupSwagger(app);
 
 // ---------------------- ROUTES ----------------------
-// Put listsRoutes here, early in the chain
 app.use("/api/lists", listsRoutes);
-
 app.use("/auth", authRoutes);
 app.use("/api/reviews", reviewsRouter);
 app.use("/shop", shopRoutes);
@@ -76,6 +70,13 @@ app.get('/api/search', async (req, res) => {
     console.error('Search proxy error', err?.message || err);
     res.status(500).json({ error: 'Failed to perform search' });
   }
+});
+
+// ---------------------- STATIC FRONTEND ----------------------
+// Place this after *all* API/server routes!
+app.use(express.static(path.join(__dirname, '../client/dist')));
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/dist', 'index.html'));
 });
 
 // ---------------------- SERVER ----------------------
