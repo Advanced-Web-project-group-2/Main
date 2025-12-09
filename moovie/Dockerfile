@@ -1,21 +1,28 @@
-# Use official Node.js image
-FROM node:18
+# Use official Node.js image (upgraded to Node 20 for Vite 7 compatibility)
+FROM node:20
 
 # Build frontend
-WORKDIR /client
+WORKDIR /app/client
 COPY moovie/client/package*.json ./
 RUN npm install
+# Install axios which is missing from package.json but used in the code
+RUN npm install axios
 COPY moovie/client/ ./
 RUN npm run build
 
-# Build backend
-WORKDIR /server
+# Setup backend
+WORKDIR /app/server
 COPY moovie/server/package*.json ./
 RUN npm install
 COPY moovie/server/ ./
 
-# Expose the port for Railway (default is 3000, but your code listens on process.env.PORT)
+# Copy built frontend to where server expects it
+RUN mkdir -p /app/server/client/dist
+RUN cp -r /app/client/dist/* /app/server/client/dist/
+
+# Expose the port for Railway
 EXPOSE 3000
 
-# Start backend
-CMD ["npm", "start"]
+# Start backend from the src directory
+WORKDIR /app/server/src
+CMD ["node", "index.js"]
