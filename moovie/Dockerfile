@@ -1,6 +1,9 @@
 FROM node:20
 
-# Build frontend
+# Build frontend with TMDB API key from Railway env
+ARG VITE_TMDB_API_KEY
+ENV VITE_TMDB_API_KEY=$VITE_TMDB_API_KEY
+
 WORKDIR /app/client
 COPY moovie/client/package*.json ./
 RUN npm install

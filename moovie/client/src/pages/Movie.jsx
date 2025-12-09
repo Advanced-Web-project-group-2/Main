@@ -16,7 +16,7 @@ export default function Movie() {
   const [votes, setVotes] = useState({}); // { reviewId: 'like' | 'dislike' | null }
   const { user } = useAuth();
 
-  const API_KEY = import.meta.env.VITE_TMDB_API_KEY || "e7b2a2baf908be99c03d69f99197bea2"; // fallback for production build
+  const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
   const token = localStorage.getItem("token");
 
   // Fetch movie data

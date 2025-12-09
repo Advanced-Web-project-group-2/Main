@@ -32,7 +32,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const PORT = process.env.PORT || 5000;
-const TMDB_API_KEY = process.env.TMDB_API_KEY || "e7b2a2baf908be99c03d69f99197bea2"; // fallback if env not set
+const TMDB_API_KEY = process.env.TMDB_API_KEY;
 const app = express();
 
 // ---------------------- MIDDLEWARE ----------------------
