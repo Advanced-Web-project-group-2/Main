@@ -6,7 +6,7 @@ export default function NowInCinemas() {
 
   useEffect(() => {
     // Fetch from Node server
-    fetch('http://localhost:5000/api/now-playing')
+    fetch('/api/now-playing')
       .then(res => res.json())
       .then(data => {
 

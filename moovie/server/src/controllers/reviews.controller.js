@@ -1,4 +1,5 @@
 import pool from "../db.js";
+import { addCreditsToUser } from "../services/reward.service.js";
 
 // Get reviews for a specific movie
 export const getReviews = async (req, res) => {
@@ -79,6 +80,14 @@ export const addReview = async (req, res) => {
       [user_id, movie_id, movie_name || null, content, rating]
     );
 
+    // Award +3 credits for leaving a review
+    try {
+      await addCreditsToUser(user_id, 3);
+    } catch (creditErr) {
+      console.error("Error adding reward credits:", creditErr);
+      // Don't fail the review submission if credit reward fails
+    }
+
     res.status(201).json(result.rows[0]);
   } catch (err) {
     console.error("Error adding review:", err);
@@ -127,14 +136,26 @@ export const likeReview = async (req, res) => {
         "UPDATE review_votes SET vote_type = 'like' WHERE user_id = $1 AND review_id = $2",
         [user_id, reviewId]
       );
+      // Award +1 credit for adding a like vote
+      try {
+        await addCreditsToUser(user_id, 1);
+      } catch (creditErr) {
+        console.error("Error adding reward credits:", creditErr);
+      }
       return res.json({ liked: true });
     }
 
-    // New like
+    // New like - Award +1 credit for adding a like vote
     await pool.query(
       "INSERT INTO review_votes (user_id, review_id, vote_type) VALUES ($1, $2, 'like')",
       [user_id, reviewId]
     );
+
+    try {
+      await addCreditsToUser(user_id, 1);
+    } catch (creditErr) {
+      console.error("Error adding reward credits:", creditErr);
+    }
 
     res.json({ liked: true });
   } catch (err) {
@@ -184,14 +205,26 @@ export const dislikeReview = async (req, res) => {
         "UPDATE review_votes SET vote_type = 'dislike' WHERE user_id = $1 AND review_id = $2",
         [user_id, reviewId]
       );
+      // Award +1 credit for adding a dislike vote
+      try {
+        await addCreditsToUser(user_id, 1);
+      } catch (creditErr) {
+        console.error("Error adding reward credits:", creditErr);
+      }
       return res.json({ disliked: true });
     }
 
-    // New dislike
+    // New dislike - Award +1 credit for adding a dislike vote
     await pool.query(
       "INSERT INTO review_votes (user_id, review_id, vote_type) VALUES ($1, $2, 'dislike')",
       [user_id, reviewId]
     );
+
+    try {
+      await addCreditsToUser(user_id, 1);
+    } catch (creditErr) {
+      console.error("Error adding reward credits:", creditErr);
+    }
 
     res.json({ disliked: true });
   } catch (err) {

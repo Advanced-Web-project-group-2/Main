@@ -1,4 +1,5 @@
 import pool from "../db.js";
+import { addCreditsToUser } from "../services/reward.service.js";
 
 // ------------------- GET FAVOURITES -------------------
 export const getFavourites = async (req, res) => {
@@ -56,10 +57,19 @@ export const addFavourite = async (req, res) => {
           )
         ).rows[0].id;
 
-    await pool.query(
-      "INSERT INTO list_movies (list_id, movie_id) VALUES ($1, $2) ON CONFLICT DO NOTHING",
+    const insertResult = await pool.query(
+      "INSERT INTO list_movies (list_id, movie_id) VALUES ($1, $2) ON CONFLICT DO NOTHING RETURNING *",
       [listId, movieId]
     );
+
+    // Only award credits if the movie was newly added (not a duplicate)
+    if (insertResult.rowCount > 0) {
+      try {
+        await addCreditsToUser(userId, 2);
+      } catch (creditErr) {
+        console.error("Error adding reward credits:", creditErr);
+      }
+    }
 
     res.json({ message: "Added to favourites" });
   } catch (err) {

@@ -5,7 +5,7 @@ export default function TopThreeMovies() {
   const [movies, setMovies] = useState([]);
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/now-playing')
+    fetch('/api/now-playing')
       .then(res => res.json())
       .then(data => setMovies(data.results.slice(0, 5)))
       .catch(err => console.error(err));

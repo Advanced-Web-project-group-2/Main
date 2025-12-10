@@ -1,10 +1,17 @@
 import dotenv from 'dotenv';
-dotenv.config();
+import fs from 'fs';
+import path from 'path';
+
+// Only load .env if it exists (for local development)
+if (fs.existsSync(path.resolve('.env'))) {
+  dotenv.config();
+}
+
+console.log('Environment variables loaded. NODE_ENV:', process.env.NODE_ENV || 'production');
 
 import express from 'express';
 import cors from 'cors';
 import axios from 'axios';
-import path from 'path';
 import { fileURLToPath } from 'url';
 
 import pool from './db.js';
@@ -20,14 +27,12 @@ import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 import { setupSwagger } from "./swagger.js";
 
+// Correct __dirname setup for ESM:
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.resolve();
+const __dirname = path.dirname(__filename);
 
-
-
-
-
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
+const TMDB_API_KEY = process.env.TMDB_API_KEY;
 const app = express();
 
 // ---------------------- MIDDLEWARE ----------------------
@@ -35,13 +40,10 @@ app.use(cors());
 app.use(express.json());
 
 // ---------------------- SWAGGER SETUP ----------------------
-
 setupSwagger(app);
 
 // ---------------------- ROUTES ----------------------
-// Put listsRoutes here, early in the chain
 app.use("/api/lists", listsRoutes);
-
 app.use("/auth", authRoutes);
 app.use("/api/reviews", reviewsRouter);
 app.use("/shop", shopRoutes);
@@ -55,7 +57,7 @@ app.use("/src/assets", express.static(path.join(__dirname, "../client/src/assets
 app.get('/api/now-playing', async (req, res) => {
   try {
     const response = await axios.get('https://api.themoviedb.org/3/movie/now_playing', {
-      params: { api_key: process.env.TMDB_API_KEY, language: 'en-US', page: 1 }
+      params: { api_key: TMDB_API_KEY, language: 'en-US', page: 1 }
     });
     res.json(response.data);
   } catch (err) {
@@ -69,13 +71,25 @@ app.get('/api/search', async (req, res) => {
 
   try {
     const response = await axios.get('https://api.themoviedb.org/3/search/movie', {
-      params: { api_key: process.env.TMDB_API_KEY, query: q, language: 'en-US', page: 1, include_adult: false }
+      params: { api_key: TMDB_API_KEY, query: q, language: 'en-US', page: 1, include_adult: false }
     });
     res.json(response.data);
   } catch (err) {
     console.error('Search proxy error', err?.message || err);
     res.status(500).json({ error: 'Failed to perform search' });
   }
+});
+
+// ---------------------- STATIC FRONTEND ----------------------
+// Serve raw client assets referenced by seeded image URLs (/src/assets/...)
+app.use('/src/assets', express.static(path.resolve(__dirname, '../assets')));
+
+// Place this after *all* API/server routes!
+const distPath = path.resolve(__dirname, '../client/dist');
+console.log('Serving static files from:', distPath);
+app.use(express.static(distPath));
+app.get(/.*/, (req, res) => {
+  res.sendFile(path.join(distPath, 'index.html'));
 });
 
 // ---------------------- SERVER ----------------------

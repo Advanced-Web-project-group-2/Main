@@ -41,7 +41,7 @@ export default function Profile() {
       return alert("New passwords do not match");
 
     try {
-      const res = await fetch("http://localhost:5000/auth/change-password", {
+      const res = await fetch("/auth/change-password", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -70,7 +70,7 @@ export default function Profile() {
     if (!deletePassword) return alert("Enter password first");
 
     try {
-      const res = await fetch("http://localhost:5000/auth/delete", {
+      const res = await fetch("/auth/delete", {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -93,7 +93,7 @@ export default function Profile() {
 
   // ICONS & ACCESSORIES
   const equipIcon = async (itemId) => {
-    await fetch(`http://localhost:5000/shop/equip/icon/${itemId}`, {
+    await fetch(`/shop/equip/icon/${itemId}`, {
       method: "PATCH",
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -101,7 +101,7 @@ export default function Profile() {
   };
 
   const toggleAccessory = async (itemId) => {
-    await fetch(`http://localhost:5000/shop/equip/accessory/${itemId}`, {
+    await fetch(`/shop/equip/accessory/${itemId}`, {
       method: "PATCH",
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -111,13 +111,13 @@ export default function Profile() {
   const refreshShopData = async () => {
     try {
       const [iconsRes, accessoriesRes, equippedRes] = await Promise.all([
-        fetch("http://localhost:5000/shop/user-items/icons", {
+        fetch("/shop/user-items/icons", {
           headers: { Authorization: `Bearer ${token}` },
         }),
-        fetch("http://localhost:5000/shop/user-items/accessories", {
+        fetch("/shop/user-items/accessories", {
           headers: { Authorization: `Bearer ${token}` },
         }),
-        fetch("http://localhost:5000/shop/equipped", {
+        fetch("/shop/equipped", {
           headers: { Authorization: `Bearer ${token}` },
         }),
       ]);

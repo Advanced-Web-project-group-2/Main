@@ -6,6 +6,24 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
+      // Forward auth calls to the backend server
+      '/auth': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+        secure: false,
+      },
+      // Forward shop calls to the backend server
+      '/shop': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+        secure: false,
+      },
+      // Forward users calls to the backend server
+      '/users': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+        secure: false,
+      },
       // Forward any calls to /api/* to the backend server
       '/api': {
         target: 'http://localhost:5000',

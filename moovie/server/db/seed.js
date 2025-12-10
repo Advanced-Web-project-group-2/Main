@@ -1,6 +1,6 @@
 import pool from "../src/db.js";
 
-async function waitForDb(retries = 10, delay = 2000) {
+async function waitForDb(retries = 30, delay = 3000) {
   while (retries > 0) {
     try {
       await pool.query("SELECT 1");
