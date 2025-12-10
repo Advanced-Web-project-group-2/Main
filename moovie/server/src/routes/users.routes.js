@@ -100,17 +100,6 @@ router.put("/update/:id", updateUser);
  * @swagger
  * /users/delete:
  *   delete:
- *     summary: Delete the authenticated user's account
- *     tags: [Users]
- *     security:
- *       - BearerAuth: []
- *     responses:
- *       200:
- *         description: User deleted successfully
-/**
- * @swagger
- * /users/delete:
- *   delete:
  *     summary: Delete authenticated user's account
  *     tags: [Users]
  *     security:
