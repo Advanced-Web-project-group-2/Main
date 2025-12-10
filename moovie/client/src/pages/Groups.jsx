@@ -121,7 +121,7 @@ export default function Groups() {
 
       {!user && (
         <div className="groups-signin-message">
-          <p><Link to="/signin">Sign in</Link> to view your groups and manage memberships.</p>s
+          <p><Link to="/signin">Sign in</Link> to view your groups and manage memberships.</p>
         </div>
       )}
 

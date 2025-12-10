@@ -4,10 +4,12 @@ import axios from "axios";
 import "../styles/InCinemas.css";
 
 import AddToListButton from '../components/AddToListButton';
+import { useAuth } from "../context/AuthContext";
 
 export default function InCinemas() {
   const [movies, setMovies] = useState([]);
   const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
+  const { refreshUserData } = useAuth();
 
   useEffect(() => {
     axios
@@ -15,6 +17,16 @@ export default function InCinemas() {
       .then((res) => setMovies(res.data.results))
       .catch((err) => console.error(err));
   }, []);
+
+  // Listen for movie added to group event to refresh credits
+  useEffect(() => {
+    const handleMovieAddedToGroup = () => {
+      refreshUserData();
+    };
+    
+    window.addEventListener('movieAddedToGroup', handleMovieAddedToGroup);
+    return () => window.removeEventListener('movieAddedToGroup', handleMovieAddedToGroup);
+  }, [refreshUserData]);
 
   return (
     <div className="cinemas-page">
