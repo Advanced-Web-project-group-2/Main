@@ -117,14 +117,89 @@ router.get("/user-items/accessories", authMiddleware, (req, res) =>
   getUserItemsByType({ ...req, params: { itemType: "accessories" } }, res)
 );
 
+/**
+ * @swagger
+ * /shop/equip/icon/{itemId}:
+ *   patch:
+ *     summary: Equip an icon item
+ *     tags: [Shop]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: itemId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Icon equipped successfully
+ *       400:
+ *         description: Invalid item
+ *       401:
+ *         description: Authentication required
+ */
 router.patch("/equip/icon/:itemId", authMiddleware, equipIcon);
 
-
+/**
+ * @swagger
+ * /shop/equip/accessory/{itemId}:
+ *   patch:
+ *     summary: Toggle an accessory item
+ *     tags: [Shop]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: itemId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Accessory toggled successfully
+ *       400:
+ *         description: Invalid item
+ *       401:
+ *         description: Authentication required
+ */
 router.patch("/equip/accessory/:itemId", authMiddleware, toggleAccessory);
 
-
+/**
+ * @swagger
+ * /shop/equipped:
+ *   get:
+ *     summary: Get authenticated user's equipped items
+ *     tags: [Shop]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of equipped items
+ *       401:
+ *         description: Authentication required
+ */
 router.get("/equipped", authMiddleware, getEquippedItems);
 
+/**
+ * @swagger
+ * /shop/equipped/{userId}:
+ *   get:
+ *     summary: Get another user's equipped items (public)
+ *     tags: [Shop]
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: List of user's equipped items
+ *       500:
+ *         description: Failed to fetch avatar
+ */
 router.get("/equipped/:userId", async (req, res) => {
   try {
     req.user = { id: req.params.userId };

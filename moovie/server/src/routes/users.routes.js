@@ -107,14 +107,54 @@ router.put("/update/:id", updateUser);
  *     responses:
  *       200:
  *         description: User deleted successfully
+/**
+ * @swagger
+ * /users/delete:
+ *   delete:
+ *     summary: Delete authenticated user's account
+ *     tags: [Users]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: User deleted successfully
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Server error
+ */
+router.delete("/delete", authMiddleware, deleteUser);
+
+/**
+ * @swagger
+ * /users/me:
+ *   get:
+ *     summary: Get authenticated user's profile
+ *     tags: [Users]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: User profile data
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                   format: uuid
+ *                 username:
+ *                   type: string
+ *                 credits:
+ *                   type: integer
  *       401:
  *         description: Unauthorized
  *       404:
  *         description: User not found
+ *       500:
+ *         description: Failed to fetch user
  */
-
-router.delete("/delete", authMiddleware, deleteUser);
-
 router.get("/me", authMiddleware, async (req, res) => {
   try {
     const result = await pool.query(
