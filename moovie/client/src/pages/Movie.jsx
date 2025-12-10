@@ -14,7 +14,7 @@ export default function Movie() {
   const [rating, setRating] = useState(5);
   const [avatarCache, setAvatarCache] = useState({});
   const [votes, setVotes] = useState({}); // { reviewId: 'like' | 'dislike' | null }
-  const { user } = useAuth();
+  const { user, refreshUserData } = useAuth();
 
   const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
   const token = localStorage.getItem("token");
@@ -64,6 +64,16 @@ export default function Movie() {
     if (reviews.length > 0) loadAvatars();
   }, [reviews]);
 
+  // Listen for movie added to group event to refresh credits
+  useEffect(() => {
+    const handleMovieAddedToGroup = () => {
+      refreshUserData();
+    };
+    
+    window.addEventListener('movieAddedToGroup', handleMovieAddedToGroup);
+    return () => window.removeEventListener('movieAddedToGroup', handleMovieAddedToGroup);
+  }, [refreshUserData]);
+
   if (!movie) return <p>Loading...</p>;
 
   // Submit review
@@ -86,6 +96,9 @@ export default function Movie() {
       setReviews([res.data, ...reviews]);
       setReviewText("");
       setRating(5);
+      
+      // Refresh user data to show updated credits
+      refreshUserData();
     } catch (err) {
       const message =
         err.response?.data?.error ||
@@ -123,6 +136,9 @@ export default function Movie() {
       }
 
       alert("Added to Favourites!");
+      
+      // Refresh user data to show updated credits
+      refreshUserData();
     } catch (err) {
       console.error(err);
       alert("Failed to add to favourites");
@@ -143,6 +159,9 @@ export default function Movie() {
 
       setVotes((prev) => ({ ...prev, [reviewId]: data.liked ? "like" : null }));
       fetchReviews();
+      
+      // Refresh user data to show updated credits
+      refreshUserData();
     } catch (err) {
       console.error(err);
       alert("Failed to like review");
@@ -163,6 +182,9 @@ export default function Movie() {
 
       setVotes((prev) => ({ ...prev, [reviewId]: data.disliked ? "dislike" : null }));
       fetchReviews();
+      
+      // Refresh user data to show updated credits
+      refreshUserData();
     } catch (err) {
       console.error(err);
       alert("Failed to dislike review");

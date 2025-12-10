@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import AddToListButton from "../components/AddToListButton";
 import "../styles/AdvancedSearch.css";
 import { useOutletContext } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 export default function AdvancedSearch() {
   const [title, setTitle] = useState("");
@@ -17,6 +18,7 @@ export default function AdvancedSearch() {
   const [loading, setLoading] = useState(false);
 
   const { setBackground } = useOutletContext(); // Layout background
+  const { refreshUserData } = useAuth();
 
   const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
 
@@ -37,6 +39,16 @@ export default function AdvancedSearch() {
     setBackground("/src/assets/images/advancedsearch-bg.jpg");
     return () => setBackground(null); // Reset on unmount
   }, [setBackground]);
+
+  // Listen for movie added to group event to refresh credits
+  useEffect(() => {
+    const handleMovieAddedToGroup = () => {
+      refreshUserData();
+    };
+    
+    window.addEventListener('movieAddedToGroup', handleMovieAddedToGroup);
+    return () => window.removeEventListener('movieAddedToGroup', handleMovieAddedToGroup);
+  }, [refreshUserData]);
 
   const handleSearch = async (e) => {
     e.preventDefault();
