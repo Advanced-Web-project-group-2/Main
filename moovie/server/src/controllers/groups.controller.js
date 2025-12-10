@@ -1,4 +1,5 @@
 import pool from '../db.js';
+import { addCreditsToUser } from '../services/reward.service.js';
 
 // POST /api/groups
 export const createGroup = async (req, res) => {
@@ -348,18 +349,28 @@ export const addMovieToGroup = async (req, res) => {
     );
 
     // Insert into group_movies; do nothing on conflict (idempotent)
-    await pool.query(
+    const insertResult = await pool.query(
       `INSERT INTO group_movies (group_id, movie_id, added_by)
        VALUES ($1, $2, $3)
-       ON CONFLICT (group_id, movie_id) DO NOTHING`,
+       ON CONFLICT (group_id, movie_id) DO NOTHING
+       RETURNING *`,
       [groupId, movieId, userId]
     );
+
+    // Only award credits if the movie was newly added (not a duplicate)
+    if (insertResult.rowCount > 0) {
+      try {
+        await addCreditsToUser(userId, 2);
+      } catch (creditErr) {
+        console.error("Error adding reward credits:", creditErr);
+      }
+    }
 
     // Optionally return a standardized result: true if added or already present
     return res.json({ added: true });
   } catch (err) {
     console.error('addMovieToGroup error:', err);
-    return res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: 'Internal server error' });
   }
 };
 

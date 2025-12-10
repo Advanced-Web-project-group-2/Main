@@ -7,7 +7,7 @@ async function basicSearch(query, limit = 10) {
   if (!query || !query.trim()) return [];
   const q = query.trim();
   const relUrl = `/api/search?q=${encodeURIComponent(q)}`;
-  const backendUrl = `http://localhost:5000/api/search?q=${encodeURIComponent(q)}`;
+  const backendUrl = `/api/search?q=${encodeURIComponent(q)}`;
 
   try {
     let res = await fetch(relUrl);

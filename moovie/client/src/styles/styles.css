@@ -2,7 +2,7 @@
    GLOBAL FONTS & BASE STYLES
 ================================= */
 
-@import url('./navbar.css');
+@import url('./navBar.css');
 
 @font-face {
   font-family: "Gohu";
