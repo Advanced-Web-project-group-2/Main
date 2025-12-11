@@ -19,7 +19,7 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  await pool.query("DROP TABLE IF EXISTS reviews;");
-  await pool.query("DROP TABLE IF EXISTS users;");
+  await pool.query("TRUNCATE TABLE reviews RESTART IDENTITY CASCADE;");
+  await pool.query("TRUNCATE TABLE users RESTART IDENTITY CASCADE;");
   await pool.end();
 });
