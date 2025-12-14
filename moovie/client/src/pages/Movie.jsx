@@ -5,6 +5,8 @@ import axios from "axios";
 import "../styles/Movie.css";
 import "../styles/likes.css";
 import AddToListButton from "../components/AddToListButton";
+import { addFavourite } from "../services/listService";
+
 
 export default function Movie() {
   const { movieId } = useParams();
@@ -110,40 +112,18 @@ export default function Movie() {
 
   // Add to favourites
   const handleAddFavourite = async () => {
-    if (!token) return alert("You must be logged in to add to favourites");
+  if (!user) return alert("You must be logged in to add to favourites");
 
-    try {
-      const res = await fetch(`/api/lists/favourites`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          movieId: movie.id,
-          movieName: movie.title,
-          genre: movie.genres?.map((g) => g.name).join(", "),
-          releaseYear: movie.release_date?.split("-")[0],
-          posterUrl: movie.poster_path
-            ? `https://image.tmdb.org/t/p/w300${movie.poster_path}`
-            : null,
-        }),
-      });
+  try {
+    await addFavourite(movie);
+    alert("Added to Favourites!");
+    refreshUserData();
+  } catch (err) {
+    console.error(err);
+    alert(err.message || "Failed to add to favourites");
+  }
+};
 
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.error || "Failed to add to favourites");
-      }
-
-      alert("Added to Favourites!");
-      
-      // Refresh user data to show updated credits
-      refreshUserData();
-    } catch (err) {
-      console.error(err);
-      alert("Failed to add to favourites");
-    }
-  };
 
   // Like a review
   const handleLike = async (reviewId) => {

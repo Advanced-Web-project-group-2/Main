@@ -6,10 +6,48 @@ import "../styles/InCinemas.css";
 import AddToListButton from '../components/AddToListButton';
 import { useAuth } from "../context/AuthContext";
 
+import listService from "../services/listService";
+
 export default function InCinemas() {
   const [movies, setMovies] = useState([]);
   const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
   const { refreshUserData } = useAuth();
+  const token = localStorage.getItem("token");
+
+  const handleAddFavourite = async (movie) => {
+  if (!token) return alert("You must be logged in to add to favourites");
+
+  try {
+    const res = await fetch(`/api/lists/favourites`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        movieId: movie.id,
+        movieName: movie.title,
+        genre: movie.genre_ids?.join(",") || "",
+        releaseYear: movie.release_date?.split("-")[0],
+        posterUrl: movie.poster_path
+          ? `https://image.tmdb.org/t/p/w300${movie.poster_path}`
+          : null,
+      }),
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || "Failed to add to favourites");
+    }
+
+    alert("Added to Favourites!");
+    refreshUserData();
+  } catch (err) {
+    console.error(err);
+    alert(err.message || "Failed to add to favourites");
+  }
+};
+
 
   useEffect(() => {
     axios
@@ -61,7 +99,9 @@ export default function InCinemas() {
                 </p>
 
                 <div className="cinema-buttons">
-                  <button className="btn-warning">❤️ Favorite</button>
+                  <button className="btn-warning"
+                  onClick={() => handleAddFavourite(movie)}
+                  >❤️ Favorite</button> 
                   <AddToListButton movie={movie} /> {/* Popup window for "Add to List" */} 
                   <button className="btn-secondary">🔗 Share</button>
                 </div>
