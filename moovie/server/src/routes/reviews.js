@@ -4,15 +4,82 @@ import authMiddleware from "../middleware/auth.js";
 
 const router = express.Router();
 
-router.post("/:reviewId/like", authMiddleware, likeReview);
-router.post("/:reviewId/dislike", authMiddleware, dislikeReview);
-
 /**
  * @swagger
  * tags:
  *   name: Reviews
  *   description: Movie reviews and ratings
  */
+
+/**
+ * @swagger
+ * /api/reviews/{reviewId}/like:
+ *   post:
+ *     summary: Like a review
+ *     tags: [Reviews]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: reviewId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Like toggled successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 liked:
+ *                   type: boolean
+ *       400:
+ *         description: Cannot vote on own review
+ *       401:
+ *         description: Authentication required
+ *       404:
+ *         description: Review not found
+ *       500:
+ *         description: Server error
+ */
+router.post("/:reviewId/like", authMiddleware, likeReview);
+
+/**
+ * @swagger
+ * /api/reviews/{reviewId}/dislike:
+ *   post:
+ *     summary: Dislike a review
+ *     tags: [Reviews]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: reviewId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Dislike toggled successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 disliked:
+ *                   type: boolean
+ *       400:
+ *         description: Cannot vote on own review
+ *       401:
+ *         description: Authentication required
+ *       404:
+ *         description: Review not found
+ *       500:
+ *         description: Server error
+ */
+router.post("/:reviewId/dislike", authMiddleware, dislikeReview);
 
 /**
  * @swagger

@@ -147,7 +147,7 @@ export const likeReview = async (req, res) => {
 
     // New like - Award +1 credit for adding a like vote
     await pool.query(
-      "INSERT INTO review_votes (user_id, review_id, vote_type) VALUES ($1, $2, 'like')",
+      "INSERT INTO review_votes (user_id, review_id, vote_type) VALUES ($1, $2, 'like') ON CONFLICT (user_id, review_id) DO UPDATE SET vote_type = 'like'",
       [user_id, reviewId]
     );
 
@@ -216,7 +216,7 @@ export const dislikeReview = async (req, res) => {
 
     // New dislike - Award +1 credit for adding a dislike vote
     await pool.query(
-      "INSERT INTO review_votes (user_id, review_id, vote_type) VALUES ($1, $2, 'dislike')",
+      "INSERT INTO review_votes (user_id, review_id, vote_type) VALUES ($1, $2, 'dislike') ON CONFLICT (user_id, review_id) DO UPDATE SET vote_type = 'dislike'",
       [user_id, reviewId]
     );
 

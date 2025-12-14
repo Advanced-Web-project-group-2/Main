@@ -7,6 +7,7 @@ import AddToListButton from "../components/AddToListButton";
 import "../styles/AdvancedSearch.css";
 import { useOutletContext } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import listService from "../services/listService";
 
 export default function AdvancedSearch() {
   const [title, setTitle] = useState("");
@@ -19,6 +20,7 @@ export default function AdvancedSearch() {
 
   const { setBackground } = useOutletContext(); // Layout background
   const { refreshUserData } = useAuth();
+  const token = localStorage.getItem("token");
 
   const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
 
@@ -100,6 +102,36 @@ export default function AdvancedSearch() {
     setLoading(false);
   };
 
+  const handleAddFavourite = async (movie) => {
+  if (!token) return alert("You must be logged in to add to favourites");
+
+  try {
+    await fetch("/api/lists/favourites", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        movieId: movie.id,
+        movieName: movie.title,
+        genre: movie.genre_ids?.join(",") || "",
+        releaseYear: movie.release_date?.split("-")[0],
+        posterUrl: movie.poster_path
+          ? `https://image.tmdb.org/t/p/w300${movie.poster_path}`
+          : null,
+      }),
+    });
+
+    alert("Added to Favourites!");
+    refreshUserData();
+  } catch (err) {
+    console.error(err);
+    alert("Failed to add to favourites");
+  }
+};
+
+
   return (
     <div className="advanced-search-container">
       <section id="advanced-search">
@@ -156,9 +188,14 @@ export default function AdvancedSearch() {
                   </p>
 
                   <div className="movie-buttons">
-                    <button>❤️ Add to Favorites</button>
+                    <button
+                      className="btn-warning"
+                      onClick={() => handleAddFavourite(movie)}
+                    >
+                      ❤️ Add to Favorites
+                    </button>
                     <AddToListButton movie={movie} /> {/* Popup window for "Add to List" */}
-                    <button>🔗 Share</button>
+                    <button className="btn-secondary">🔗 Share</button>
                   </div>
                 </div>
               </div>
