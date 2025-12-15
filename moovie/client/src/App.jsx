@@ -14,6 +14,7 @@ import Profile from "./pages/Profile.jsx";
 import Shop from "./pages/Shop.jsx";
 import Movie from "./pages/Movie.jsx";
 import PublicFavourites from "./pages/PublicFavourites.jsx";
+import CustomList from "./pages/CustomList.jsx";
 
 export default function App() {
   return (
@@ -31,6 +32,9 @@ export default function App() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/shop" element={<Shop />} />
           <Route path="/movie/:movieId" element={<Movie />} />
+
+          {/* Custom list detail (shareable) */}
+          <Route path="/lists/custom/:listId" element={<CustomList />} />
 
           {/* Public favourites – both URLs use same component **/}
           <Route

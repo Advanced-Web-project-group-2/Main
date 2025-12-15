@@ -1,0 +1,142 @@
+.custom-list-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 16px;
+}
+
+.custom-list-card {
+  width: 100%;
+  max-width: 520px;
+  background: #ffffff;
+  border-radius: 24px;
+  border: 4px solid #000;
+  box-shadow: 6px 6px 0 #000;
+  padding: 24px 32px;
+}
+
+.custom-list-title {
+  font-size: 1.8rem;
+  margin-bottom: 4px;
+}
+
+.custom-list-description {
+  font-size: 0.95rem;
+  margin-bottom: 16px;
+}
+
+.custom-list-empty {
+  margin-top: 16px;
+}
+
+.custom-list-movies {
+  margin-top: 12px;
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.custom-list-movie-row {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  text-align: left;
+  background: #f8f8f8;
+  border-radius: 18px;
+  border: 3px solid #000;
+  padding: 10px 12px;
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.custom-list-movie-row:hover {
+  transform: translateY(-2px);
+  box-shadow: 4px 4px 0 #000;
+}
+
+.custom-list-poster {
+  width: 60px;
+  height: auto;
+  border-radius: 12px;
+  margin-right: 16px;
+}
+
+.custom-list-movie-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.custom-list-movie-title {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.custom-list-movie-year,
+.custom-list-movie-genre {
+  font-size: 0.9rem;
+}
+
+.custom-list-footer {
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.custom-list-back-btn {
+  border-radius: 999px;
+  padding: 10px 20px;
+  border: 3px solid #000;
+  background: #fff;
+  cursor: pointer;
+}
+
+/* Responsive tweaks */
+@media (max-width: 768px) {
+  .custom-list-card {
+    padding: 14px 14px;
+  }
+
+  .custom-list-movie-row {
+    flex-direction: row;
+    padding: 8px 10px;
+  }
+
+  .custom-list-poster {
+    width: 50px;
+    margin-right: 10px;
+  }
+
+  .custom-list-title {
+    font-size: 1.4rem;
+  }
+
+  .custom-list-movie-title {
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .custom-list-card {
+    padding: 10px 12px;
+  }
+
+  .custom-list-movie-row {
+    flex-direction: row;
+    align-items: center;
+    padding: 6px 8px;
+  }
+
+  .custom-list-poster {
+    width: 40px;
+    margin-right: 8px;
+    margin-bottom: 0;
+  }
+
+  .custom-list-movie-year,
+  .custom-list-movie-genre {
+    font-size: 0.8rem;
+  }
+}
