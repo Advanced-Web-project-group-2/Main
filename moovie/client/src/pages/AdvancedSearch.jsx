@@ -21,6 +21,7 @@ export default function AdvancedSearch() {
   const { setBackground } = useOutletContext(); // Layout background
   const { refreshUserData } = useAuth();
   const token = localStorage.getItem("token");
+  const [showToast, setShowToast] = useState(false);
 
   const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
 
@@ -131,6 +132,18 @@ export default function AdvancedSearch() {
   }
 };
 
+const handleShare = async (movie) => {
+  const shareText = `Check out ${movie.title} - releasing ${movie.release_date?.slice(0, 4) || "Unknown"}!  ${window.location.origin}/movie/${movie.id}`;
+
+  try {
+    await navigator. clipboard.writeText(shareText);
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 5000);
+  } catch (error) {
+    console.error('Failed to copy:', error);
+    alert('Unable to copy.  Please try again.');
+  }
+};
 
   return (
     <div className="advanced-search-container">
@@ -195,14 +208,27 @@ export default function AdvancedSearch() {
                       ❤️ Add to Favorites
                     </button>
                     <AddToListButton movie={movie} /> {/* Popup window for "Add to List" */}
-                    <button className="btn-secondary">🔗 Share</button>
+                    <button 
+                      className="btn-secondary"
+                      onClick={() => handleShare(movie)}
+                    >
+                      🔗 Share
+                    </button>
                   </div>
                 </div>
               </div>
+
             ))
           )}
         </div>
       </section>
+
+      {/* Toast Notification */}
+      {showToast && (
+        <div className="toast">
+          ✓ Copied to clipboard!
+        </div>
+      )}
     </div>
   );
 }
