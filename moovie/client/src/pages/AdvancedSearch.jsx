@@ -133,10 +133,10 @@ export default function AdvancedSearch() {
 };
 
 const handleShare = async (movie) => {
-  const shareText = `Check out ${movie.title} - releasing ${movie.release_date?.slice(0, 4) || "Unknown"}!  ${window.location.origin}/movie/${movie.id}`;
+  const shareUrl = `${window.location.origin}/movie/${movie.id}`;
 
   try {
-    await navigator. clipboard.writeText(shareText);
+    await navigator. clipboard.writeText(shareUrl);
     setShowToast(true);
     setTimeout(() => setShowToast(false), 5000);
   } catch (error) {
