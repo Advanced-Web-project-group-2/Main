@@ -9,7 +9,8 @@ import {
   getUserLists,
   addMovieToList,
   removeMovieFromList,
-  getListMovies
+  getListMovies,
+  deleteList,
 } from "../controllers/lists.controller.js";
 
 const router = express.Router();
@@ -255,5 +256,27 @@ router.delete("/:listId/movies", authMiddleware, removeMovieFromList);
  *         description: List of movies
  */
 router.get("/:listId", authMiddleware, getListMovies);
+
+/**
+ * @swagger
+ * /api/lists/{listId}:
+ *   delete:
+ *     summary: Delete a custom list
+ *     tags: [Lists]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: listId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: List deleted
+ *       404:
+ *         description: List not found
+ */
+router.delete("/:listId", authMiddleware, deleteList);
 
 export default router;

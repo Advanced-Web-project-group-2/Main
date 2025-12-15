@@ -47,23 +47,93 @@ export default function CustomList() {
     fetchList();
   }, [listId]);
 
-  if (loading) return <div className="custom-list-wrapper"><p>Loading list...</p></div>;
-  if (error) return <div className="custom-list-wrapper"><p>{error}</p></div>;
+  const handleRemoveMovie = async (movieId) => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const res = await fetch(`/api/lists/${listId}/movies`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ movieId }),
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to remove movie");
+      }
+
+      // Update UI instantly
+      setMovies((prev) => prev.filter((m) => m.id !== movieId));
+    } catch (err) {
+      console.error(err);
+      alert("Could not remove movie from list");
+    }
+  };
+
+  if (loading)
+    return (
+      <div className="custom-list-wrapper">
+        <p>Loading list...</p>
+      </div>
+    );
+
+  if (error)
+    return (
+      <div className="custom-list-wrapper">
+        <p>{error}</p>
+      </div>
+    );
+
+  const handleDeleteList = async () => {
+  if (!confirm("Are you sure you want to delete this list? This cannot be undone.")) return;
+
+  try {
+    const token = localStorage.getItem("token");
+
+    const res = await fetch(`/api/lists/${listId}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!res.ok) {
+      const errData = await res.json();
+      throw new Error(errData.error || "Failed to delete list");
+    }
+
+    alert("List deleted successfully");
+    navigate("/profile"); 
+  } catch (err) {
+    console.error(err);
+    alert(err.message || "Could not delete list");
+  }
+};
 
   return (
-    <div className="custom-list-wrapper">
-      <div className="custom-list-card">
-        <h2 className="custom-list-title">{listInfo?.name || "Movie List"}</h2>
-        {listInfo?.description && (
-          <p className="custom-list-description">{listInfo.description}</p>
-        )}
+  <div className="custom-list-wrapper">
+    <div className="custom-list-card">
+      <h2 className="custom-list-title">
+        {listInfo?.name || "Movie List"}
+      </h2>
 
-        {movies.length === 0 ? (
-          <p className="custom-list-empty">No movies in this list yet.</p>
-        ) : (
-          <ul className="custom-list-movies">
-            {movies.map((movie) => (
-              <li key={movie.id}>
+      {listInfo?.description && (
+        <p className="custom-list-description">
+          {listInfo.description}
+        </p>
+      )}
+
+      {movies.length === 0 ? (
+        <p className="custom-list-empty">No movies in this list yet.</p>
+      ) : (
+        <ul className="custom-list-movies">
+          {movies.map((movie) => (
+            <li key={movie.id}>
+              <div className="custom-list-movie-row">
+                {/* clickable movie part */}
                 <button
                   className="custom-list-movie-row"
                   onClick={() => navigate(`/movie/${movie.id}`)}
@@ -79,32 +149,59 @@ export default function CustomList() {
                     className="custom-list-poster"
                     loading="lazy"
                   />
+
                   <div className="custom-list-movie-info">
-                    <span className="custom-list-movie-title">{movie.name}</span>
+                    <span className="custom-list-movie-title">
+                      {movie.name}
+                    </span>
+
                     {movie.release_year && (
                       <span className="custom-list-movie-year">
                         ({movie.release_year})
                       </span>
                     )}
+
                     {movie.genre && (
-                      <span className="custom-list-movie-genre">{movie.genre}</span>
+                      <span className="custom-list-movie-genre">
+                        {movie.genre}
+                      </span>
                     )}
                   </div>
                 </button>
-              </li>
-            ))}
-          </ul>
-        )}
 
-        <div className="custom-list-footer">
-          <button
-            className="custom-list-back-btn"
-            onClick={() => navigate("/")}
-          >
-            Back to Home
-          </button>
-        </div>
+                {/* remove button */}
+                <button
+                  className="custom-list-remove-btn"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleRemoveMovie(movie.id);
+                  }}
+                  title="Remove from list"
+                >
+                  ❌
+                </button>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <div className="custom-list-footer">
+        <button
+          className="custom-list-back-btn"
+          onClick={() => navigate("/")}
+        >
+          Back to Home
+        </button>
+
+        <button
+          className="custom-list-delete-btn"
+          onClick={handleDeleteList}
+        >
+          🗑 Delete List
+        </button>
       </div>
     </div>
-  );
+  </div>
+);
 }

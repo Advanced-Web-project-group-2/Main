@@ -1,6 +1,7 @@
 import pool from "../db.js";
 import { addCreditsToUser } from "../services/reward.service.js";
 
+
 // ------------------- GET FAVOURITES -------------------
 export const getFavourites = async (req, res) => {
   try {
@@ -221,6 +222,35 @@ export const getListMovies = async (req, res) => {
     res.json({ movies: movies.rows });
   } catch (err) {
     console.error("Get list movies error:", err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+// ------------------- DELETE LIST -------------------
+export const deleteList = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { listId } = req.params;
+
+    // Ensure list belongs to user and is not Favourites
+    const listRes = await pool.query(
+      "SELECT * FROM lists WHERE id = $1 AND owner_id = $2 AND name != 'Favourites'",
+      [listId, userId]
+    );
+
+    if (listRes.rowCount === 0) {
+      return res.status(404).json({ error: "List not found or not allowed" });
+    }
+
+    // Remove movies first
+    await pool.query("DELETE FROM list_movies WHERE list_id = $1", [listId]);
+
+    // Remove list
+    await pool.query("DELETE FROM lists WHERE id = $1", [listId]);
+
+    res.json({ message: "List deleted" });
+  } catch (err) {
+    console.error("Delete list error:", err);
     res.status(500).json({ error: "Internal server error" });
   }
 };
