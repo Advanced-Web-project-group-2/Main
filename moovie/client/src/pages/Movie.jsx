@@ -5,8 +5,6 @@ import axios from "axios";
 import "../styles/Movie.css";
 import "../styles/likes.css";
 import AddToListButton from "../components/AddToListButton";
-import { addFavourite } from "../services/listService";
-
 
 export default function Movie() {
   const { movieId } = useParams();
@@ -16,7 +14,8 @@ export default function Movie() {
   const [rating, setRating] = useState(5);
   const [avatarCache, setAvatarCache] = useState({});
   const [votes, setVotes] = useState({}); // { reviewId: 'like' | 'dislike' | null }
-  const { user, refreshUserData } = useAuth();
+  const [showToast, setShowToast] = useState(false); // Added for toast
+  const { user } = useAuth();
 
   const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
   const token = localStorage.getItem("token");
@@ -32,8 +31,8 @@ export default function Movie() {
   // Fetch reviews
   const fetchReviews = async () => {
     try {
-      const res = await axios.get(`/api/reviews/${movieId}`);
-      setReviews(res.data.reviews);
+      const res = await axios.get(`http://localhost:5000/api/reviews/${movieId}`);
+      setReviews(res.data. reviews);
     } catch (err) {
       console.error(err);
     }
@@ -46,13 +45,13 @@ export default function Movie() {
   // Fetch avatars per unique reviewer
   useEffect(() => {
     const loadAvatars = async () => {
-      const uniqueUserIds = [...new Set(reviews.map((r) => r.user_id))];
+      const uniqueUserIds = [... new Set(reviews.map((r) => r.user_id))];
       const newAvatars = { ...avatarCache };
 
       for (const userId of uniqueUserIds) {
-        if (!newAvatars[userId]) {
+        if (! newAvatars[userId]) {
           try {
-            const res = await fetch(`/shop/equipped/${userId}`);
+            const res = await fetch(`http://localhost:5000/shop/equipped/${userId}`);
             const data = await res.json();
             newAvatars[userId] = data.equipped || [];
           } catch {
@@ -66,16 +65,6 @@ export default function Movie() {
     if (reviews.length > 0) loadAvatars();
   }, [reviews]);
 
-  // Listen for movie added to group event to refresh credits
-  useEffect(() => {
-    const handleMovieAddedToGroup = () => {
-      refreshUserData();
-    };
-    
-    window.addEventListener('movieAddedToGroup', handleMovieAddedToGroup);
-    return () => window.removeEventListener('movieAddedToGroup', handleMovieAddedToGroup);
-  }, [refreshUserData]);
-
   if (!movie) return <p>Loading...</p>;
 
   // Submit review
@@ -85,7 +74,7 @@ export default function Movie() {
 
     try {
       const res = await axios.post(
-        "/api/reviews",
+        "http://localhost:5000/api/reviews",
         {
           movie_id: Number(movieId),
           movie_name: movie.title,
@@ -98,13 +87,10 @@ export default function Movie() {
       setReviews([res.data, ...reviews]);
       setReviewText("");
       setRating(5);
-      
-      // Refresh user data to show updated credits
-      refreshUserData();
     } catch (err) {
       const message =
-        err.response?.data?.error ||
-        err.response?.data?.message ||
+        err.response?.data?. error ||
+        err.response?. data?.message ||
         "Failed to submit review";
       alert(message);
     }
@@ -112,24 +98,57 @@ export default function Movie() {
 
   // Add to favourites
   const handleAddFavourite = async () => {
-  if (!user) return alert("You must be logged in to add to favourites");
+    if (!token) return alert("You must be logged in to add to favourites");
 
-  try {
-    await addFavourite(movie);
-    alert("Added to Favourites!");
-    refreshUserData();
-  } catch (err) {
-    console.error(err);
-    alert(err.message || "Failed to add to favourites");
-  }
-};
+    try {
+      const res = await fetch(`/api/lists/favourites`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          movieId: movie.id,
+          movieName: movie.title,
+          genre: movie.genres?. map((g) => g.name).join(", "),
+          releaseYear: movie.release_date?. split("-")[0],
+          posterUrl: movie.poster_path
+            ? `https://image.tmdb.org/t/p/w300${movie.poster_path}`
+            : null,
+        }),
+      });
 
+      if (! res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || "Failed to add to favourites");
+      }
+
+      alert("Added to Favourites!");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to add to favourites");
+    }
+  };
+
+  // Share movie
+  const handleShare = async () => {
+    const shareText = `Check out ${movie.title} - releasing ${movie.release_date?. split("-")[0]}!  ${window.location.href}`;
+
+    try {
+      await navigator.clipboard.writeText(shareText);
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 5000);
+    } catch (error) {
+      console.error('Failed to copy:', error);
+      alert('Unable to copy.  Please try again.');
+    }
+  };
 
   // Like a review
   const handleLike = async (reviewId) => {
     if (!user) return; // guests cannot vote
     try {
-      const res = await fetch(`/api/reviews/${reviewId}/like`, {
+      const res = await fetch(`http://localhost:5000/api/reviews/${reviewId}/like`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -137,11 +156,8 @@ export default function Movie() {
 
       if (!res.ok) return alert(data.error || "Failed to vote");
 
-      setVotes((prev) => ({ ...prev, [reviewId]: data.liked ? "like" : null }));
+      setVotes((prev) => ({ ...prev, [reviewId]: data.liked ?  "like" : null }));
       fetchReviews();
-      
-      // Refresh user data to show updated credits
-      refreshUserData();
     } catch (err) {
       console.error(err);
       alert("Failed to like review");
@@ -152,19 +168,16 @@ export default function Movie() {
   const handleDislike = async (reviewId) => {
     if (!user) return; // guests cannot vote
     try {
-      const res = await fetch(`/api/reviews/${reviewId}/dislike`, {
+      const res = await fetch(`http://localhost:5000/api/reviews/${reviewId}/dislike`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
       });
-      const data = await res.json();
+      const data = await res. json();
 
       if (!res.ok) return alert(data.error || "Failed to vote");
 
       setVotes((prev) => ({ ...prev, [reviewId]: data.disliked ? "dislike" : null }));
       fetchReviews();
-      
-      // Refresh user data to show updated credits
-      refreshUserData();
     } catch (err) {
       console.error(err);
       alert("Failed to dislike review");
@@ -188,7 +201,7 @@ export default function Movie() {
             <div className="movie-actions">
               <button className="btn-white" onClick={handleAddFavourite}>❤️ Add to Favorites</button>
               <AddToListButton movie={movie} /> {/* Popup window for "Add to List" */}
-              <button className="btn-white">🔗 Share</button>
+              <button className="btn-white" onClick={handleShare}>🔗 Share</button>
             </div>
           </div>
         </div>
@@ -200,7 +213,7 @@ export default function Movie() {
           <h3>Write a Review</h3>
           <form onSubmit={handleSubmit}>
             <select value={rating} onChange={(e) => setRating(Number(e.target.value))}>
-              {[1, 2, 3, 4, 5].map((n) => (
+              {[1, 2, 3, 4, 5]. map((n) => (
                 <option value={n} key={n}>{'⭐'.repeat(n)}</option>
               ))}
             </select>
@@ -213,7 +226,7 @@ export default function Movie() {
       {/* Reviews */}
       <div className="movie-box">
         <h3>User Reviews</h3>
-        {reviews.length === 0 ? (
+        {reviews. length === 0 ? (
           <p>No reviews yet</p>
         ) : (
           <ul className="reviews-list">
@@ -222,7 +235,7 @@ export default function Movie() {
                 {/* Avatar */}
                 <div className="review-avatar">
                   {avatarCache[r.user_id]?.length ? (
-                    avatarCache[r.user_id].map((layer, i) => (
+                    avatarCache[r. user_id].map((layer, i) => (
                       <img
                         key={i}
                         className="avatar-layer"
@@ -239,7 +252,7 @@ export default function Movie() {
                 <div className="review-content">
                   <strong>{r.username}</strong> {"⭐".repeat(r.rating)}
                   <p>{r.content}</p>
-                  <small>{new Date(r.created_at).toLocaleDateString()}</small>
+                  <small>{new Date(r. created_at).toLocaleDateString()}</small>
 
                   {/* Like/Dislike buttons */}
                   <div className="review-votes">
@@ -251,11 +264,11 @@ export default function Movie() {
                         !user
                           ? "Log in to vote"
                           : r.user_id === user.id
-                          ? "You cannot vote your own review"
+                          ?  "You cannot vote your own review"
                           : "Like"
                       }
                     >
-                      👍 {r.likes ?? 0}
+                      👍 {r. likes ?? 0}
                     </button>
 
                     <button
@@ -263,11 +276,11 @@ export default function Movie() {
                       onClick={() => user && handleDislike(r.id)}
                       disabled={!user || r.user_id === user.id}
                       title={
-                        !user
+                        ! user
                           ? "Log in to vote"
                           : r.user_id === user.id
                           ? "You cannot vote your own review"
-                          : "Dislike"
+                          :  "Dislike"
                       }
                     >
                       👎 {r.dislikes ?? 0}
@@ -279,6 +292,13 @@ export default function Movie() {
           </ul>
         )}
       </div>
+
+      {/* Toast Notification */}
+      {showToast && (
+        <div className="toast">
+          ✓ Link copied to clipboard!
+        </div>
+      )}
     </div>
   );
 }
