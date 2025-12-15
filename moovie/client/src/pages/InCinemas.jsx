@@ -8,26 +8,26 @@ import AddToListButton from '../components/AddToListButton';
 export default function InCinemas() {
   const [movies, setMovies] = useState([]);
   const [showToast, setShowToast] = useState(false);
-  const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
+  const API_KEY = import.meta.env. VITE_TMDB_API_KEY;
 
   useEffect(() => {
     axios
-      .get(`https://api.themoviedb.org/3/movie/now_playing?api_key=${API_KEY}`)
+      . get(`https://api.themoviedb.org/3/movie/now_playing?api_key=${API_KEY}`)
       .then((res) => setMovies(res.data.results))
       .catch((err) => console.error(err));
   }, []);
 
   const handleShare = async (movie) => {
-    const shareText = `Check out ${movie.title} - releasing ${new Date(movie.release_date).toLocaleDateString()}! ${window.location.origin}/movie/${movie.id}`;
+    const shareUrl = `${window.location.origin}/movie/${movie.id}`;
 
     try {
-      await navigator.clipboard.writeText(shareText);
+      await navigator.clipboard.writeText(shareUrl);
       // Show toast notification
       setShowToast(true);
-      setTimeout(() => setShowToast(false), 3000);
+      setTimeout(() => setShowToast(false), 5000);
     } catch (error) {
       console.error('Failed to copy:', error);
-      alert('Unable to copy.  Please try again.');
+      alert('Unable to copy.   Please try again.');
     }
   };
 
@@ -36,7 +36,7 @@ export default function InCinemas() {
       <h2>🎬 Now Showing in Cinemas</h2>
 
       {movies.length === 0 ? (
-        <p className="loading-text">Loading movies...</p>
+        <p className="loading-text">Loading movies... </p>
       ) : (
         <div className="cinema-grid">
           {movies. map((movie) => (

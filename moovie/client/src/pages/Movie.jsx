@@ -49,7 +49,7 @@ export default function Movie() {
       const newAvatars = { ...avatarCache };
 
       for (const userId of uniqueUserIds) {
-        if (! newAvatars[userId]) {
+        if (!newAvatars[userId]) {
           try {
             const res = await fetch(`http://localhost:5000/shop/equipped/${userId}`);
             const data = await res.json();
@@ -108,7 +108,7 @@ export default function Movie() {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          movieId: movie.id,
+          movieId:  movie.id,
           movieName: movie.title,
           genre: movie.genres?. map((g) => g.name).join(", "),
           releaseYear: movie.release_date?. split("-")[0],
@@ -132,15 +132,15 @@ export default function Movie() {
 
   // Share movie
   const handleShare = async () => {
-    const shareText = `Check out ${movie.title} - releasing ${movie.release_date?. split("-")[0]}!  ${window.location.href}`;
+    const shareUrl = window.location.href; // Current page URL
 
     try {
-      await navigator.clipboard.writeText(shareText);
+      await navigator.clipboard.writeText(shareUrl);
       setShowToast(true);
       setTimeout(() => setShowToast(false), 5000);
     } catch (error) {
       console.error('Failed to copy:', error);
-      alert('Unable to copy.  Please try again.');
+      alert('Unable to copy.   Please try again.');
     }
   };
 
@@ -154,7 +154,7 @@ export default function Movie() {
       });
       const data = await res.json();
 
-      if (!res.ok) return alert(data.error || "Failed to vote");
+      if (! res.ok) return alert(data.error || "Failed to vote");
 
       setVotes((prev) => ({ ...prev, [reviewId]: data.liked ?  "like" : null }));
       fetchReviews();
@@ -296,7 +296,7 @@ export default function Movie() {
       {/* Toast Notification */}
       {showToast && (
         <div className="toast">
-          ✓ Link copied to clipboard!
+          ✓ Link copied to clipboard! 
         </div>
       )}
     </div>
