@@ -98,3 +98,14 @@ seedShop().catch(err => console.error("SEED ERROR:", err));
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });
+
+// ---------------------- SERVER ----------------------
+if (process.env.NODE_ENV !== 'test') {
+  seedShop().catch(err => console.error("SEED ERROR:", err));
+
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server running at http://localhost:${PORT}`);
+  });
+}
+
+export default app;
