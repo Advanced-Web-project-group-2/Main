@@ -103,7 +103,7 @@ router.delete("/favourites", authMiddleware, removeFavourite);
 
 /**
  * @swagger
- * /api/lists/favourites/public/{userId}:
+ * /api/lists/favorites/public/{userId}:
  *   get:
  *     summary: Get another user's public favourites list
  *     tags: [Lists]
@@ -278,5 +278,7 @@ router.get("/:listId", authMiddleware, getListMovies);
  *         description: List not found
  */
 router.delete("/:listId", authMiddleware, deleteList);
+
+
 
 export default router;

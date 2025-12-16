@@ -141,6 +141,24 @@ router.get("/protected", authMiddleware, (req, res) => {
 router.put("/change-password", authMiddleware, changePassword);
 
 
+/**
+@swagger
+/auth/delete:
+delete:
+summary: Delete authenticated user's account
+tags: [Auth]
+security:
+BearerAuth: []
+responses:
+200:
+description: Account deleted successfully
+401:
+description: Unauthorized
+404:
+description: User not found
+500:
+description: Server error
+*/
 router.delete("/delete", authMiddleware, deleteAccount);
 
 /**
