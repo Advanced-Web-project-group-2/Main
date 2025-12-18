@@ -113,7 +113,7 @@ It was developed collaboratively by:
 - Pilar Murcia Pozuelo  
 - Yvonne Frankort  
 - Petteri Pätsi  
-- Markku Puutala  
+- Markku Putaala  
 
 We are second-year students of Information and Technology, specializing in software development.  
 
