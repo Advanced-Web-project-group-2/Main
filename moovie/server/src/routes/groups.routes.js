@@ -1,23 +1,23 @@
-import express from 'express';
+// server/src/routes/groups.routes.js
+import express from "express";
+import authMiddleware from "../middleware/auth.js";
 import {
-	createGroup,
-	getGroupById,
-	getMyGroups,
-	searchGroups,
-	sendJoinRequest,
-	cancelJoinRequest,
-	getJoinStatus,
-	getPendingRequests,
-	approveRequest,
-	rejectRequest,
-	leaveGroup,
-	removeMember,
-	deleteGroup,
-	getGroupMovies,
-	addMovieToGroup,
-
-} from '../controllers/groups.controller.js';
-import authMiddleware from '../middleware/auth.js';
+  createGroup,
+  getGroupById,
+  getMyGroups,
+  searchGroups,
+  sendJoinRequest,
+  cancelJoinRequest,
+  getJoinStatus,
+  getPendingRequests,
+  approveRequest,
+  rejectRequest,
+  leaveGroup,
+  removeMember,
+  deleteGroup,
+  getGroupMovies,
+  addMovieToGroup,
+} from "../controllers/groups.controller.js";
 
 const router = express.Router();
 
@@ -25,7 +25,7 @@ const router = express.Router();
  * @swagger
  * tags:
  *   name: Groups
- *   description: Group management & membership
+ *   description: Group management & membership endpoints
  */
 
 /**
@@ -35,13 +35,15 @@ const router = express.Router();
  *     summary: Create a new group
  *     tags: [Groups]
  *     security:
- *       - bearerAuth: []
+ *       - BearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - name
  *             properties:
  *               name:
  *                 type: string
@@ -50,55 +52,63 @@ const router = express.Router();
  *                 type: string
  *               icon_url:
  *                 type: string
+ *               description:
+ *                 type: string
  *     responses:
  *       201:
- *         description: Group successfully created
+ *         description: Group created
  *       400:
- *         description: Validation error
+ *         description: Invalid or missing name
  *       401:
  *         description: Unauthorized
+ *       500:
+ *         description: Internal server error
  */
-router.post('/', authMiddleware, createGroup);
+router.post("/", authMiddleware, createGroup);
 
 /**
  * @swagger
  * /api/groups/mine:
  *   get:
- *     summary: Get groups where the authenticated user is a member
+ *     summary: Get groups where current user is a member
  *     tags: [Groups]
  *     security:
- *       - bearerAuth: []
+ *       - BearerAuth: []
  *     responses:
  *       200:
  *         description: List of groups
  *       401:
  *         description: Unauthorized
+ *       500:
+ *         description: Internal server error
  */
-router.get('/mine', authMiddleware, getMyGroups);
+router.get("/mine", authMiddleware, getMyGroups);
 
 /**
  * @swagger
  * /api/groups:
  *   get:
- *     summary: Search groups (public)
+ *     summary: Public search for groups
  *     tags: [Groups]
  *     parameters:
  *       - in: query
  *         name: q
  *         schema:
  *           type: string
- *         description: Search term
+ *         description: Query string
  *     responses:
  *       200:
- *         description: List of groups
+ *         description: List of matching or recent groups
+ *       500:
+ *         description: Internal server error
  */
-router.get('/', searchGroups);
+router.get("/", searchGroups);
 
 /**
  * @swagger
  * /api/groups/{id}:
  *   get:
- *     summary: Get group details (members + pending requests)
+ *     summary: Get group details
  *     tags: [Groups]
  *     parameters:
  *       - in: path
@@ -108,60 +118,72 @@ router.get('/', searchGroups);
  *           type: integer
  *     responses:
  *       200:
- *         description: Group found
+ *         description: Group details
  *       404:
  *         description: Group not found
+ *       500:
+ *         description: Internal server error
  */
-router.get('/:id', getGroupById);
+router.get("/:id", getGroupById);
 
-// Admin: delete group
 /**
  * @swagger
  * /api/groups/{id}:
  *   delete:
- *     summary: Delete a group by ID
+ *     summary: Delete group (admin only)
  *     tags: [Groups]
+ *     security:
+ *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
- *         required: true
  *         schema:
  *           type: integer
+ *         required: true
  *     responses:
  *       200:
- *         description: Group deleted successfully
+ *         description: Group deleted
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden (not admin)
  *       404:
  *         description: Group not found
+ *       500:
+ *         description: Internal server error
  */
-router.delete('/:id', authMiddleware, deleteGroup);
+router.delete("/:id", authMiddleware, deleteGroup);
 
-// Get movies added to this group
 /**
  * @swagger
  * /api/groups/{id}/movies:
  *   get:
- *     summary: Get movies added to the group
+ *     summary: Get movies added to a group
  *     tags: [Groups]
  *     parameters:
  *       - in: path
  *         name: id
- *         required: true
  *         schema:
  *           type: integer
+ *         required: true
  *     responses:
  *       200:
- *         description: Movies list
+ *         description: List of movies
+ *       400:
+ *         description: Invalid group id
+ *       500:
+ *         description: Internal server error
  */
-router.get('/:id/movies', getGroupMovies);
+router.get("/:id/movies", getGroupMovies);
 
 /**
  * @swagger
  * /api/groups/{id}/join:
  *   post:
- *     summary: Send join request
- *     security:
- *       - bearerAuth: []
+ *     summary: Send a join request
  *     tags: [Groups]
+ *     security:
+ *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -170,44 +192,52 @@ router.get('/:id/movies', getGroupMovies);
  *           type: integer
  *     responses:
  *       200:
- *         description: Join request sent
+ *         description: Request pending or already applied
  *       400:
- *         description: Already member or invalid
+ *         description: Already a member
  *       401:
  *         description: Unauthorized
+ *       404:
+ *         description: Group not found
+ *       500:
+ *         description: Internal server error
  */
-router.post('/:id/join', authMiddleware, sendJoinRequest);
+router.post("/:id/join", authMiddleware, sendJoinRequest);
 
 /**
  * @swagger
  * /api/groups/{id}/join:
  *   delete:
  *     summary: Cancel pending join request
- *     security:
- *       - bearerAuth: []
  *     tags: [Groups]
+ *     security:
+ *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
- *         required: true
  *         schema:
  *           type: integer
+ *         required: true
  *     responses:
  *       200:
- *         description: Join request canceled
+ *         description: Request canceled
+ *       400:
+ *         description: No pending request
  *       401:
  *         description: Unauthorized
+ *       500:
+ *         description: Internal server error
  */
-router.delete('/:id/join', authMiddleware, cancelJoinRequest);
+router.delete("/:id/join", authMiddleware, cancelJoinRequest);
 
 /**
  * @swagger
  * /api/groups/{id}/join-status:
  *   get:
- *     summary: Check current user's status in a group
+ *     summary: Get current user's join status
  *     tags: [Groups]
  *     security:
- *       - bearerAuth: []
+ *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -216,64 +246,72 @@ router.delete('/:id/join', authMiddleware, cancelJoinRequest);
  *         required: true
  *     responses:
  *       200:
- *         description: Status returned
+ *         description: Status: admin | member | pending | not_member
+ *       500:
+ *         description: Internal server error
  */
-router.get('/:id/join-status', authMiddleware, getJoinStatus);
+router.get("/:id/join-status", authMiddleware, getJoinStatus);
 
 /**
  * @swagger
  * /api/groups/{id}/leave:
  *   delete:
- *     summary: Leave a group (non-admin only)
+ *     summary: Leave group (non-admin)
  *     tags: [Groups]
  *     security:
- *       - bearerAuth: []
+ *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
+ *         required: true
  *         schema:
  *           type: integer
- *         required: true
  *     responses:
  *       200:
  *         description: Left group
  *       400:
- *         description: Cannot leave if admin
+ *         description: Not a member / admin cannot leave
  *       401:
  *         description: Unauthorized
+ *       500:
+ *         description: Internal server error
  */
-router.delete('/:id/leave', authMiddleware, leaveGroup);
+router.delete("/:id/leave", authMiddleware, leaveGroup);
 
 /**
  * @swagger
  * /api/groups/{id}/requests:
  *   get:
- *     summary: Get pending join requests (admin only)
+ *     summary: Get pending requests (admin only)
  *     tags: [Groups]
  *     security:
- *       - bearerAuth: []
+ *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
- *         required: true
  *         schema:
  *           type: integer
+ *         required: true
  *     responses:
  *       200:
  *         description: Pending requests
+ *       401:
+ *         description: Unauthorized
  *       403:
- *         description: Admin only
+ *         description: Forbidden
+ *       500:
+ *         description: Internal server error
  */
-router.get('/:id/requests', authMiddleware, getPendingRequests);
+router.get("/:id/requests", authMiddleware, getPendingRequests);
 
 /**
  * @swagger
  * /api/groups/{id}/requests/{userId}/approve:
  *   post:
- *     summary: Approve user's join request (admin only)
+ *     summary: Approve join request (admin only)
  *     tags: [Groups]
  *     security:
- *       - bearerAuth: []
+ *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -287,20 +325,24 @@ router.get('/:id/requests', authMiddleware, getPendingRequests);
  *           type: integer
  *     responses:
  *       200:
- *         description: Request approved
+ *         description: User added as member
+ *       401:
+ *         description: Unauthorized
  *       403:
- *         description: Admin only
+ *         description: Forbidden
+ *       500:
+ *         description: Internal server error
  */
-router.post('/:id/requests/:userId/approve', authMiddleware, approveRequest);
+router.post("/:id/requests/:userId/approve", authMiddleware, approveRequest);
 
 /**
  * @swagger
  * /api/groups/{id}/requests/{userId}/reject:
  *   post:
- *     summary: Reject user's join request (admin only)
+ *     summary: Reject join request (admin only)
  *     tags: [Groups]
  *     security:
- *       - bearerAuth: []
+ *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -315,59 +357,72 @@ router.post('/:id/requests/:userId/approve', authMiddleware, approveRequest);
  *     responses:
  *       200:
  *         description: Request rejected
+ *       400:
+ *         description: No such request / already member
+ *       401:
+ *         description: Unauthorized
  *       403:
- *         description: Admin only
+ *         description: Forbidden
+ *       500:
+ *         description: Internal server error
  */
-router.post('/:id/requests/:userId/reject', authMiddleware, rejectRequest);
+router.post("/:id/requests/:userId/reject", authMiddleware, rejectRequest);
 
 /**
  * @swagger
  * /api/groups/{id}/members/{userId}:
  *   delete:
- *     summary: Remove a member from the group (admin only)
+ *     summary: Remove a member (admin only)
  *     tags: [Groups]
  *     security:
- *       - bearerAuth: []
+ *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
- *         required: true
  *         schema:
  *           type: integer
+ *         required: true
  *       - in: path
  *         name: userId
- *         required: true
  *         schema:
  *           type: integer
+ *         required: true
  *     responses:
  *       200:
  *         description: Member removed
+ *       400:
+ *         description: Admin cannot remove themselves / user not member / cannot remove admin
+ *       401:
+ *         description: Unauthorized
  *       403:
- *         description: Admin only
+ *         description: Forbidden
+ *       500:
+ *         description: Internal server error
  */
-router.delete('/:id/members/:userId', authMiddleware, removeMember);
+router.delete("/:id/members/:userId", authMiddleware, removeMember);
 
 /**
  * @swagger
  * /api/groups/{id}/movies:
  *   post:
- *     summary: Add a movie to the group
+ *     summary: Add movie to group
  *     tags: [Groups]
  *     security:
- *       - bearerAuth: []
+ *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
+ *         required: true
  *         schema:
  *           type: integer
- *         required: true
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
- *             required: [movieId]
+ *             required:
+ *               - movieId
  *             properties:
  *               movieId:
  *                 type: integer
@@ -381,10 +436,18 @@ router.delete('/:id/members/:userId', authMiddleware, removeMember);
  *                 type: string
  *     responses:
  *       200:
- *         description: Movie added
+ *         description: Movie added (duplicate ignored)
+ *       400:
+ *         description: movieId or groupId missing
+ *       401:
+ *         description: Unauthorized
  *       403:
  *         description: Not a group member
+ *       404:
+ *         description: Group not found
+ *       500:
+ *         description: Internal server error
  */
-router.post('/:id/movies', authMiddleware, addMovieToGroup);
+router.post("/:id/movies", authMiddleware, addMovieToGroup);
 
 export default router;

@@ -1,3 +1,4 @@
+// server/src/routes/lists.routes.js
 import express from "express";
 import authMiddleware from "../middleware/auth.js";
 import {
@@ -37,6 +38,10 @@ const router = express.Router();
  *     responses:
  *       200:
  *         description: List of favourite movies
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Internal server error
  */
 router.get("/favourites", authMiddleware, getFavourites);
 
@@ -71,6 +76,10 @@ router.get("/favourites", authMiddleware, getFavourites);
  *         description: Added to favourites
  *       400:
  *         description: Missing movieId
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Internal server error
  */
 router.post("/favourites", authMiddleware, addFavourite);
 
@@ -95,11 +104,16 @@ router.post("/favourites", authMiddleware, addFavourite);
  *     responses:
  *       200:
  *         description: Movie removed
+ *       400:
+ *         description: Missing movieId
+ *       401:
+ *         description: Unauthorized
  *       404:
- *         description: Favourites not found
+ *         description: Favourites list not found
+ *       500:
+ *         description: Internal server error
  */
 router.delete("/favourites", authMiddleware, removeFavourite);
-
 
 /**
  * @swagger
@@ -116,10 +130,10 @@ router.delete("/favourites", authMiddleware, removeFavourite);
  *     responses:
  *       200:
  *         description: Public favourites returned
+ *       500:
+ *         description: Internal server error
  */
-
 router.get("/favorites/public/:userId", getPublicFavourites);
-
 
 /* -------------------------------------------------------------------------- */
 /*                                CUSTOM LISTS                               */
@@ -150,6 +164,10 @@ router.get("/favorites/public/:userId", getPublicFavourites);
  *         description: List created
  *       400:
  *         description: Missing list name
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Internal server error
  */
 router.post("/", authMiddleware, createList);
 
@@ -157,13 +175,17 @@ router.post("/", authMiddleware, createList);
  * @swagger
  * /api/lists:
  *   get:
- *     summary: Get all custom lists for authenticated user (excluding Favourites)
+ *     summary: Get authenticated user's custom lists
  *     tags: [Lists]
  *     security:
  *       - BearerAuth: []
  *     responses:
  *       200:
  *         description: List of custom lists
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Internal server error
  */
 router.get("/", authMiddleware, getUserLists);
 
@@ -203,7 +225,11 @@ router.get("/", authMiddleware, getUserLists);
  *       200:
  *         description: Movie added
  *       400:
- *         description: movieId missing
+ *         description: MovieId missing
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Internal server error
  */
 router.post("/:listId/movies", authMiddleware, addMovieToList);
 
@@ -234,6 +260,10 @@ router.post("/:listId/movies", authMiddleware, addMovieToList);
  *     responses:
  *       200:
  *         description: Movie removed
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Internal server error
  */
 router.delete("/:listId/movies", authMiddleware, removeMovieFromList);
 
@@ -241,7 +271,7 @@ router.delete("/:listId/movies", authMiddleware, removeMovieFromList);
  * @swagger
  * /api/lists/{listId}:
  *   get:
- *     summary: Get all movies inside a specific custom list
+ *     summary: Get movies in a custom list
  *     tags: [Lists]
  *     security:
  *       - BearerAuth: []
@@ -254,6 +284,10 @@ router.delete("/:listId/movies", authMiddleware, removeMovieFromList);
  *     responses:
  *       200:
  *         description: List of movies
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Internal server error
  */
 router.get("/:listId", authMiddleware, getListMovies);
 
@@ -274,11 +308,13 @@ router.get("/:listId", authMiddleware, getListMovies);
  *     responses:
  *       200:
  *         description: List deleted
+ *       401:
+ *         description: Unauthorized
  *       404:
- *         description: List not found
+ *         description: List not found or forbidden
+ *       500:
+ *         description: Internal server error
  */
 router.delete("/:listId", authMiddleware, deleteList);
-
-
 
 export default router;

@@ -1,3 +1,4 @@
+// server/src/routes/users.routes.js
 import { Router } from "express";
 import {
   getAllUsers,
@@ -10,33 +11,32 @@ import pool from "../db.js";
 
 const router = Router();
 
-// Public / admin utility endpoints
-
 /**
  * @swagger
  * tags:
  *   name: Users
- *   description: User management (admin/dev tools)
+ *   description: User management (admin/developer utility endpoints)
  */
 
 /**
  * @swagger
  * /users:
  *   get:
- *     summary: Get all users
+ *     summary: Get all users (admin/dev use)
  *     tags: [Users]
  *     responses:
  *       200:
- *         description: List of all users
+ *         description: Returns all users
+ *       500:
+ *         description: Server error
  */
-
 router.get("/", getAllUsers);
 
 /**
  * @swagger
  * /users/add:
  *   post:
- *     summary: Add a new user (dev/admin use)
+ *     summary: Add a new user (dev/admin only)
  *     tags: [Users]
  *     requestBody:
  *       required: true
@@ -57,11 +57,12 @@ router.get("/", getAllUsers);
  *     responses:
  *       201:
  *         description: User created
+ *       400:
+ *         description: Missing required fields
+ *       500:
+ *         description: Server error
  */
-
 router.post("/add", addUser);
-
-// Authenticated ones
 
 /**
  * @swagger
@@ -75,7 +76,7 @@ router.post("/add", addUser);
  *         required: true
  *         schema:
  *           type: string
- *           format: uuid
+ *           description: User ID
  *     requestBody:
  *       required: true
  *       content:
@@ -90,10 +91,13 @@ router.post("/add", addUser);
  *     responses:
  *       200:
  *         description: User updated
+ *       400:
+ *         description: No update fields provided
  *       404:
  *         description: User not found
+ *       500:
+ *         description: Server error
  */
-
 router.put("/update/:id", updateUser);
 
 /**
@@ -109,6 +113,8 @@ router.put("/update/:id", updateUser);
  *         description: User deleted successfully
  *       401:
  *         description: Unauthorized
+ *       404:
+ *         description: User not found
  *       500:
  *         description: Server error
  */
@@ -124,25 +130,13 @@ router.delete("/delete", authMiddleware, deleteUser);
  *       - BearerAuth: []
  *     responses:
  *       200:
- *         description: User profile data
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 id:
- *                   type: string
- *                   format: uuid
- *                 username:
- *                   type: string
- *                 credits:
- *                   type: integer
+ *         description: Current user profile
  *       401:
  *         description: Unauthorized
  *       404:
  *         description: User not found
  *       500:
- *         description: Failed to fetch user
+ *         description: Failed to fetch profile
  */
 router.get("/me", authMiddleware, async (req, res) => {
   try {
@@ -162,6 +156,4 @@ router.get("/me", authMiddleware, async (req, res) => {
   }
 });
 
-
 export default router;
-

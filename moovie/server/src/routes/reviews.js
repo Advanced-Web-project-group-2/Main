@@ -1,3 +1,4 @@
+// server/src/routes/reviews.js
 import express from "express";
 import { getReviews, addReview, likeReview, dislikeReview } from "../controllers/reviews.controller.js";
 import authMiddleware from "../middleware/auth.js";
@@ -15,7 +16,7 @@ const router = express.Router();
  * @swagger
  * /api/reviews/{reviewId}/like:
  *   post:
- *     summary: Like a review
+ *     summary: Like a review (toggle on/off)
  *     tags: [Reviews]
  *     security:
  *       - BearerAuth: []
@@ -27,7 +28,7 @@ const router = express.Router();
  *           type: integer
  *     responses:
  *       200:
- *         description: Like toggled successfully
+ *         description: Like toggled or switched from dislike → like
  *         content:
  *           application/json:
  *             schema:
@@ -36,13 +37,13 @@ const router = express.Router();
  *                 liked:
  *                   type: boolean
  *       400:
- *         description: Cannot vote on own review
+ *         description: Cannot like own review
  *       401:
  *         description: Authentication required
  *       404:
  *         description: Review not found
  *       500:
- *         description: Server error
+ *         description: Internal server error
  */
 router.post("/:reviewId/like", authMiddleware, likeReview);
 
@@ -50,7 +51,7 @@ router.post("/:reviewId/like", authMiddleware, likeReview);
  * @swagger
  * /api/reviews/{reviewId}/dislike:
  *   post:
- *     summary: Dislike a review
+ *     summary: Dislike a review (toggle on/off)
  *     tags: [Reviews]
  *     security:
  *       - BearerAuth: []
@@ -62,7 +63,7 @@ router.post("/:reviewId/like", authMiddleware, likeReview);
  *           type: integer
  *     responses:
  *       200:
- *         description: Dislike toggled successfully
+ *         description: Dislike toggled or switched from like → dislike
  *         content:
  *           application/json:
  *             schema:
@@ -71,13 +72,13 @@ router.post("/:reviewId/like", authMiddleware, likeReview);
  *                 disliked:
  *                   type: boolean
  *       400:
- *         description: Cannot vote on own review
+ *         description: Cannot dislike own review
  *       401:
  *         description: Authentication required
  *       404:
  *         description: Review not found
  *       500:
- *         description: Server error
+ *         description: Internal server error
  */
 router.post("/:reviewId/dislike", authMiddleware, dislikeReview);
 
@@ -85,7 +86,7 @@ router.post("/:reviewId/dislike", authMiddleware, dislikeReview);
  * @swagger
  * /api/reviews/{movieId}:
  *   get:
- *     summary: Get reviews for a movie
+ *     summary: Get all reviews & average rating for a movie
  *     tags: [Reviews]
  *     parameters:
  *       - in: path
@@ -95,7 +96,7 @@ router.post("/:reviewId/dislike", authMiddleware, dislikeReview);
  *           type: integer
  *     responses:
  *       200:
- *         description: List of reviews and average rating
+ *         description: Reviews returned (empty if none)
  *         content:
  *           application/json:
  *             schema:
@@ -106,27 +107,20 @@ router.post("/:reviewId/dislike", authMiddleware, dislikeReview);
  *                   items:
  *                     type: object
  *                     properties:
- *                       id:
- *                         type: integer
- *                       user_id:
- *                         type: integer
- *                       username:
- *                         type: string
- *                       content:
- *                         type: string
- *                       rating:
- *                         type: number
- *                       likes:
- *                         type: integer
- *                       dislikes:
- *                         type: integer
+ *                       id: { type: integer }
+ *                       user_id: { type: integer }
+ *                       username: { type: string }
+ *                       content: { type: string }
+ *                       rating: { type: number }
+ *                       likes: { type: integer }
+ *                       dislikes: { type: integer }
  *                       created_at:
  *                         type: string
  *                         format: date-time
  *                 avgRating:
  *                   type: number
  *       500:
- *         description: Server error
+ *         description: Internal server error
  */
 router.get("/:movieId", getReviews);
 
@@ -134,7 +128,7 @@ router.get("/:movieId", getReviews);
  * @swagger
  * /api/reviews:
  *   post:
- *     summary: Submit a review for a movie
+ *     summary: Submit a movie review (one per user per movie)
  *     tags: [Reviews]
  *     security:
  *       - BearerAuth: []
@@ -150,23 +144,21 @@ router.get("/:movieId", getReviews);
  *                 type: integer
  *               movie_name:
  *                 type: string
- *                 example: "Inception"
  *               content:
  *                 type: string
- *                 example: "Amazing movie with mind-bending visuals!"
  *               rating:
  *                 type: number
  *                 minimum: 1
  *                 maximum: 10
  *     responses:
  *       201:
- *         description: Review created
+ *         description: Review created and credits awarded
  *       400:
- *         description: Validation error or already reviewed
+ *         description: Missing fields OR already reviewed
  *       401:
  *         description: Authentication required
  *       500:
- *         description: Server error
+ *         description: Internal server error
  */
 router.post("/", authMiddleware, addReview);
 

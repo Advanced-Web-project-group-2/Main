@@ -15,7 +15,7 @@ const router = express.Router();
  * @swagger
  * tags:
  *   name: Auth
- *   description: Authentication endpoints
+ *   description: Authentication & user account endpoints
  */
 
 /**
@@ -32,19 +32,26 @@ const router = express.Router();
  *             type: object
  *             required:
  *               - username
+ *               - email
  *               - password
  *             properties:
  *               username:
  *                 type: string
+ *               email:
+ *                 type: string
+ *                 format: email
  *               password:
  *                 type: string
+ *                 description: Must contain uppercase, lowercase & number. Minimum 8 chars.
  *     responses:
  *       201:
- *         description: User created
+ *         description: User created successfully
  *       400:
- *         description: Missing username or password
- *       409:
- *         description: Username already exists
+ *         description: Missing or invalid fields / username or email already used
+ *       403:
+ *         description: Password does not meet requirements
+ *       500:
+ *         description: Internal server error
  */
 router.post("/register", register);
 
@@ -61,32 +68,21 @@ router.post("/register", register);
  *           schema:
  *             type: object
  *             required:
- *               - username
+ *               - email
  *               - password
  *             properties:
- *               username:
+ *               email:
  *                 type: string
+ *                 format: email
  *               password:
  *                 type: string
  *     responses:
  *       200:
  *         description: Login successful
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 token:
- *                   type: string
- *                 user:
- *                   type: object
- *                   properties:
- *                     id:
- *                       type: string
- *                     username:
- *                       type: string
- *       401:
- *         description: Invalid username or password
+ *       400:
+ *         description: Invalid email or password / missing fields
+ *       500:
+ *         description: Internal server error
  */
 router.post("/login", login);
 
@@ -102,7 +98,7 @@ router.post("/login", login);
  *       200:
  *         description: Access granted
  *       401:
- *         description: Missing or invalid token
+ *         description: Unauthorized or missing token
  */
 router.get("/protected", authMiddleware, (req, res) => {
   res.json({ message: "You are authenticated!", user: req.user });
@@ -112,7 +108,7 @@ router.get("/protected", authMiddleware, (req, res) => {
  * @swagger
  * /auth/change-password:
  *   put:
- *     summary: Change user password
+ *     summary: Change current user's password
  *     tags: [Auth]
  *     security:
  *       - BearerAuth: []
@@ -132,34 +128,59 @@ router.get("/protected", authMiddleware, (req, res) => {
  *                 type: string
  *     responses:
  *       200:
- *         description: Password updated
+ *         description: Password updated successfully
+ *       400:
+ *         description: Missing fields
  *       401:
- *         description: Old password incorrect or unauthorized
+ *         description: Incorrect old password / unauthorized
+ *       403:
+ *         description: New password does not meet requirements
  *       404:
  *         description: User not found
+ *       500:
+ *         description: Internal server error
  */
 router.put("/change-password", authMiddleware, changePassword);
 
+/**
+ * @swagger
+ * /auth/delete:
+ *   delete:
+ *     summary: Delete the authenticated user's account
+ *     tags: [Auth]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - password
+ *             properties:
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Account deleted successfully
+ *       400:
+ *         description: Missing password
+ *       401:
+ *         description: Incorrect password
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Internal server error
+ */
+router.delete("/delete", authMiddleware, deleteAccount);
 
 /**
-@swagger
-/auth/delete:
-delete:
-summary: Delete authenticated user's account
-tags: [Auth]
-security:
-BearerAuth: []
-responses:
-200:
-description: Account deleted successfully
-401:
-description: Unauthorized
-404:
-description: User not found
-500:
-description: Server error
-*/
-router.delete("/delete", authMiddleware, deleteAccount);
+ * @swagger
+ * tags:
+ *   name: Users
+ *   description: User credit operations
+ */
 
 /**
  * @swagger
@@ -173,13 +194,14 @@ router.delete("/delete", authMiddleware, deleteAccount);
  *         required: true
  *         schema:
  *           type: string
- *           format: uuid
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - amount
  *             properties:
  *               amount:
  *                 type: number
@@ -188,11 +210,12 @@ router.delete("/delete", authMiddleware, deleteAccount);
  *       200:
  *         description: Credits updated successfully
  *       400:
- *         description: Amount missing or invalid
+ *         description: Invalid or missing amount
  *       404:
  *         description: User not found
+ *       500:
+ *         description: Internal server error
  */
-
 router.put("/add-credits/:userId", addCredits);
 
 export default router;
